@@ -48,3 +48,29 @@
     opacity: 1; // Le bouton apparaît au survol
   }
 }
+
+.month-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+
+  button {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    background: #f8f8f8;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.9rem;
+
+    &.active {
+      background: #dcdcdc;
+      font-weight: bold;
+    }
+  }
+}
+
+.no-data {
+  text-align: center;
+  font-style: italic;
+  margin-top: 20px;
+}
