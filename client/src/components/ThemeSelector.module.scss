@@ -1,0 +1,65 @@
+.wrapper {
+  position: relative;
+  display: flex;
+  gap: 8px;
+
+  input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 180px;
+    cursor: pointer;
+    background: #fff;
+  }
+}
+
+.menu {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  display: flex;
+  border: 1px solid #ccc;
+  background: #fff;
+  z-index: 100;
+}
+
+.mainMenu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 200px;
+  border-right: 1px solid #ccc;
+
+  .menuItem {
+    position: relative;
+    padding: 8px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+
+    &:hover {
+      background: #f5f5f5;
+    }
+
+    .subMenu {
+      position: absolute;
+      top: 0;
+      left: 100%;
+      width: 250px;
+      background: #fff;
+      border: 1px solid #ccc;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      .subMenuItem {
+        padding: 8px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+
+        &:hover {
+          background: #e6e6e6;
+        }
+      }
+    }
+  }
+}

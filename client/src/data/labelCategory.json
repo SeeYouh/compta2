@@ -1,0 +1,95 @@
+{
+  "Autres": [
+    "Inclassables",
+    "Cadeaux",
+    "Frais exceptionnels",
+    "Petits travaux"
+  ],
+  "Banques": [
+    "Agios",
+    "Commissions",
+    "Cotisation bancaire",
+    "Crédit",
+    "Frais bancaires",
+    "Retrait"
+  ],
+  "Course en Ligne": [
+    "Animalerie en ligne",
+    "Auto / Moto en ligne",
+    "Autres en ligne",
+    "Bricolage en ligne",
+    "Courant en ligne",
+    "Fournitures / Bureau / Scolaire en ligne",
+    "Jardin en ligne",
+    "Loisirs en ligne",
+    "Maison / Déco en ligne",
+    "Textile / Habillement en ligne",
+    "Vélo en ligne",
+    "Électronique / Informatique en ligne"
+  ],
+  "Course en Magasin": [
+    "Animalerie",
+    "Auto / Moto",
+    "Autres",
+    "Bricolage",
+    "Courant",
+    "Fournitures / Bureau / Scolaire",
+    "Jardin",
+    "Loisirs",
+    "Maison / Déco",
+    "Textile / Habillement",
+    "Vélo",
+    "Électronique / Informatique"
+  ],
+  "Épargne": ["Assurance-vie / PEA", "Livret", "Placement / Investissement"],
+  "Famille": [
+    "Aide familiale",
+    "Cadeaux famille",
+    "Compte joint (Boursorama)",
+    "Frais enfants",
+    "Pension alimentaire",
+    "Proche"
+  ],
+  "Habitat": [
+    "Assurance habitation",
+    "Crédit immobilier / Loyer",
+    "Eau",
+    "Internet / Téléphonie",
+    "Taxes logement",
+    "Électricité / Gaz"
+  ],
+  "Loisirs": ["Salle de sport", "Spotify"],
+  "Restauration": [
+    "Boulangerie / Viennoiserie",
+    "Fast-food / Snack",
+    "Restaurant"
+  ],
+  "Revenus": [
+    "Aides sociales",
+    "Dons",
+    "Pensions / Rentes",
+    "Remboursements",
+    "Revenus complémentaires",
+    "Salaire"
+  ],
+  "Santé": [
+    "Consultations médicales",
+    "Mutuelle",
+    "Optique / Dentaire",
+    "Pharmacie",
+    "Psychologie"
+  ],
+  "Soins personnels": [
+    "Coiffeur / Esthétique",
+    "Parfumerie / Cosmétique",
+    "Vêtements / Chaussures"
+  ],
+  "Transport": [
+    "Achat / Crédit véhicule",
+    "Assurance auto",
+    "Carburant",
+    "Entretien / Réparations",
+    "Péages / Parking",
+    "Transports en commun"
+  ]
+}
