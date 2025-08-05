@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import styles from "./AmountInput.module.scss";
+import styles from "../sass/components/AmountInput.module.scss";
 
 const AmountInput = ({ onChange }) => {
   const [amount, setAmount] = useState("");

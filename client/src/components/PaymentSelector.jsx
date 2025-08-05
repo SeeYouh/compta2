@@ -1,11 +1,56 @@
-import React, { useState } from "react";
+// import React, { useState } from "react";
 
-import payments from "../data/labelPayments.json"; // tableau simple ["CB", "Virement", etc.]
-import styles from "./PaymentSelector.module.scss";
+// import payments from "../data/labelPayments.json";
+// import styles from "../sass/components/PaymentSelector.module.scss";
+
+// const PaymentSelector = ({ onChange }) => {
+//   const [selectedPayment, setSelectedPayment] = useState("");
+//   const [menuOpen, setMenuOpen] = useState(false);
+
+//   const handleSelectPayment = (payment) => {
+//     setSelectedPayment(payment);
+//     setMenuOpen(false);
+//     if (onChange) onChange(payment);
+//   };
+
+//   return (
+//     <div className={styles.wrapper}>
+//       <input
+//         type="text"
+//         value={selectedPayment}
+//         placeholder="Moyen de paiement"
+//         readOnly
+//         onClick={() => setMenuOpen((prev) => !prev)}
+//       />
+
+//       {menuOpen && (
+//         <ul className={styles.menu}>
+//           {payments.map((payment) => (
+//             <li
+//               key={payment}
+//               className={styles.menuItem}
+//               onClick={() => handleSelectPayment(payment)}
+//             >
+//               {payment}
+//             </li>
+//           ))}
+//         </ul>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default PaymentSelector;
+
+import React, { useEffect, useRef, useState } from "react";
+
+import payments from "../data/labelPayments.json";
+import styles from "../sass/components/PaymentSelector.module.scss";
 
 const PaymentSelector = ({ onChange }) => {
   const [selectedPayment, setSelectedPayment] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const wrapperRef = useRef(null); // Référence sur le conteneur
 
   const handleSelectPayment = (payment) => {
     setSelectedPayment(payment);
@@ -13,8 +58,22 @@ const PaymentSelector = ({ onChange }) => {
     if (onChange) onChange(payment);
   };
 
+  // Gestion clic extérieur
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className={styles.wrapper}>
+    <div className={styles.wrapper} ref={wrapperRef}>
       <input
         type="text"
         value={selectedPayment}
