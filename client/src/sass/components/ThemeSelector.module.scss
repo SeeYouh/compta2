@@ -2,14 +2,19 @@
   position: relative;
   display: flex;
   gap: 8px;
+}
 
-  input {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 180px;
-    cursor: pointer;
-    background: #fff;
+.selector {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 180px;
+  background: #fff;
+  cursor: pointer;
+  user-select: none;
+
+  &.subThemeDisplay {
+    cursor: default;
   }
 }
 

@@ -1,6 +1,6 @@
 .table-grid {
   display: grid;
-  grid-template-columns: 8vw 15vw 10vw 35vw 9vw 9vw 9vw 5vw;
+  grid-template-columns: 8vw 20vw 10vw 30vw 9vw 9vw 9vw 5vw;
   border: 1px solid #ccc;
   margin-top: 20px;
 
@@ -17,7 +17,7 @@
 
   .table-row {
     display: contents;
-    position: relative;
+
     .table-cell {
       padding: 8px;
       border-bottom: 1px solid #eee;
@@ -45,7 +45,7 @@
   }
 
   &:hover .actions {
-    opacity: 1; // Le bouton apparaît au survol
+    opacity: 1;
   }
 }
 
@@ -54,7 +54,7 @@
   gap: 8px;
   margin-bottom: 16px;
 
-  button {
+  .month-tabs_btn {
     padding: 6px 12px;
     border: 1px solid #ccc;
     background: #f8f8f8;
@@ -62,9 +62,12 @@
     border-radius: 4px;
     font-size: 0.9rem;
 
+    &:hover {
+      background: #dcdcdc;
+    }
+
     &.active {
       background: #dcdcdc;
-      font-weight: bold;
     }
   }
 }
@@ -73,4 +76,9 @@
   text-align: center;
   font-style: italic;
   margin-top: 20px;
+}
+
+.form-container {
+  display: flex;
+  align-items: center;
 }

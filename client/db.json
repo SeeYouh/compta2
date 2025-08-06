@@ -387,6 +387,26 @@
       "designation": "Maurin distrib Balzac",
       "recette": "",
       "depense": "5.80"
+    },
+    {
+      "id": "6c40",
+      "date": "05/08/2025",
+      "theme": "Restauration",
+      "subTheme": "",
+      "payment": "Carte",
+      "designation": "Maurin distrib Balzac",
+      "recette": "",
+      "depense": "5.50"
+    },
+    {
+      "id": "6fa7",
+      "date": "05/08/2025",
+      "theme": "Loisirs",
+      "subTheme": "",
+      "payment": "Virement",
+      "designation": "Elancia",
+      "recette": "",
+      "depense": "44.90"
     }
   ]
 }

@@ -47,6 +47,7 @@ function App() {
   const [formData, setFormData] = useState({
     date: "",
     theme: "",
+    subTheme: "",
     payment: "",
     designation: "",
     amount: "",
@@ -101,6 +102,7 @@ function App() {
     const newTransaction = {
       date: formattedDate,
       theme: formData.theme,
+      subTheme: formData.subTheme,
       payment: formData.payment,
       designation: formData.designation,
       recette: formData.bankMovement === "recette" ? formData.amount : "",
@@ -117,6 +119,7 @@ function App() {
       setFormData({
         date: "",
         theme: "",
+        subTheme: "",
         payment: "",
         designation: "",
         amount: "",
@@ -190,20 +193,22 @@ function MonthTabs({ months, selectedMonth, onSelect }) {
   return (
     <div className="month-tabs">
       {months.map((month, index) => (
-        <button
+        <div
           key={index}
-          className={selectedMonth === index ? "active" : ""}
+          className={`month-tabs_btn ${
+            selectedMonth === index ? "active" : ""
+          }`}
           onClick={() => onSelect(index)}
         >
           {month}
-        </button>
+        </div>
       ))}
-      <button
-        className={selectedMonth === null ? "active" : ""}
+      <div
+        className={`month-tabs_btn ${selectedMonth === null ? "active" : ""}`}
         onClick={() => onSelect(null)}
       >
         Tous
-      </button>
+      </div>
     </div>
   );
 }
@@ -211,7 +216,7 @@ function MonthTabs({ months, selectedMonth, onSelect }) {
 // Composant formulaire
 function TransactionForm({ formData, errors, onChange, onSubmit }) {
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={onSubmit} className="form-container">
       <input
         type="date"
         name="actionDate"
@@ -305,7 +310,9 @@ function TransactionsTable({
             onMouseLeave={() => onHover(null)}
           >
             <div className="table-cell">{t.date}</div>
-            <div className="table-cell">{t.theme}</div>
+            <div className="table-cell">
+              {t.theme} : {t.subTheme}
+            </div>
             <div className="table-cell">{t.payment}</div>
             <div className="table-cell">{t.designation}</div>
             <div className="table-cell">
