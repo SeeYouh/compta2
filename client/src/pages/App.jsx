@@ -1,166 +1,206 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+// import { useCallback, useEffect, useMemo, useState } from "react";
 
-import AmountInput from "../components/AmountInput";
+// import BalanceCalculator from "../components/BalanceCalculator";
+// import {
+//   createTransaction,
+//   deleteTransaction,
+//   getTransactions,
+// } from "../components/utils/transactionsApi";
+// import { FIELD_RULES, MONTHS, TABLE_HEADERS } from "../components/utils/index";
+// import MonthTabs from "../components/MonthTabs";
+// import { parseFRDate } from "../components/utils/date";
+// import TransactionForm from "../components/TransactionForm";
+// import TransactionsTable from "../components/TransactionsTable";
+
+// const App = () => {
+//   const [transactions, setTransactions] = useState([]);
+//   const [errors, setErrors] = useState({});
+//   const [hoveredRow, setHoveredRow] = useState(null);
+//   const [selectedMonth, setSelectedMonth] = useState(null);
+//   const [formData, setFormData] = useState({
+//     date: "",
+//     theme: "",
+//     subTheme: "",
+//     payment: "",
+//     designation: "",
+//     amount: "",
+//     bankMovement: "",
+//   });
+
+//   const fetchTransactions = useCallback(async () => {
+//     try {
+//       const data = await getTransactions();
+//       setTransactions(data);
+//     } catch (err) {
+//       console.error("Erreur chargement transactions :", err);
+//     }
+//   }, []);
+
+//   useEffect(() => {
+//     fetchTransactions();
+//   }, [fetchTransactions]);
+
+//   const handleChange = (name, value) => {
+//     setFormData((prev) => ({ ...prev, [name]: value }));
+//   };
+
+//   const validateForm = () => {
+//     return FIELD_RULES.reduce((errors, rule) => {
+//       const isInvalid =
+//         typeof rule.validate === "function"
+//           ? rule.validate(formData)
+//           : !formData[rule.field];
+
+//       if (isInvalid) errors[rule.field] = rule.message;
+//       return errors;
+//     }, {});
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     const newErrors = validateForm();
+//     if (Object.keys(newErrors).length > 0) {
+//       setErrors(newErrors);
+//       return;
+//     }
+
+//     const [year, month, day] = formData.date.split("-");
+//     const formattedDate = `${day}/${month}/${year}`;
+
+//     const payload = {
+//       date: formattedDate,
+//       theme: formData.theme,
+//       subTheme: formData.subTheme,
+//       payment: formData.payment,
+//       designation: formData.designation,
+//       recette: formData.bankMovement === "recette" ? formData.amount : "",
+//       depense: formData.bankMovement === "depense" ? formData.amount : "",
+//     };
+
+//     try {
+//       await createTransaction(payload);
+//       await fetchTransactions();
+//       setFormData({
+//         date: "",
+//         theme: "",
+//         subTheme: "",
+//         payment: "",
+//         designation: "",
+//         amount: "",
+//         bankMovement: "",
+//       });
+//       setErrors({});
+//     } catch (err) {
+//       console.error("Erreur ajout transaction :", err);
+//     }
+//   };
+
+//   const handleDelete = async (id) => {
+//     try {
+//       await deleteTransaction(id);
+//       await fetchTransactions();
+//     } catch (err) {
+//       console.error("Erreur suppression :", err);
+//     }
+//   };
+
+//   const transactionsSorted = useMemo(() => {
+//     return [...transactions].sort(
+//       (a, b) => parseFRDate(a.date) - parseFRDate(b.date)
+//     );
+//   }, [transactions]);
+
+//   const transactionsWithBalance = BalanceCalculator({
+//     transactions: transactionsSorted,
+//   });
+
+//   const filteredTransactions = useMemo(() => {
+//     if (selectedMonth === null) return transactionsWithBalance;
+//     return transactionsWithBalance.filter(
+//       (t) => parseFRDate(t.date).getMonth() === selectedMonth
+//     );
+//   }, [transactionsWithBalance, selectedMonth]);
+
+//   return (
+//     <>
+//       <MonthTabs
+//         months={MONTHS}
+//         selectedMonth={selectedMonth}
+//         onSelect={setSelectedMonth}
+//       />
+
+//       <TransactionForm
+//         formData={formData}
+//         errors={errors}
+//         onChange={handleChange}
+//         onSubmit={handleSubmit}
+//       />
+
+//       <TransactionsTable
+//         transactions={filteredTransactions}
+//         headers={TABLE_HEADERS}
+//         hoveredRow={hoveredRow}
+//         onHover={setHoveredRow}
+//         onDelete={handleDelete}
+//       />
+//     </>
+//   );
+// };
+
+// export default App;
+
+import { useCallback, useMemo, useState } from "react";
+
 import BalanceCalculator from "../components/BalanceCalculator";
-import FormatCurrency from "../components/utils/FormatCurrency";
-import PaymentSelector from "../components/PaymentSelector";
-import ThemeSelector from "../components/ThemeSelector";
+import {
+  filterByMonth,
+  sortByFRDate,
+} from "../components/utils/transactionsDerivers";
+import { MONTHS, TABLE_HEADERS } from "../components/utils";
+import MonthTabs from "../components/MonthTabs";
+import TransactionForm from "../components/TransactionForm";
+import TransactionsTable from "../components/TransactionsTable";
+import { useTransactionForm } from "../components/hooks/useTransactionForm";
+import { useTransactions } from "../components/hooks/useTransactions";
 
-const MONTHS = [
-  "Janvier",
-  "Février",
-  "Mars",
-  "Avril",
-  "Mai",
-  "Juin",
-  "Juillet",
-  "Août",
-  "Septembre",
-  "Octobre",
-  "Novembre",
-  "Décembre",
-];
+const App = () => {
+  const { transactions, add, remove } = useTransactions();
+  const { formData, errors, handleChange, validate, reset, toPayload } =
+    useTransactionForm();
 
-const TABLE_HEADERS = [
-  "Dates",
-  "Thèmes",
-  "Moyens de paiement",
-  "Désignations",
-  "Recettes",
-  "Dépenses",
-  "Soldes",
-  "Actions",
-];
-
-// Parse une date FR JJ/MM/AAAA en objet Date
-const parseFRDate = (dateStr) => {
-  if (!dateStr) return null;
-  const [day, month, year] = dateStr.split("/").map(Number);
-  return new Date(year, month - 1, day);
-};
-
-function App() {
-  const [transactions, setTransactions] = useState([]);
-  const [errors, setErrors] = useState({});
-  const [hoveredRow, setHoveredRow] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
-  const [formData, setFormData] = useState({
-    date: "",
-    theme: "",
-    subTheme: "",
-    payment: "",
-    designation: "",
-    amount: "",
-    bankMovement: "",
-  });
+  const [hoveredRow, setHoveredRow] = useState(null);
 
-  // Centralisation du fetch
-  const fetchTransactions = useCallback(async () => {
-    try {
-      const res = await fetch("http://localhost:3001/transactions");
-      const data = await res.json();
-      setTransactions(data);
-    } catch (err) {
-      console.error("Erreur chargement transactions :", err);
-    }
-  }, []);
+  const onSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      const newErrors = validate();
+      if (Object.keys(newErrors).length) return;
+      await add(toPayload());
+      reset();
+    },
+    [add, toPayload, reset, validate]
+  );
 
-  useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
+  const onDelete = useCallback(
+    async (id) => {
+      await remove(id);
+    },
+    [remove]
+  );
 
-  const handleChange = (name, value) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.date) newErrors.date = "La date est obligatoire.";
-    if (!formData.theme) newErrors.theme = "Le thème est obligatoire.";
-    if (!formData.payment)
-      newErrors.payment = "Le moyen de paiement est obligatoire.";
-    if (!formData.designation)
-      newErrors.designation = "La désignation est obligatoire.";
-    if (!formData.amount || !formData.bankMovement)
-      newErrors.amount =
-        "Le montant et le type (recette ou dépense) sont obligatoires.";
-    return newErrors;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const newErrors = validateForm();
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    // On récupère la date depuis l'input type date et on la convertit en format FR (JJ/MM/AAAA)
-    const [year, month, day] = formData.date.split("-");
-    const formattedDate = `${day}/${month}/${year}`;
-
-    const newTransaction = {
-      date: formattedDate,
-      theme: formData.theme,
-      subTheme: formData.subTheme,
-      payment: formData.payment,
-      designation: formData.designation,
-      recette: formData.bankMovement === "recette" ? formData.amount : "",
-      depense: formData.bankMovement === "depense" ? formData.amount : "",
-    };
-
-    try {
-      await fetch("http://localhost:3001/transactions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newTransaction),
-      });
-      await fetchTransactions();
-      setFormData({
-        date: "",
-        theme: "",
-        subTheme: "",
-        payment: "",
-        designation: "",
-        amount: "",
-        bankMovement: "",
-      });
-      setErrors({});
-    } catch (err) {
-      console.error("Erreur ajout transaction :", err);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await fetch(`http://localhost:3001/transactions/${id}`, {
-        method: "DELETE",
-      });
-      await fetchTransactions();
-    } catch (err) {
-      console.error("Erreur suppression :", err);
-    }
-  };
-
-  // Tri des transactions par date FR
-  const transactionsSorted = useMemo(() => {
-    return [...transactions].sort(
-      (a, b) => parseFRDate(a.date) - parseFRDate(b.date)
-    );
-  }, [transactions]);
-
-  // Calcul des soldes
-  const transactionsWithBalance = BalanceCalculator({
-    transactions: transactionsSorted,
-  });
-
-  // Filtrage par mois FR
-  const filteredTransactions = useMemo(() => {
-    if (selectedMonth === null) return transactionsWithBalance;
-    return transactionsWithBalance.filter(
-      (t) => parseFRDate(t.date).getMonth() === selectedMonth
-    );
-  }, [transactionsWithBalance, selectedMonth]);
+  const transactionsSorted = useMemo(
+    () => sortByFRDate(transactions),
+    [transactions]
+  );
+  const transactionsWithBalance = useMemo(
+    () => BalanceCalculator({ transactions: transactionsSorted }),
+    [transactionsSorted]
+  );
+  const filteredTransactions = useMemo(
+    () => filterByMonth(transactionsWithBalance, selectedMonth),
+    [transactionsWithBalance, selectedMonth]
+  );
 
   return (
     <>
@@ -174,7 +214,7 @@ function App() {
         formData={formData}
         errors={errors}
         onChange={handleChange}
-        onSubmit={handleSubmit}
+        onSubmit={onSubmit}
       />
 
       <TransactionsTable
@@ -182,156 +222,10 @@ function App() {
         headers={TABLE_HEADERS}
         hoveredRow={hoveredRow}
         onHover={setHoveredRow}
-        onDelete={handleDelete}
+        onDelete={onDelete}
       />
     </>
   );
-}
-
-// Composant des onglets mois
-function MonthTabs({ months, selectedMonth, onSelect }) {
-  return (
-    <div className="month-tabs">
-      {months.map((month, index) => (
-        <div
-          key={index}
-          className={`month-tabs_btn ${
-            selectedMonth === index ? "active" : ""
-          }`}
-          onClick={() => onSelect(index)}
-        >
-          {month}
-        </div>
-      ))}
-      <div
-        className={`month-tabs_btn ${selectedMonth === null ? "active" : ""}`}
-        onClick={() => onSelect(null)}
-      >
-        Tous
-      </div>
-    </div>
-  );
-}
-
-// Composant formulaire
-function TransactionForm({ formData, errors, onChange, onSubmit }) {
-  return (
-    <form onSubmit={onSubmit} className="form-container">
-      <input
-        type="date"
-        name="actionDate"
-        value={formData.date}
-        onChange={(e) => onChange("date", e.target.value)}
-      />
-      {errors.date && <p className="error">{errors.date}</p>}
-
-      <ThemeSelector onChange={({ theme }) => onChange("theme", theme)} />
-      {errors.theme && <p className="error">{errors.theme}</p>}
-
-      <PaymentSelector onChange={(payment) => onChange("payment", payment)} />
-      {errors.payment && <p className="error">{errors.payment}</p>}
-
-      <input
-        type="text"
-        name="designation"
-        placeholder="Désignation"
-        value={formData.designation}
-        onChange={(e) => onChange("designation", e.target.value)}
-      />
-      {errors.designation && <p className="error">{errors.designation}</p>}
-
-      <AmountInput onChange={(val) => onChange("amount", val)} />
-      <ul>
-        <li>
-          <input
-            type="radio"
-            name="bankMovement"
-            id="bankIncomeMovement"
-            value="recette"
-            checked={formData.bankMovement === "recette"}
-            onChange={(e) => onChange("bankMovement", e.target.value)}
-          />
-          <label htmlFor="bankIncomeMovement"> Recette </label>
-        </li>
-        <li>
-          <input
-            type="radio"
-            name="bankMovement"
-            id="bankExpenseMovement"
-            value="depense"
-            checked={formData.bankMovement === "depense"}
-            onChange={(e) => onChange("bankMovement", e.target.value)}
-          />
-          <label htmlFor="bankExpenseMovement"> Dépense </label>
-        </li>
-      </ul>
-      {errors.amount && <p className="error">{errors.amount}</p>}
-
-      <button type="submit">Ajouter</button>
-    </form>
-  );
-}
-
-function TransactionsTable({
-  transactions,
-  headers,
-  hoveredRow,
-  onHover,
-  onDelete,
-}) {
-  return (
-    <div className="table-grid">
-      <div className="table-header">
-        {headers.map((item, index) => (
-          <div key={index} className="table-cell header">
-            {item}
-          </div>
-        ))}
-      </div>
-
-      {transactions.length === 0 ? (
-        <div className="table-row no-data">
-          <div
-            className="table-cell"
-            style={{
-              gridColumn: `1 / span ${headers.length}`,
-              textAlign: "center",
-            }}
-          >
-            Aucune action bancaire pour ce mois.
-          </div>
-        </div>
-      ) : (
-        transactions.map((t) => (
-          <div
-            key={t.id}
-            className="table-row"
-            onMouseEnter={() => onHover(t.id)}
-            onMouseLeave={() => onHover(null)}
-          >
-            <div className="table-cell">{t.date}</div>
-            <div className="table-cell">
-              {t.theme} : {t.subTheme}
-            </div>
-            <div className="table-cell">{t.payment}</div>
-            <div className="table-cell">{t.designation}</div>
-            <div className="table-cell">
-              {t.recette ? FormatCurrency(t.recette) : ""}
-            </div>
-            <div className="table-cell">
-              {t.depense ? FormatCurrency(t.depense) : ""}
-            </div>
-            <div className="table-cell">{FormatCurrency(t.solde)}</div>
-            <div className="table-cell actions">
-              {hoveredRow === t.id && (
-                <button onClick={() => onDelete(t.id)}>✖</button>
-              )}
-            </div>
-          </div>
-        ))
-      )}
-    </div>
-  );
-}
+};
 
 export default App;

@@ -31,17 +31,9 @@
   }
 
   .actions {
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    text-align: center;
-
-    button {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      font-size: 1rem;
-      color: red;
-    }
+    cursor: pointer;
+    font-size: 1rem;
+    color: red;
   }
 
   &:hover .actions {

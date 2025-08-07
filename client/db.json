@@ -371,24 +371,6 @@
       "depense": 19.9
     },
     {
-      "id": "915a",
-      "date": "01/08/2025",
-      "theme": "Restauration",
-      "payment": "Carte",
-      "designation": "Maurin distrib Balzac",
-      "recette": "",
-      "depense": "1.50"
-    },
-    {
-      "id": "2766",
-      "date": "04/08/2025",
-      "theme": "Restauration",
-      "payment": "Carte",
-      "designation": "Maurin distrib Balzac",
-      "recette": "",
-      "depense": "5.80"
-    },
-    {
       "id": "6c40",
       "date": "05/08/2025",
       "theme": "Restauration",
@@ -407,6 +389,36 @@
       "designation": "Elancia",
       "recette": "",
       "depense": "44.90"
+    },
+    {
+      "id": "0acf",
+      "date": "07/08/2025",
+      "theme": "Revenus",
+      "subTheme": "",
+      "payment": "Virement",
+      "designation": "Morgan Intérim",
+      "recette": "1170.69",
+      "depense": ""
+    },
+    {
+      "id": "356d",
+      "date": "01/08/2025",
+      "theme": "Restauration",
+      "subTheme": "Fast-food / Snack",
+      "payment": "Carte",
+      "designation": "Distributeur Packetis",
+      "recette": "",
+      "depense": "1.50"
+    },
+    {
+      "id": "79f2",
+      "date": "04/08/2025",
+      "theme": "Restauration",
+      "subTheme": "Fast-food / Snack",
+      "payment": "Carte",
+      "designation": "Distributeur Packetis",
+      "recette": "",
+      "depense": "5.80"
     }
   ]
 }

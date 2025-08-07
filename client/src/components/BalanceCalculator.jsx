@@ -1,21 +1,19 @@
 const BalanceCalculator = ({ transactions }) => {
-  let runningBalance = 0;
+  return transactions.reduce((acc, t) => {
+    const prev = acc.length ? acc[acc.length - 1].solde : 0;
 
-  const transactionsWithBalance = transactions.map((t) => {
-    // Ajoute ou soustrait selon recette/dépense
-    if (t.recette) {
-      runningBalance += parseFloat(t.recette);
-    } else if (t.depense) {
-      runningBalance -= parseFloat(t.depense);
-    }
+    const credit = Number.parseFloat(t.recette);
+    const debit = Number.parseFloat(t.depense);
 
-    return {
-      ...t,
-      solde: runningBalance.toFixed(2) + "€",
-    };
-  });
+    const delta =
+      (Number.isFinite(credit) ? credit : 0) -
+      (Number.isFinite(debit) ? debit : 0);
 
-  return transactionsWithBalance;
+    const solde = prev + delta;
+
+    acc.push({ ...t, solde }); // solde NUMÉRIQUE ici
+    return acc;
+  }, []);
 };
 
 export default BalanceCalculator;

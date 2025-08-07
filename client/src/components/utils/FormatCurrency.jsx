@@ -1,20 +1,15 @@
 const FormatCurrency = (value) => {
   if (value === "" || value === null) return "";
 
-  const number = parseFloat(value);
+  const number = Number(value);
+  if (Number.isNaN(number)) return "";
 
-  // Séparateur de milliers uniquement si >= 1000
-  if (Math.abs(number) >= 1000) {
-    return (
-      number.toLocaleString("fr-FR", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }) + "€"
-    );
-  }
-
-  // Si < 1000 → pas de séparateur mais 2 décimales
-  return number.toFixed(2) + "€";
+  return new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(number);
 };
 
 export default FormatCurrency;
