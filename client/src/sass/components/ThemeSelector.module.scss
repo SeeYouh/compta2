@@ -31,6 +31,7 @@
 
 .mainMenu {
   list-style: none;
+  flex-direction: column;
   margin: 0;
   padding: 0;
   width: 200px;
@@ -49,6 +50,7 @@
     .subMenu {
       position: absolute;
       top: 0;
+      flex-direction: column;
       left: 100%;
       width: 250px;
       background: var(--color-surface);
