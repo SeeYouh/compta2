@@ -419,6 +419,36 @@
       "designation": "Distributeur Packetis",
       "recette": "",
       "depense": "5.80"
+    },
+    {
+      "id": "f947",
+      "date": "08/08/2025",
+      "theme": "Revenus",
+      "subTheme": "Salaire",
+      "payment": "Virement",
+      "designation": "Samsic Intérim",
+      "recette": 834.96,
+      "depense": null
+    },
+    {
+      "id": "e8b1",
+      "date": "08/08/2025",
+      "theme": "Restauration",
+      "subTheme": "Fast-food / Snack",
+      "payment": "Carte",
+      "designation": "Pizza 335",
+      "recette": "",
+      "depense": "37.80"
+    },
+    {
+      "id": "99a2",
+      "date": "07/08/2025",
+      "theme": "Famille",
+      "subTheme": "Compte joint (Boursorama)",
+      "payment": "Virement",
+      "designation": "Virement mensuel",
+      "recette": "",
+      "depense": "500.00"
     }
   ]
 }

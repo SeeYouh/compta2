@@ -3,15 +3,20 @@ import React, { useEffect, useRef, useState } from "react";
 import payments from "../data/labelPayments.json";
 import styles from "../sass/components/PaymentSelector.module.scss";
 
-const PaymentSelector = ({ onChange }) => {
-  const [selectedPayment, setSelectedPayment] = useState("");
+const PaymentSelector = ({ value, onChange }) => {
+  const [selectedPayment, setSelectedPayment] = useState(value || "");
   const [menuOpen, setMenuOpen] = useState(false);
-  const wrapperRef = useRef(null); // Référence sur le conteneur
+  const wrapperRef = useRef(null);
+
+  // Sync externe -> interne
+  useEffect(() => {
+    setSelectedPayment(value || "");
+  }, [value]);
 
   const handleSelectPayment = (payment) => {
     setSelectedPayment(payment);
     setMenuOpen(false);
-    if (onChange) onChange(payment);
+    onChange?.(payment);
   };
 
   // Gestion clic extérieur
@@ -21,11 +26,8 @@ const PaymentSelector = ({ onChange }) => {
         setMenuOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -56,39 +58,3 @@ const PaymentSelector = ({ onChange }) => {
 };
 
 export default PaymentSelector;
-
-// import React, { useMemo, useState } from "react";
-
-// import payments from "../data/labelPayments.json";
-// import Select from "./ui/Select";
-// import styles from "../sass/components/PaymentSelector.module.scss";
-
-// const PaymentSelector = ({ onChange, defaultValue = "" }) => {
-//   const [value, setValue] = useState(defaultValue || "");
-//   const opts = useMemo(() => payments, []);
-
-//   const handleChange = (opt) => {
-//     setValue(opt);
-//     onChange?.(opt);
-//   };
-
-//   return (
-//     <Select
-//       value={value}
-//       onChange={handleChange}
-//       options={opts}
-//       placeholder="Moyen de paiement"
-//       getKey={(v) => v}
-//       getLabel={(v) => v}
-//       classNames={{
-//         wrapper: styles.wrapper,
-//         trigger: styles.selector,
-//         menu: styles.menu,
-//         menuItem: styles.menuItem,
-//         active: styles.active,
-//       }}
-//     />
-//   );
-// };
-
-// export default PaymentSelector;
