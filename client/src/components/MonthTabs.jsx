@@ -4,7 +4,7 @@ const MonthTabs = ({ months, selectedMonth, onSelect }) => {
       {months.map((month, index) => (
         <div
           key={index}
-          className={`month-tabs_btn ${
+          className={`month-tabs__btn ${
             selectedMonth === index ? "active" : ""
           }`}
           onClick={() => onSelect(index)}
@@ -13,7 +13,7 @@ const MonthTabs = ({ months, selectedMonth, onSelect }) => {
         </div>
       ))}
       <div
-        className={`month-tabs_btn ${selectedMonth === null ? "active" : ""}`}
+        className={`month-tabs__btn ${selectedMonth === null ? "active" : ""}`}
         onClick={() => onSelect(null)}
       >
         Tous
