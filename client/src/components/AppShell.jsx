@@ -3,6 +3,8 @@ import React from "react";
 
 import { motion } from "framer-motion";
 
+const MotionDiv = motion.div;
+
 export default function AppShell({ sidebar, headerRight, children }) {
   return (
     <div className="app">
@@ -15,13 +17,13 @@ export default function AppShell({ sidebar, headerRight, children }) {
       {sidebar && <aside className="app__sidebar">{sidebar}</aside>}
 
       <main className="app__main">
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
         >
           {children}
-        </motion.div>
+        </MotionDiv>
       </main>
     </div>
   );
