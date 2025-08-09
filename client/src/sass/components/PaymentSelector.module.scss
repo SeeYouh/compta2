@@ -4,11 +4,12 @@
 
   input {
     padding: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-border);
     border-radius: 4px;
     width: 200px;
     cursor: pointer;
-    background: #fff;
+    background: var(--color-surface);
+    color: var(--color-text);
   }
 }
 
@@ -16,8 +17,8 @@
   position: absolute;
   top: 40px;
   left: 0;
-  border: 1px solid #ccc;
-  background: #fff;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
   list-style: none;
   margin: 0;
   padding: 0;
@@ -27,10 +28,10 @@
   .menuItem {
     padding: 8px;
     cursor: pointer;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--color-border);
 
     &:hover {
-      background: #f5f5f5;
+      background: var(--color-surface-hover);
     }
   }
 }

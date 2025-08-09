@@ -1,5 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
 
+import AppShell from "../components/AppShell";
+import ThemeToggle from "../components/ThemeToggle";
+
 import BalanceCalculator from "../components/BalanceCalculator";
 import {
   filterByMonth,
@@ -18,17 +21,6 @@ const App = () => {
     useTransactionForm();
 
   const [selectedMonth, setSelectedMonth] = useState(null);
-  const [hoveredRow, setHoveredRow] = useState(null);
-
-  useEffect(() => {
-    const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches;
-    document.documentElement.setAttribute(
-      "data-theme",
-      prefersDark ? "dark" : "light"
-    );
-  }, []);
 
   const onSubmit = useCallback(
     async (e) => {
@@ -53,7 +45,7 @@ const App = () => {
       await update(id, patch);
     },
     [update]
-  ); // ⬅️ ici
+  );
 
   const transactionsSorted = useMemo(
     () => sortByFRDate(transactions),
@@ -69,7 +61,7 @@ const App = () => {
   );
 
   return (
-    <>
+    <AppShell headerRight={<ThemeToggle />}>
       <MonthTabs
         months={MONTHS}
         selectedMonth={selectedMonth}
@@ -84,12 +76,10 @@ const App = () => {
       <TransactionsTable
         transactions={filteredTransactions}
         headers={TABLE_HEADERS}
-        hoveredRow={hoveredRow}
-        onHover={setHoveredRow}
         onDelete={onDelete}
-        onUpdate={onUpdate} // ⬅️ ici
+        onUpdate={onUpdate}
       />
-    </>
+    </AppShell>
   );
 };
 
