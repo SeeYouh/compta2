@@ -131,9 +131,10 @@ const TransactionsTable = ({
                     }}
                   />
                 ) : (
-                  <>
-                    {t.theme} : {t.subTheme}
-                  </>
+                  <ul>
+                    <li>{t.theme}</li>
+                    <li>{t.subTheme}</li>
+                  </ul>
                 )}
               </div>
 
@@ -164,7 +165,7 @@ const TransactionsTable = ({
               </div>
 
               {/* Recette */}
-              <div className="table-cell">
+              <div className="table-cell moneyFormat">
                 {isEditing ? (
                   <AmountInput
                     value={draft.recette}
@@ -178,7 +179,7 @@ const TransactionsTable = ({
               </div>
 
               {/* Dépense */}
-              <div className="table-cell">
+              <div className="table-cell moneyFormat">
                 {isEditing ? (
                   <AmountInput
                     value={draft.depense}
@@ -192,7 +193,9 @@ const TransactionsTable = ({
               </div>
 
               {/* Solde (affichage) */}
-              <div className="table-cell">{FormatCurrency(t.solde)}</div>
+              <div className="table-cell moneyFormat">
+                {FormatCurrency(t.solde)}
+              </div>
 
               {/* Actions */}
               <div className="table-cell">

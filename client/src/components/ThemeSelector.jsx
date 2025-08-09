@@ -40,11 +40,11 @@ const ThemeSelector = ({ value, onChange }) => {
   return (
     <div className={styles.wrapper} ref={wrapperRef}>
       <div className={styles.selector} onClick={() => setMenuOpen((p) => !p)}>
-        {selectedTheme || "Choisir un thème"}
+        {selectedTheme || "Catégories"}
       </div>
 
       <div className={`${styles.selector} ${styles.subThemeDisplay}`}>
-        {selectedSubTheme || "Sous-thème sélectionné"}
+        {selectedSubTheme || "Sous-catégories"}
       </div>
 
       {menuOpen && (
