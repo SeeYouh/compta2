@@ -77,21 +77,38 @@ body {
 }
 
 .month-tabs {
+  margin: 0 auto 1rem auto;
+  width: 100%;
+  max-width: 300px;
 
-  margin-bottom: 1rem;
+  &__label {
+    padding: 5px 15px 5px 15px;
+  }
+
+  &__current {
+    padding: 5px 15px 5px calc(15px + 0.25rem);
+    border-left: 1px solid var(--color-border);
+  }
 
   &__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.5rem;
-    font-size: 0.875rem;
+    font-size: 1rem;
+    padding: 0.25rem;
     color: var(--color-text);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    border-radius: 0.5rem;
+    cursor: pointer;
   }
 
   &__grid {
     display: flex;
+    justify-content: center;
     gap: 1rem;
+    margin: 0 auto;
   }
 
   &__col {
@@ -106,6 +123,7 @@ body {
     border: 1px solid var(--color-border);
     background: var(--color-surface);
     cursor: pointer;
+    text-align: center;
     font-size: 0.875rem;
     color: var(--color-text);
     transition: background 0.2s, color 0.2s;
