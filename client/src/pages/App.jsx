@@ -1,8 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 
 import AppShell from "../components/AppShell";
-import ThemeToggle from "../components/ThemeToggle";
-
 import BalanceCalculator from "../components/BalanceCalculator";
 import {
   filterByMonth,
@@ -10,6 +8,7 @@ import {
 } from "../components/utils/transactionsDerivers";
 import { MONTHS, TABLE_HEADERS } from "../components/utils";
 import MonthTabs from "../components/MonthTabs";
+import ThemeToggle from "../components/ThemeToggle";
 import TransactionForm from "../components/TransactionForm";
 import TransactionsTable from "../components/TransactionsTable";
 import { useTransactionForm } from "../components/hooks/useTransactionForm";
@@ -62,17 +61,19 @@ const App = () => {
 
   return (
     <AppShell headerRight={<ThemeToggle />}>
-      <MonthTabs
-        months={MONTHS}
-        selectedMonth={selectedMonth}
-        onSelect={setSelectedMonth}
-      />
-      <TransactionForm
-        formData={formData}
-        errors={errors}
-        onChange={handleChange}
-        onSubmit={onSubmit}
-      />
+      <div className="navBar">
+        <MonthTabs
+          months={MONTHS}
+          selectedMonth={selectedMonth}
+          onSelect={setSelectedMonth}
+        />
+        <TransactionForm
+          formData={formData}
+          errors={errors}
+          onChange={handleChange}
+          onSubmit={onSubmit}
+        />
+      </div>
       <TransactionsTable
         transactions={filteredTransactions}
         headers={TABLE_HEADERS}

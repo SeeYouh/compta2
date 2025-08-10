@@ -32,13 +32,12 @@ const PaymentSelector = ({ value, onChange }) => {
 
   return (
     <div className={styles.wrapper} ref={wrapperRef}>
-      <input
-        type="text"
-        value={selectedPayment}
-        placeholder="Moyen de paiement"
-        readOnly
+      <div
+        className={`${styles.selector}`}
         onClick={() => setMenuOpen((prev) => !prev)}
-      />
+      >
+        {selectedPayment || "Moyen de paiement"}
+      </div>
 
       {menuOpen && (
         <ul className={styles.menu}>

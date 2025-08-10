@@ -69,6 +69,7 @@ const AmountInput = ({ value, defaultValue = "", onChange, ...rest }) => {
         placeholder="Montant"
         {...rest}
       />
+      <p className="absolute-right">€</p>
       {error && <p className={styles.error}>{error}</p>}
     </div>
   );
