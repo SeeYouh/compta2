@@ -21,6 +21,7 @@ ChartJS.register(
   ArcElement
 );
 
+
 export default function ChartsDashboard({ transactions }) {
   const [showBar, setShowBar] = useState(true);
   const [showPie, setShowPie] = useState(true);
@@ -28,26 +29,6 @@ export default function ChartsDashboard({ transactions }) {
   const [monthB, setMonthB] = useState(1);
   const [monthPie, setMonthPie] = useState(0);
 
-  const monthTotals = useMemo(
-    () =>
-      (month) => {
-        const txs = filterByMonth(transactions, month);
-        return txs.reduce((s, t) => s + Number(t.depense || 0), 0);
-      },
-    [transactions]
-  );
-
-  const barData = useMemo(
-    () => ({
-      labels: [MONTHS[monthA].slice(0, 3), MONTHS[monthB].slice(0, 3)],
-      datasets: [
-        {
-          label: "Dépenses",
-          data: [monthTotals(monthA), monthTotals(monthB)],
-          backgroundColor: ["#4e79a7", "#f28e2b"],
-        },
-      ],
-    }),
     [monthA, monthB, monthTotals]
   );
 
@@ -59,6 +40,7 @@ export default function ChartsDashboard({ transactions }) {
       if (!amount) return;
       totals[t.theme] = (totals[t.theme] || 0) + amount;
     });
+
     const labels = Object.keys(totals);
     const data = Object.values(totals);
     const colors = ["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f", "#edc949"];
@@ -71,6 +53,7 @@ export default function ChartsDashboard({ transactions }) {
         },
       ],
     };
+    return Object.entries(totals).map(([name, value]) => ({ name, value }));
   }, [transactions, monthPie]);
 
   return (
@@ -119,6 +102,7 @@ export default function ChartsDashboard({ transactions }) {
               plugins: { legend: { display: false } },
             }}
           />
+          <BarChart data={barData} />
         </div>
       )}
 
@@ -133,7 +117,7 @@ export default function ChartsDashboard({ transactions }) {
               ))}
             </select>
           </div>
-          <Pie data={pieData} />
+          <PieChart data={pieData} />
         </div>
       )}
     </div>
