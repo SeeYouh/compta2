@@ -13,6 +13,7 @@ import TransactionForm from "../components/TransactionForm";
 import TransactionsTable from "../components/TransactionsTable";
 import { useTransactionForm } from "../components/hooks/useTransactionForm";
 import { useTransactions } from "../components/hooks/useTransactions";
+import ChartsDashboard from "../components/ChartsDashboard";
 
 const App = () => {
   const { transactions, add, remove, update } = useTransactions();
@@ -20,6 +21,7 @@ const App = () => {
     useTransactionForm();
 
   const [selectedMonth, setSelectedMonth] = useState(null);
+  const [showCharts, setShowCharts] = useState(false);
 
   const onSubmit = useCallback(
     async (e) => {
@@ -60,7 +62,16 @@ const App = () => {
   );
 
   return (
-    <AppShell headerRight={<ThemeToggle />}>
+    <AppShell
+      headerRight={
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={() => setShowCharts((v) => !v)}>
+            {showCharts ? "Fermer les graphiques" : "Graphiques"}
+          </button>
+          <ThemeToggle />
+        </div>
+      }
+    >
       <div className="navBar">
         <MonthTabs
           months={MONTHS}
@@ -74,6 +85,9 @@ const App = () => {
           onSubmit={onSubmit}
         />
       </div>
+      {showCharts && (
+        <ChartsDashboard transactions={transactions} />
+      )}
       <TransactionsTable
         transactions={filteredTransactions}
         headers={TABLE_HEADERS}

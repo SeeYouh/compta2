@@ -88,7 +88,7 @@ body {
   margin: 0 auto 1rem auto;
 }
 
-.month-tabs {
+  .month-tabs {
   // margin: 0 auto 1rem auto;
   width: 100%;
   max-width: 350px;
@@ -164,6 +164,26 @@ body {
       color: #fff;
       border-color: var(--color-accent);
     }
+  }
+}
+
+.charts-dashboard {
+  margin: 1rem 0;
+
+  &__controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  &__chart {
+    margin-bottom: 2rem;
+  }
+
+  &__filters {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 }
 
