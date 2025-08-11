@@ -1,16 +1,18 @@
-import { useState, useMemo } from "react";
-import { Bar, Pie } from "react-chartjs-2";
+import { useMemo, useState } from "react";
+
 import {
-  Chart as ChartJS,
+  ArcElement,
   BarElement,
   CategoryScale,
+  Chart as ChartJS,
+  Legend,
   LinearScale,
   Tooltip,
-  Legend,
-  ArcElement,
 } from "chart.js";
-import { MONTHS } from "./utils";
+import { Bar, Pie } from "react-chartjs-2";
+
 import { filterByMonth } from "./utils/transactionsDerivers";
+import { MONTHS } from "./utils";
 
 ChartJS.register(
   BarElement,
@@ -21,7 +23,6 @@ ChartJS.register(
   ArcElement
 );
 
-
 export default function ChartsDashboard({ transactions }) {
   const [showBar, setShowBar] = useState(true);
   const [showPie, setShowPie] = useState(true);
@@ -29,21 +30,69 @@ export default function ChartsDashboard({ transactions }) {
   const [monthB, setMonthB] = useState(1);
   const [monthPie, setMonthPie] = useState(0);
 
-    [monthA, monthB, monthTotals]
-  );
+  // Données pour le Bar (comparaison par thème entre deux mois)
+  const barData = useMemo(() => {
+    const txA = filterByMonth(transactions, monthA);
+    const txB = filterByMonth(transactions, monthB);
 
+    const totalsA = {};
+    const totalsB = {};
+
+    for (const t of txA) {
+      const amount = Number(t.depense || 0);
+      if (!amount) continue;
+      totalsA[t.theme] = (totalsA[t.theme] || 0) + amount;
+    }
+
+    for (const t of txB) {
+      const amount = Number(t.depense || 0);
+      if (!amount) continue;
+      totalsB[t.theme] = (totalsB[t.theme] || 0) + amount;
+    }
+
+    const labels = Array.from(
+      new Set([...Object.keys(totalsA), ...Object.keys(totalsB)])
+    ).sort();
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: MONTHS[monthA],
+          data: labels.map((l) => totalsA[l] ?? 0),
+          backgroundColor: "#4e79a7",
+        },
+        {
+          label: MONTHS[monthB],
+          data: labels.map((l) => totalsB[l] ?? 0),
+          backgroundColor: "#e15759",
+        },
+      ],
+    };
+  }, [transactions, monthA, monthB]);
+
+  // Données pour le Pie (répartition par thème sur un mois)
   const pieData = useMemo(() => {
     const txs = filterByMonth(transactions, monthPie);
     const totals = {};
-    txs.forEach((t) => {
+
+    for (const t of txs) {
       const amount = Number(t.depense || 0);
-      if (!amount) return;
+      if (!amount) continue;
       totals[t.theme] = (totals[t.theme] || 0) + amount;
-    });
+    }
 
     const labels = Object.keys(totals);
     const data = Object.values(totals);
-    const colors = ["#4e79a7", "#f28e2b", "#e15759", "#76b7b2", "#59a14f", "#edc949"];
+    const colors = [
+      "#4e79a7",
+      "#f28e2b",
+      "#e15759",
+      "#76b7b2",
+      "#59a14f",
+      "#edc949",
+    ];
+
     return {
       labels,
       datasets: [
@@ -53,7 +102,6 @@ export default function ChartsDashboard({ transactions }) {
         },
       ],
     };
-    return Object.entries(totals).map(([name, value]) => ({ name, value }));
   }, [transactions, monthPie]);
 
   return (
@@ -80,14 +128,20 @@ export default function ChartsDashboard({ transactions }) {
       {showBar && (
         <div className="charts-dashboard__chart">
           <div className="charts-dashboard__filters">
-            <select value={monthA} onChange={(e) => setMonthA(Number(e.target.value))}>
+            <select
+              value={monthA}
+              onChange={(e) => setMonthA(Number(e.target.value))}
+            >
               {MONTHS.map((m, i) => (
                 <option key={m} value={i}>
                   {m}
                 </option>
               ))}
             </select>
-            <select value={monthB} onChange={(e) => setMonthB(Number(e.target.value))}>
+            <select
+              value={monthB}
+              onChange={(e) => setMonthB(Number(e.target.value))}
+            >
               {MONTHS.map((m, i) => (
                 <option key={m} value={i}>
                   {m}
@@ -99,17 +153,19 @@ export default function ChartsDashboard({ transactions }) {
             data={barData}
             options={{
               responsive: true,
-              plugins: { legend: { display: false } },
+              plugins: { legend: { display: true } },
             }}
           />
-          <BarChart data={barData} />
         </div>
       )}
 
       {showPie && (
         <div className="charts-dashboard__chart">
           <div className="charts-dashboard__filters">
-            <select value={monthPie} onChange={(e) => setMonthPie(Number(e.target.value))}>
+            <select
+              value={monthPie}
+              onChange={(e) => setMonthPie(Number(e.target.value))}
+            >
               {MONTHS.map((m, i) => (
                 <option key={m} value={i}>
                   {m}
@@ -117,10 +173,15 @@ export default function ChartsDashboard({ transactions }) {
               ))}
             </select>
           </div>
-          <PieChart data={pieData} />
+          <Pie
+            data={pieData}
+            options={{
+              responsive: true,
+              plugins: { legend: { display: true } },
+            }}
+          />
         </div>
       )}
     </div>
   );
 }
-
