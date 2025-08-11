@@ -88,7 +88,7 @@ body {
   margin: 0 auto 1rem auto;
 }
 
-  .month-tabs {
+.month-tabs {
   // margin: 0 auto 1rem auto;
   width: 100%;
   max-width: 350px;
@@ -177,7 +177,10 @@ body {
   }
 
   &__chart {
-    margin-bottom: 2rem;
+    margin: 0 auto 2rem auto;
+    width: 100%;
+    max-width: 450px;
+    height: auto;
   }
 
   &__filters {
