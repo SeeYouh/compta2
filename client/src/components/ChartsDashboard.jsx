@@ -124,64 +124,65 @@ export default function ChartsDashboard({ transactions }) {
           Répartition
         </label>
       </div>
-
-      {showBar && (
-        <div className="charts-dashboard__chart">
-          <div className="charts-dashboard__filters">
-            <select
-              value={monthA}
-              onChange={(e) => setMonthA(Number(e.target.value))}
-            >
-              {MONTHS.map((m, i) => (
-                <option key={m} value={i}>
-                  {m}
-                </option>
-              ))}
-            </select>
-            <select
-              value={monthB}
-              onChange={(e) => setMonthB(Number(e.target.value))}
-            >
-              {MONTHS.map((m, i) => (
-                <option key={m} value={i}>
-                  {m}
-                </option>
-              ))}
-            </select>
+      <div className="charts-dashboard_group">
+        {showBar && (
+          <div className="charts-dashboard__chart">
+            <div className="charts-dashboard__filters">
+              <select
+                value={monthA}
+                onChange={(e) => setMonthA(Number(e.target.value))}
+              >
+                {MONTHS.map((m, i) => (
+                  <option key={m} value={i}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={monthB}
+                onChange={(e) => setMonthB(Number(e.target.value))}
+              >
+                {MONTHS.map((m, i) => (
+                  <option key={m} value={i}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <Bar
+              data={barData}
+              options={{
+                responsive: true,
+                plugins: { legend: { display: true } },
+              }}
+            />
           </div>
-          <Bar
-            data={barData}
-            options={{
-              responsive: true,
-              plugins: { legend: { display: true } },
-            }}
-          />
-        </div>
-      )}
+        )}
 
-      {showPie && (
-        <div className="charts-dashboard__chart">
-          <div className="charts-dashboard__filters">
-            <select
-              value={monthPie}
-              onChange={(e) => setMonthPie(Number(e.target.value))}
-            >
-              {MONTHS.map((m, i) => (
-                <option key={m} value={i}>
-                  {m}
-                </option>
-              ))}
-            </select>
+        {showPie && (
+          <div className="charts-dashboard__chart">
+            <div className="charts-dashboard__filters">
+              <select
+                value={monthPie}
+                onChange={(e) => setMonthPie(Number(e.target.value))}
+              >
+                {MONTHS.map((m, i) => (
+                  <option key={m} value={i}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <Pie
+              data={pieData}
+              options={{
+                responsive: true,
+                plugins: { legend: { display: true } },
+              }}
+            />
           </div>
-          <Pie
-            data={pieData}
-            options={{
-              responsive: true,
-              plugins: { legend: { display: true } },
-            }}
-          />
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

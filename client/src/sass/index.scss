@@ -170,6 +170,15 @@ body {
 .charts-dashboard {
   margin: 1rem 0;
 
+  &_group {
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    max-width: 1440px;
+  }
+
   &__controls {
     display: flex;
     gap: 1rem;
