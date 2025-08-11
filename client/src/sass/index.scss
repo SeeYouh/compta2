@@ -167,6 +167,29 @@ body {
   }
 }
 
+.charts-dashboard {
+  margin: 1rem 0;
+
+  &__controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  &__chart {
+    margin: 0 auto 2rem auto;
+    width: 100%;
+    max-width: 450px;
+    height: auto;
+  }
+
+  &__filters {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
 .txn-form {
   max-width: 400px;
   width: 100%;
