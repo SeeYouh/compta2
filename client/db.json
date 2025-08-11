@@ -16,8 +16,8 @@
       "theme": "Restauration",
       "subTheme": "Fast-food / Snack",
       "payment": "Carte",
-      "designation": "Maurin distrib Balzac",
-      "recette": "",
+      "designation": "Packetis - Distributeur alimentaire",
+      "recette": null,
       "depense": 4
     },
     {
@@ -321,23 +321,13 @@
       "depense": 69
     },
     {
-      "id": "32",
-      "date": "30/07/2025",
-      "theme": "Restauration",
-      "subTheme": "Fast-food / Snack",
-      "payment": "Carte",
-      "designation": "Distributeur Packetis",
-      "recette": "",
-      "depense": 1.5
-    },
-    {
       "id": "33",
-      "date": "31/07/2025",
+      "date": "13/09/2025",
       "theme": "Course en Ligne",
       "subTheme": "Loisirs en ligne",
       "payment": "Carte",
       "designation": "Amazon : Manga OPM",
-      "recette": "",
+      "recette": null,
       "depense": 10.3
     },
     {
@@ -362,12 +352,12 @@
     },
     {
       "id": "36",
-      "date": "02/08/2025",
+      "date": "18/08/2025",
       "theme": "Course en Ligne",
       "subTheme": "Loisirs en ligne",
       "payment": "Prélèvement",
       "designation": "Jeux",
-      "recette": "",
+      "recette": null,
       "depense": 19.9
     },
     {
@@ -376,29 +366,29 @@
       "theme": "Restauration",
       "subTheme": "",
       "payment": "Carte",
-      "designation": "Maurin distrib Balzac",
-      "recette": "",
-      "depense": "5.50"
+      "designation": "Packetis - Distributeur alimentaire",
+      "recette": null,
+      "depense": 1.5
     },
     {
       "id": "6fa7",
       "date": "05/08/2025",
       "theme": "Loisirs",
-      "subTheme": "",
+      "subTheme": "Salle de sport",
       "payment": "Virement",
       "designation": "Elancia",
-      "recette": "",
-      "depense": "44.90"
+      "recette": null,
+      "depense": 44.9
     },
     {
       "id": "0acf",
       "date": "07/08/2025",
       "theme": "Revenus",
-      "subTheme": "",
+      "subTheme": "Salaire",
       "payment": "Virement",
       "designation": "Morgan Intérim",
-      "recette": "1170.69",
-      "depense": ""
+      "recette": 1170.69,
+      "depense": null
     },
     {
       "id": "356d",
@@ -406,9 +396,9 @@
       "theme": "Restauration",
       "subTheme": "Fast-food / Snack",
       "payment": "Carte",
-      "designation": "Distributeur Packetis",
-      "recette": "",
-      "depense": "1.50"
+      "designation": "Packetis - Distributeur alimentaire",
+      "recette": null,
+      "depense": 1.5
     },
     {
       "id": "79f2",
@@ -416,9 +406,9 @@
       "theme": "Restauration",
       "subTheme": "Fast-food / Snack",
       "payment": "Carte",
-      "designation": "Distributeur Packetis",
-      "recette": "",
-      "depense": "5.80"
+      "designation": "Packetis - Distributeur alimentaire",
+      "recette": null,
+      "depense": 5.8
     },
     {
       "id": "f947",
@@ -449,6 +439,56 @@
       "designation": "Virement mensuel",
       "recette": "",
       "depense": "500.00"
+    },
+    {
+      "id": "d11f",
+      "date": "09/08/2025",
+      "theme": "Course en Ligne",
+      "subTheme": "Électronique / Informatique en ligne",
+      "payment": "Carte",
+      "designation": "LWS - Hébergement - jsi-webservice.fr",
+      "recette": "",
+      "depense": "53.84"
+    },
+    {
+      "id": "8215",
+      "date": "09/08/2025",
+      "theme": "Transport",
+      "subTheme": "Carburant",
+      "payment": "Carte",
+      "designation": "eLeclerc - Carburant - 3008",
+      "recette": "",
+      "depense": "73.01"
+    },
+    {
+      "id": "7e2d",
+      "date": "09/08/2025",
+      "theme": "Course en Ligne",
+      "subTheme": "Courant en ligne",
+      "payment": "Carte",
+      "designation": "eLeclerc - Course",
+      "recette": "",
+      "depense": "246.03"
+    },
+    {
+      "id": "1f75",
+      "date": "09/08/2025",
+      "theme": "Transport",
+      "subTheme": "Entretien / Réparations",
+      "payment": "Carte",
+      "designation": "eLeclerc - Nettoyage rouleau - 3008",
+      "recette": "",
+      "depense": "6.00"
+    },
+    {
+      "id": "89df",
+      "date": "06/08/2025",
+      "theme": "Restauration",
+      "subTheme": "Fast-food / Snack",
+      "payment": "Carte",
+      "designation": "Packetis - Distributeur alimentaire",
+      "recette": "",
+      "depense": "4.00"
     }
   ]
 }
