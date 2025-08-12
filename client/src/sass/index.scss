@@ -3,9 +3,9 @@
 @use "./utils/Utilities.scss" as *;
 
 :root {
-  --color-bg: #f9fafb;
+  --color-bg: #fafafa;
   --color-subSurface: #f5f7f9;
-  --color-surface: #ffffff;
+  --color-surface: #f9fafb;
   --color-text: #111827;
   --color-text-dim: #6b7280;
   --color-border: #e5e7eb;
@@ -188,8 +188,7 @@ body {
   &__chart {
     margin: 0 auto 2rem auto;
     width: 100%;
-    max-width: 450px;
-    height: auto;
+    height: 100%;
   }
 
   &__filters {
@@ -427,4 +426,21 @@ body {
   text-align: center;
   font-style: italic;
   margin-top: 1rem;
+}
+
+.btnGraph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  // border: 1px solid white;
+  width: 2.5rem;
+  height: auto;
+
+  .Calque1 {
+    &-un {
+      color: red;
+    }
+  }
 }

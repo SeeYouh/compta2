@@ -2,10 +2,13 @@ import { useCallback, useMemo, useState } from "react";
 
 import AppShell from "../components/AppShell";
 import BalanceCalculator from "../components/BalanceCalculator";
+import ChartsDashboard from "../components/ChartsDashboard";
 import {
   filterByMonth,
   sortByFRDate,
 } from "../components/utils/transactionsDerivers";
+import IconGraphActivated from "../assets/IconGraphActivated";
+import IcongraphDisable from "../assets/IconGraph";
 import { MONTHS, TABLE_HEADERS } from "../components/utils";
 import MonthTabs from "../components/MonthTabs";
 import ThemeToggle from "../components/ThemeToggle";
@@ -13,7 +16,6 @@ import TransactionForm from "../components/TransactionForm";
 import TransactionsTable from "../components/TransactionsTable";
 import { useTransactionForm } from "../components/hooks/useTransactionForm";
 import { useTransactions } from "../components/hooks/useTransactions";
-import ChartsDashboard from "../components/ChartsDashboard";
 
 const App = () => {
   const { transactions, add, remove, update } = useTransactions();
@@ -62,16 +64,7 @@ const App = () => {
   );
 
   return (
-    <AppShell
-      headerRight={
-        <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={() => setShowCharts((v) => !v)}>
-            {showCharts ? "Fermer les graphiques" : "Graphiques"}
-          </button>
-          <ThemeToggle />
-        </div>
-      }
-    >
+    <AppShell headerRight={<ThemeToggle />}>
       <div className="navBar">
         <MonthTabs
           months={MONTHS}
@@ -84,10 +77,11 @@ const App = () => {
           onChange={handleChange}
           onSubmit={onSubmit}
         />
+        <div className="btnGraph" onClick={() => setShowCharts((v) => !v)}>
+          {showCharts ? <IcongraphDisable /> : <IconGraphActivated />}
+        </div>
       </div>
-      {showCharts && (
-        <ChartsDashboard transactions={transactions} />
-      )}
+      {showCharts && <ChartsDashboard transactions={transactions} />}
       <TransactionsTable
         transactions={filteredTransactions}
         headers={TABLE_HEADERS}

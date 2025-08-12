@@ -489,6 +489,36 @@
       "designation": "Packetis - Distributeur alimentaire",
       "recette": "",
       "depense": "4.00"
+    },
+    {
+      "id": "cf46",
+      "date": "11/08/2025",
+      "theme": "Banques",
+      "subTheme": "Frais bancaires",
+      "payment": "Prélèvement",
+      "designation": "Cotisation Eurocompte",
+      "recette": "",
+      "depense": "9.13"
+    },
+    {
+      "id": "88af",
+      "date": "11/08/2025",
+      "theme": "Soins personnels",
+      "subTheme": "Coiffeur / Esthétique",
+      "payment": "Carte",
+      "designation": "The barber Compagny - Coupe Cheveux",
+      "recette": "",
+      "depense": "23.80"
+    },
+    {
+      "id": "b808",
+      "date": "15/08/2025",
+      "theme": "Banques",
+      "subTheme": "Crédit",
+      "payment": "Prélèvement",
+      "designation": "Prêt personnel",
+      "recette": "",
+      "depense": "60.11"
     }
   ]
 }

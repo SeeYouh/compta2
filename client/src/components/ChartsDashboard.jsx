@@ -9,9 +9,10 @@ import {
   LinearScale,
   Tooltip,
 } from "chart.js";
-import { Bar, Pie } from "react-chartjs-2";
+import { Bar, Doughnut } from "react-chartjs-2";
 
 import { filterByMonth } from "./utils/transactionsDerivers";
+import FormatCurrency from "./utils/FormatCurrency";
 import { MONTHS } from "./utils";
 
 ChartJS.register(
@@ -86,11 +87,23 @@ export default function ChartsDashboard({ transactions }) {
     const data = Object.values(totals);
     const colors = [
       "#4e79a7",
-      "#f28e2b",
       "#e15759",
       "#76b7b2",
       "#59a14f",
       "#edc949",
+      "#bab0ab",
+      "#86bc86",
+      "#c4b7e3",
+      "#f3c7a7",
+      "#d37295",
+      "#e57373",
+      "#6baed6",
+      "#a6d854",
+      "#f2cf5b",
+      "#f28e2b",
+      "#b5cf6b",
+      "#ffb6c1",
+      "#c6a49a",
     ];
 
     return {
@@ -126,7 +139,10 @@ export default function ChartsDashboard({ transactions }) {
       </div>
       <div className="charts-dashboard_group">
         {showBar && (
-          <div className="charts-dashboard__chart">
+          <div
+            className="charts-dashboard__chart"
+            style={{ maxWidth: "700px", maxHeight: "500px" }}
+          >
             <div className="charts-dashboard__filters">
               <select
                 value={monthA}
@@ -152,15 +168,39 @@ export default function ChartsDashboard({ transactions }) {
             <Bar
               data={barData}
               options={{
+                maintainAspectRatio: false,
+                borderRadius: 100,
                 responsive: true,
-                plugins: { legend: { display: true } },
+                plugins: {
+                  legend: {
+                    display: true,
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: (context) =>
+                        `${context.dataset.label}: ${FormatCurrency(
+                          context.parsed.y
+                        )}`,
+                    },
+                  },
+                },
+                scales: {
+                  y: {
+                    ticks: {
+                      callback: (value) => FormatCurrency(value),
+                    },
+                  },
+                },
               }}
             />
           </div>
         )}
 
         {showPie && (
-          <div className="charts-dashboard__chart">
+          <div
+            className="charts-dashboard__chart"
+            style={{ maxWidth: "500px", maxHeight: "500px" }}
+          >
             <div className="charts-dashboard__filters">
               <select
                 value={monthPie}
@@ -173,11 +213,19 @@ export default function ChartsDashboard({ transactions }) {
                 ))}
               </select>
             </div>
-            <Pie
+            <Doughnut
               data={pieData}
               options={{
                 responsive: true,
-                plugins: { legend: { display: true } },
+                plugins: {
+                  legend: { display: true },
+                  tooltip: {
+                    callbacks: {
+                      label: (context) =>
+                        `${context.label}: ${FormatCurrency(context.parsed)}`,
+                    },
+                  },
+                },
               }}
             />
           </div>
