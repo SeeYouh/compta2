@@ -67,7 +67,6 @@ export default function MonthTabs({ months, selectedMonth, onSelect }) {
       </div>
 
       <div
-        id="month-tabs-panel"
         className="month-tabs__grid"
         role="listbox"
         aria-labelledby="month-tabs-trigger"

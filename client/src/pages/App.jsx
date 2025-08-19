@@ -68,7 +68,7 @@ const App = () => {
         if (!Number.isNaN(d)) s.add(d.getFullYear());
       } catch {}
     }
-    return Array.from(s).sort((a, b) => b - a);
+    return Array.from(s).sort((a, b) => a - b);
   }, [transactions]);
 
   useEffect(() => {
@@ -127,7 +127,7 @@ const App = () => {
       />
 
       <div className="navBar">
-        <div className="filtersRow">
+        <div className="filters-container ">
           <MonthTabs
             months={MONTHS}
             selectedMonth={selectedMonth}

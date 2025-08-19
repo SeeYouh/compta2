@@ -1,6 +1,4 @@
-import React from "react";
-
-import cn from "classnames";
+import styles from "../../sass/components/YearsTabs.module.scss";
 
 const YearTabs = ({ years, selectedYear, onChange }) => {
   // years: number[] triées (ex: [2025, 2024, 2023])
@@ -11,7 +9,9 @@ const YearTabs = ({ years, selectedYear, onChange }) => {
         type="button"
         role="tab"
         aria-selected={selectedYear === null}
-        className={cn("tab", { active: selectedYear === null })}
+        className={`${styles.tab} ${
+          selectedYear === null ? styles.active : ""
+        }`}
         onClick={() => onChange(null)}
       >
         Tous
@@ -23,7 +23,7 @@ const YearTabs = ({ years, selectedYear, onChange }) => {
           type="button"
           role="tab"
           aria-selected={selectedYear === y}
-          className={cn("tab", { active: selectedYear === y })}
+          className={`${styles.tab} ${selectedYear === y ? styles.active : ""}`}
           onClick={() => onChange(y)}
         >
           {y}

@@ -579,6 +579,56 @@
       "designation": "Remboursement - Achat dalle écran Asus X512D",
       "recette": "120.00",
       "depense": ""
+    },
+    {
+      "id": "1f0d",
+      "date": "18/08/2025",
+      "theme": "Course en Ligne",
+      "subTheme": "Électronique / Informatique en ligne",
+      "payment": "Carte",
+      "designation": "FNAC - Dalle écran Asus X512D ",
+      "recette": "",
+      "depense": "51.20"
+    },
+    {
+      "id": "6761",
+      "date": "18/08/2025",
+      "theme": "Autres",
+      "subTheme": "Frais exceptionnels",
+      "payment": "Carte",
+      "designation": "Amende - CT non valide",
+      "recette": "",
+      "depense": "90.00"
+    },
+    {
+      "id": "da88",
+      "date": "18/08/2025",
+      "theme": "Course en Ligne",
+      "subTheme": "Courant en ligne",
+      "payment": "Carte",
+      "designation": "E.Leclerc - Petite course",
+      "recette": "",
+      "depense": "86.68"
+    },
+    {
+      "id": "7777",
+      "date": "18/08/2025",
+      "theme": "Transport",
+      "subTheme": "Péages / Parking",
+      "payment": "Carte",
+      "designation": "Bip&Go - Forfait péage",
+      "recette": "",
+      "depense": "12.70"
+    },
+    {
+      "id": "2db6",
+      "date": "19/08/2025",
+      "theme": "Habitat",
+      "subTheme": "Internet / Téléphonie",
+      "payment": "Prélèvement",
+      "designation": "Bouygue Telecom - Forfait mobile",
+      "recette": "",
+      "depense": "10.99"
     }
   ]
 }

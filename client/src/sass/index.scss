@@ -13,6 +13,35 @@
   --color-accent-hover: #2563eb;
   --color-surface-hover: #f3f4f6;
   --color-danger: #ef4444;
+
+  // Variables pour dégradé de couleurs (basé sur color-accent)
+  --color-gradient-1: #3b82f6; // 100% - bleu accent
+  --color-gradient-1-hover: #2563eb;
+  --color-gradient-1-active: #1d4ed8;
+
+  --color-gradient-2: #60a5fa; // 90% - bleu plus clair
+  --color-gradient-2-hover: #3b82f6;
+  --color-gradient-2-active: #2563eb;
+
+  --color-gradient-3: #93c5fd; // 80% - bleu encore plus clair
+  --color-gradient-3-hover: #60a5fa;
+  --color-gradient-3-active: #3b82f6;
+
+  --color-gradient-4: #bfdbfe; // 70% - bleu très clair
+  --color-gradient-4-hover: #93c5fd;
+  --color-gradient-4-active: #60a5fa;
+
+  --color-gradient-5: #dbeafe; // 60% - bleu pastel
+  --color-gradient-5-hover: #bfdbfe;
+  --color-gradient-5-active: #93c5fd;
+
+  --color-gradient-6: #eff6ff; // 50% - bleu très pastel
+  --color-gradient-6-hover: #dbeafe;
+  --color-gradient-6-active: #bfdbfe;
+
+  --color-gradient-7: #f8fafc; // 40% - presque blanc avec teinte bleue
+  --color-gradient-7-hover: #eff6ff;
+  --color-gradient-7-active: #dbeafe;
 }
 
 [data-theme="dark"] {
@@ -26,6 +55,35 @@
   --color-accent-hover: #60a5fa;
   --color-surface-hover: #374151;
   --color-danger: #f87171;
+
+  // Variables pour dégradé de couleurs en mode sombre
+  --color-gradient-1: #3b82f6; // 100% - bleu accent (même qu'en clair)
+  --color-gradient-1-hover: #60a5fa;
+  --color-gradient-1-active: #2563eb;
+
+  --color-gradient-2: #2563eb; // 90% - bleu un peu plus sombre
+  --color-gradient-2-hover: #3b82f6;
+  --color-gradient-2-active: #1d4ed8;
+
+  --color-gradient-3: #1d4ed8; // 80% - bleu plus sombre
+  --color-gradient-3-hover: #2563eb;
+  --color-gradient-3-active: #1e40af;
+
+  --color-gradient-4: #1e40af; // 70% - bleu foncé
+  --color-gradient-4-hover: #1d4ed8;
+  --color-gradient-4-active: #1e3a8a;
+
+  --color-gradient-5: #1e3a8a; // 60% - bleu très foncé
+  --color-gradient-5-hover: #1e40af;
+  --color-gradient-5-active: #312e81;
+
+  --color-gradient-6: #312e81; // 50% - bleu indigo foncé
+  --color-gradient-6-hover: #1e3a8a;
+  --color-gradient-6-active: #3730a3;
+
+  --color-gradient-7: #3730a3; // 40% - indigo
+  --color-gradient-7-hover: #312e81;
+  --color-gradient-7-active: #4338ca;
 }
 
 * {
@@ -88,6 +146,11 @@ body {
   margin: 0 auto 1rem auto;
 }
 
+.filters-container {
+  display: flex;
+  align-items: center;
+}
+
 .month-tabs {
   // margin: 0 auto 1rem auto;
   width: 100%;
@@ -132,6 +195,8 @@ body {
     gap: 0.6rem 1rem;
     margin: 0 auto;
     background-color: var(--color-subSurface);
+    width: 350px;
+    // max-width: 350px;
   }
 
   &__col {
