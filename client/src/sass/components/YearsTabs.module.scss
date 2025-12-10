@@ -1,0 +1,132 @@
+// Styles pour les onglets d'années avec système cyclique de couleurs
+.tab {
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+  background: var(--color-surface);
+  color: var(--color-text);
+  transition: all 0.2s ease;
+  position: relative;
+
+  &:hover {
+    background: var(--color-surface-hover);
+  }
+
+  &.active {
+    background: var(--color-accent);
+    color: white;
+  }
+}
+
+// Premier onglet (Tous) - utilise directement color-accent
+.tab:first-child {
+  border-radius: 8px 0 0 0;
+  background: var(--color-accent);
+  color: white;
+
+  &:hover {
+    background: var(--color-accent-hover);
+  }
+
+  &.active {
+    background: var(--color-accent-hover);
+  }
+}
+
+// Dernier onglet - border-radius right top
+.tab:last-child {
+  border-radius: 0 8px 0 0;
+}
+
+// Système cyclique de couleurs pour les onglets d'années (7 couleurs qui se répètent)
+.tab:nth-child(7n + 2) {
+  // 2, 9, 16, 23...
+  background: var(--color-gradient-1);
+  color: white;
+  &:hover {
+    background: var(--color-gradient-1-hover);
+  }
+  &.active {
+    background: var(--color-gradient-1-active);
+  }
+}
+
+.tab:nth-child(7n + 3) {
+  // 3, 10, 17, 24...
+  background: var(--color-gradient-2);
+  color: white;
+  &:hover {
+    background: var(--color-gradient-2-hover);
+  }
+  &.active {
+    background: var(--color-gradient-2-active);
+  }
+}
+
+.tab:nth-child(7n + 4) {
+  // 4, 11, 18, 25...
+  background: var(--color-gradient-3);
+  color: white;
+  &:hover {
+    background: var(--color-gradient-3-hover);
+  }
+  &.active {
+    background: var(--color-gradient-3-active);
+  }
+}
+
+.tab:nth-child(7n + 5) {
+  // 5, 12, 19, 26...
+  background: var(--color-gradient-4);
+  color: var(--color-text); // Texte foncé pour fond clair
+  &:hover {
+    background: var(--color-gradient-4-hover);
+    color: white;
+  }
+  &.active {
+    background: var(--color-gradient-4-active);
+    color: white;
+  }
+}
+
+.tab:nth-child(7n + 6) {
+  // 6, 13, 20, 27...
+  background: var(--color-gradient-5);
+  color: var(--color-text); // Texte foncé pour fond clair
+  &:hover {
+    background: var(--color-gradient-5-hover);
+    color: var(--color-text);
+  }
+  &.active {
+    background: var(--color-gradient-5-active);
+    color: white;
+  }
+}
+
+.tab:nth-child(7n + 7) {
+  // 7, 14, 21, 28...
+  background: var(--color-gradient-6);
+  color: var(--color-text); // Texte foncé pour fond très clair
+  &:hover {
+    background: var(--color-gradient-6-hover);
+    color: var(--color-text);
+  }
+  &.active {
+    background: var(--color-gradient-6-active);
+    color: var(--color-text);
+  }
+}
+
+.tab:nth-child(7n + 8) {
+  // 8, 15, 22, 29...
+  background: var(--color-gradient-7);
+  color: var(--color-text); // Texte foncé pour fond presque blanc
+  &:hover {
+    background: var(--color-gradient-7-hover);
+    color: var(--color-text);
+  }
+  &.active {
+    background: var(--color-gradient-7-active);
+    color: var(--color-text);
+  }
+}

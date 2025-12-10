@@ -1,0 +1,285 @@
+{
+  "themes": {
+    "theme-1": {
+      "id": "theme-1",
+      "name": "Autres",
+      "slug": "autres",
+      "subThemes": {
+        "subtheme-1-1": {
+          "id": "subtheme-1-1",
+          "name": "Inclassables",
+          "slug": "inclassables"
+        },
+        "subtheme-1-2": {
+          "id": "subtheme-1-2",
+          "name": "Frais exceptionnels",
+          "slug": "frais-exceptionnels"
+        }
+      }
+    },
+    "theme-2": {
+      "id": "theme-2",
+      "name": "Restauration",
+      "slug": "restauration",
+      "subThemes": {
+        "subtheme-2-1": {
+          "id": "subtheme-2-1",
+          "name": "Fast-food / Snack",
+          "slug": "fast-food-snack"
+        },
+        "subtheme-2-2": {
+          "id": "subtheme-2-2",
+          "name": "Boulangerie / Viennoiserie",
+          "slug": "boulangerie-viennoiserie"
+        }
+      }
+    },
+    "theme-3": {
+      "id": "theme-3",
+      "name": "Transport",
+      "slug": "transport",
+      "subThemes": {
+        "subtheme-3-1": {
+          "id": "subtheme-3-1",
+          "name": "Carburant",
+          "slug": "carburant"
+        },
+        "subtheme-3-2": {
+          "id": "subtheme-3-2",
+          "name": "Entretien / Réparations",
+          "slug": "entretien-reparations"
+        },
+        "subtheme-3-3": {
+          "id": "subtheme-3-3",
+          "name": "Péages / Parking",
+          "slug": "peages-parking"
+        }
+      }
+    },
+    "theme-4": {
+      "id": "theme-4",
+      "name": "Course en Ligne",
+      "slug": "course-en-ligne",
+      "subThemes": {
+        "subtheme-4-1": {
+          "id": "subtheme-4-1",
+          "name": "Courant en ligne",
+          "slug": "courant-en-ligne"
+        },
+        "subtheme-4-2": {
+          "id": "subtheme-4-2",
+          "name": "Loisirs en ligne",
+          "slug": "loisirs-en-ligne"
+        },
+        "subtheme-4-3": {
+          "id": "subtheme-4-3",
+          "name": "Électronique / Informatique en ligne",
+          "slug": "electronique-informatique-en-ligne"
+        },
+        "subtheme-4-4": {
+          "id": "subtheme-4-4",
+          "name": "Vélo en ligne",
+          "slug": "velo-en-ligne"
+        },
+        "subtheme-4-5": {
+          "id": "subtheme-4-5",
+          "name": "Fournitures / Bureau / Scolaire en ligne",
+          "slug": "fournitures-bureau-scolaire-en-ligne"
+        },
+        "subtheme-4-6": {
+          "id": "subtheme-4-6",
+          "name": "Bricolage en ligne",
+          "slug": "bricolage-en-ligne"
+        },
+        "subtheme-4-7": {
+          "id": "subtheme-4-7",
+          "name": "Autres en ligne",
+          "slug": "autres-en-ligne"
+        },
+        "subtheme-4-8": {
+          "id": "subtheme-4-8",
+          "name": "Auto / Moto en ligne",
+          "slug": "auto-moto-en-ligne"
+        },
+        "subtheme-4-9": {
+          "id": "subtheme-4-9",
+          "name": "Maison / Déco en ligne",
+          "slug": "maison-deco-en-ligne"
+        }
+      }
+    },
+    "theme-5": {
+      "id": "theme-5",
+      "name": "Santé",
+      "slug": "sante",
+      "subThemes": {
+        "subtheme-5-1": {
+          "id": "subtheme-5-1",
+          "name": "Pharmacie",
+          "slug": "pharmacie"
+        },
+        "subtheme-5-2": {
+          "id": "subtheme-5-2",
+          "name": "Mutuelle",
+          "slug": "mutuelle"
+        }
+      }
+    },
+    "theme-6": {
+      "id": "theme-6",
+      "name": "Course en Magasin",
+      "slug": "course-en-magasin",
+      "subThemes": {
+        "subtheme-6-1": {
+          "id": "subtheme-6-1",
+          "name": "Courant",
+          "slug": "courant"
+        },
+        "subtheme-6-2": {
+          "id": "subtheme-6-2",
+          "name": "Auto / Moto",
+          "slug": "auto-moto"
+        },
+        "subtheme-6-3": {
+          "id": "subtheme-6-3",
+          "name": "Vélo",
+          "slug": "velo"
+        },
+        "subtheme-6-4": {
+          "id": "subtheme-6-4",
+          "name": "Textile / Habillement",
+          "slug": "textile-habillement"
+        }
+      }
+    },
+    "theme-7": {
+      "id": "theme-7",
+      "name": "Loisirs",
+      "slug": "loisirs",
+      "subThemes": {
+        "subtheme-7-1": {
+          "id": "subtheme-7-1",
+          "name": "Salle de sport",
+          "slug": "salle-de-sport"
+        },
+        "subtheme-7-2": {
+          "id": "subtheme-7-2",
+          "name": "Spotify",
+          "slug": "spotify"
+        }
+      }
+    },
+    "theme-8": {
+      "id": "theme-8",
+      "name": "Revenus",
+      "slug": "revenus",
+      "subThemes": {
+        "subtheme-8-1": {
+          "id": "subtheme-8-1",
+          "name": "Salaire",
+          "slug": "salaire"
+        }
+      }
+    },
+    "theme-9": {
+      "id": "theme-9",
+      "name": "Banques",
+      "slug": "banques",
+      "subThemes": {
+        "subtheme-9-1": {
+          "id": "subtheme-9-1",
+          "name": "Frais bancaires",
+          "slug": "frais-bancaires"
+        },
+        "subtheme-9-2": {
+          "id": "subtheme-9-2",
+          "name": "Agios",
+          "slug": "agios"
+        },
+        "subtheme-9-3": {
+          "id": "subtheme-9-3",
+          "name": "Crédit",
+          "slug": "credit"
+        },
+        "subtheme-9-4": {
+          "id": "subtheme-9-4",
+          "name": "Retrait",
+          "slug": "retrait"
+        },
+        "subtheme-9-5": {
+          "id": "subtheme-9-5",
+          "name": "Cotisation bancaire",
+          "slug": "cotisation-bancaire"
+        },
+        "subtheme-9-6": {
+          "id": "subtheme-9-6",
+          "name": "Commissions",
+          "slug": "commissions"
+        }
+      }
+    },
+    "theme-10": {
+      "id": "theme-10",
+      "name": "Famille",
+      "slug": "famille",
+      "subThemes": {
+        "subtheme-10-1": {
+          "id": "subtheme-10-1",
+          "name": "Compte joint (Boursorama)",
+          "slug": "compte-joint-boursorama"
+        },
+        "subtheme-10-2": {
+          "id": "subtheme-10-2",
+          "name": "Proche",
+          "slug": "proche"
+        },
+        "subtheme-10-3": {
+          "id": "subtheme-10-3",
+          "name": "Cadeaux famille",
+          "slug": "cadeaux-famille"
+        }
+      }
+    },
+    "theme-11": {
+      "id": "theme-11",
+      "name": "Épargne",
+      "slug": "epargne",
+      "subThemes": {
+        "subtheme-11-1": {
+          "id": "subtheme-11-1",
+          "name": "Livret",
+          "slug": "livret"
+        },
+        "subtheme-11-2": {
+          "id": "subtheme-11-2",
+          "name": "Assurance-vie / PEA",
+          "slug": "assurance-vie-pea"
+        }
+      }
+    },
+    "theme-12": {
+      "id": "theme-12",
+      "name": "Habitat",
+      "slug": "habitat",
+      "subThemes": {
+        "subtheme-12-1": {
+          "id": "subtheme-12-1",
+          "name": "Internet / Téléphonie",
+          "slug": "internet-telephonie"
+        }
+      }
+    },
+    "theme-13": {
+      "id": "theme-13",
+      "name": "Soins personnels",
+      "slug": "soins-personnels",
+      "subThemes": {
+        "subtheme-13-1": {
+          "id": "subtheme-13-1",
+          "name": "Coiffeur / Esthétique",
+          "slug": "coiffeur-esthetique"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,1403 @@
+@use "./utils/reset.scss" as *;
+@use "./components/Month-picker.scss" as *;
+@use "./components/DrawerThemeManager.scss" as *;
+@use "./components/ColorPicker.scss" as *;
+@use "./utils/Utilities.scss" as *;
+
+:root {
+  // ============================================
+  // COULEURS DE BASE (à modifier pour changer les thèmes)
+  // ============================================
+  --color-primary: #3b82f6; // Bleu - Couleur principale du site
+  --color-success: #22c55e; // Vert - Pour les recettes
+  --color-danger: #ef4444; // Rouge - Pour les dépenses et suppressions
+
+  // ============================================
+  // VARIATIONS DE LUMINOSITÉ (Bleu principal)
+  // ============================================
+  // Plus sombre à plus clair (7 niveaux)
+  --color-primary-900: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 60%
+  ); // #1d4ed8
+  --color-primary-800: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 50%
+  ); // #1e40af
+  --color-primary-700: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 35%
+  ); // #2563eb
+  --color-primary-600: var(--color-primary); // #3b82f6 (base)
+  --color-primary-500: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 25%
+  ); // #60a5fa
+  --color-primary-400: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 45%
+  ); // #93c5fd
+  --color-primary-300: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 65%
+  ); // #bfdbfe
+  --color-primary-200: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 80%
+  ); // #dbeafe
+  --color-primary-100: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 90%
+  ); // #eff6ff
+  --color-primary-50: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 95%
+  ); // #f8fafc
+
+  // ============================================
+  // COULEURS AVEC OPACITÉ (pour ombres, overlays)
+  // ============================================
+  --color-primary-alpha-10: color-mix(
+    in srgb,
+    var(--color-primary) 10%,
+    transparent
+  );
+  --color-primary-alpha-15: color-mix(
+    in srgb,
+    var(--color-primary) 15%,
+    transparent
+  );
+  --color-primary-alpha-30: color-mix(
+    in srgb,
+    var(--color-primary) 30%,
+    transparent
+  );
+  --color-primary-alpha-40: color-mix(
+    in srgb,
+    var(--color-primary) 40%,
+    transparent
+  );
+
+  // ============================================
+  // COULEURS NEUTRES (basées sur le bleu principal)
+  // ============================================
+  // Variations neutres = bleu avec beaucoup de blanc/noir mélangé
+  --color-neutral-900: color-mix(
+    in srgb,
+    var(--color-primary),
+    black 85%
+  ); // Noir avec teinte bleue (#111827)
+  --color-neutral-700: color-mix(
+    in srgb,
+    var(--color-primary),
+    black 60%
+  ); // Gris foncé avec teinte bleue (#6b7280)
+  --color-neutral-400: color-mix(
+    in srgb,
+    var(--color-primary),
+    white 85%
+  ); // Gris clair bordures (#e5e7eb)
+  --color-neutral-200: color-mix(
+    in srgb,
+    var(--color-primary),
+    white 90%
+  ); // Gris très clair hover (#f3f4f6)
+  --color-neutral-150: color-mix(
+    in srgb,
+    var(--color-primary),
+    white 92%
+  ); // Gris très clair sub-surface (#f5f7f9)
+  --color-neutral-100: color-mix(
+    in srgb,
+    var(--color-primary),
+    white 93%
+  ); // Gris très clair surface (#f9fafb)
+  --color-neutral-50: color-mix(
+    in srgb,
+    var(--color-primary),
+    white 95%
+  ); // Presque blanc avec teinte bleue (#fafafa)
+
+  // ============================================
+  // COULEURS SYSTÈME (basées sur la couleur principale)
+  // ============================================
+  --color-bg: var(--color-neutral-50);
+  --color-subSurface: var(--color-neutral-150);
+  --color-surface: var(--color-neutral-100);
+  --color-surface-hover: var(--color-neutral-200);
+  --color-text: var(--color-neutral-900);
+  --color-text-dim: var(--color-neutral-700);
+  --color-border: var(--color-neutral-400);
+
+  // ============================================
+  // VARIATIONS DE LUMINOSITÉ (Vert - Success)
+  // ============================================
+  --color-success-900: color-mix(in srgb, var(--color-success) 100%, black 60%);
+  --color-success-800: color-mix(in srgb, var(--color-success) 100%, black 50%);
+  --color-success-700: color-mix(in srgb, var(--color-success) 100%, black 35%);
+  --color-success-600: var(--color-success);
+  --color-success-500: color-mix(in srgb, var(--color-success) 100%, white 15%);
+  --color-success-400: color-mix(in srgb, var(--color-success) 100%, white 35%);
+  --color-success-300: color-mix(in srgb, var(--color-success) 100%, white 50%);
+  --color-success-200: color-mix(in srgb, var(--color-success) 100%, white 70%);
+  --color-success-100: color-mix(in srgb, var(--color-success) 100%, white 85%);
+
+  // ============================================
+  // VARIATIONS DANGER (Rouge vers Orange - Dépenses)
+  // ============================================
+  --color-danger-900: color-mix(
+    in srgb,
+    var(--color-danger) 100%,
+    black 60%
+  ); // Rouge très foncé
+  --color-danger-800: color-mix(
+    in srgb,
+    var(--color-danger) 100%,
+    black 50%
+  ); // Rouge foncé
+  --color-danger-700: color-mix(
+    in srgb,
+    var(--color-danger) 100%,
+    black 35%
+  ); // Rouge moyen foncé
+  --color-danger-600: var(--color-danger); // Rouge base
+  --color-danger-500: color-mix(
+    in srgb,
+    var(--color-danger) 85%,
+    #ff6b35 15%
+  ); // Rouge vers orange
+  --color-danger-400: color-mix(
+    in srgb,
+    var(--color-danger) 70%,
+    #ff8c42 30%
+  ); // Orange-rouge
+  --color-danger-300: color-mix(
+    in srgb,
+    var(--color-danger) 55%,
+    #ffa552 45%
+  ); // Orange clair
+  --color-danger-200: color-mix(
+    in srgb,
+    var(--color-danger) 40%,
+    #ffb366 60%
+  ); // Orange pâle
+  --color-danger-100: color-mix(
+    in srgb,
+    var(--color-danger) 25%,
+    #ffc280 75%
+  ); // Orange très pâle
+
+  // Alias pour la compatibilité (mapping vers le nouveau système)
+  --color-accent: var(--color-primary-600);
+  --color-accent-hover: var(--color-primary-700);
+
+  // Gradients (mapping vers le nouveau système)
+  --color-gradient-1: var(--color-primary-600);
+  --color-gradient-1-hover: var(--color-primary-500);
+  --color-gradient-1-active: var(--color-primary-700);
+
+  --color-gradient-2: var(--color-primary-500);
+  --color-gradient-2-hover: var(--color-primary-600);
+  --color-gradient-2-active: var(--color-primary-700);
+
+  --color-gradient-3: var(--color-primary-400);
+  --color-gradient-3-hover: var(--color-primary-500);
+  --color-gradient-3-active: var(--color-primary-600);
+
+  --color-gradient-4: var(--color-primary-300);
+  --color-gradient-4-hover: var(--color-primary-400);
+  --color-gradient-4-active: var(--color-primary-500);
+
+  --color-gradient-5: var(--color-primary-200);
+  --color-gradient-5-hover: var(--color-primary-300);
+  --color-gradient-5-active: var(--color-primary-400);
+
+  --color-gradient-6: var(--color-primary-100);
+  --color-gradient-6-hover: var(--color-primary-200);
+  --color-gradient-6-active: var(--color-primary-300);
+
+  --color-gradient-7: var(--color-primary-50);
+  --color-gradient-7-hover: var(--color-primary-100);
+  --color-gradient-7-active: var(--color-primary-200);
+}
+
+[data-theme="dark"] {
+  // ============================================
+  // COULEURS DE BASE (Mode sombre)
+  // ============================================
+  --color-primary: #3b82f6; // Bleu - Couleur principale du site
+  --color-success: #22c55e; // Vert - Pour les recettes
+  --color-danger: #ef4444; // Rouge - Pour les dépenses et suppressions
+
+  // ============================================
+  // VARIATIONS DE LUMINOSITÉ (Bleu principal) - Mode sombre
+  // ============================================
+  // En mode sombre, on inverse la logique : plus de noir = plus clair dans l'UI
+  --color-primary-900: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 50%
+  ); // #93c5fd (très clair)
+  --color-primary-800: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 35%
+  ); // #60a5fa
+  --color-primary-700: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 20%
+  ); // #5b9cf7
+  --color-primary-600: var(--color-primary); // #3b82f6 (base)
+  --color-primary-500: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 15%
+  ); // #2563eb
+  --color-primary-400: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 30%
+  ); // #1d4ed8
+  --color-primary-300: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 40%
+  ); // #1e40af
+  --color-primary-200: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 50%
+  ); // #1e3a8a
+  --color-primary-100: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 55%
+  ); // #312e81
+  --color-primary-50: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 60%
+  ); // #3730a3
+
+  // ============================================
+  // COULEURS AVEC OPACITÉ (pour ombres, overlays)
+  // ============================================
+  --color-primary-alpha-10: color-mix(
+    in srgb,
+    var(--color-primary) 10%,
+    transparent
+  );
+  --color-primary-alpha-15: color-mix(
+    in srgb,
+    var(--color-primary) 15%,
+    transparent
+  );
+  --color-primary-alpha-30: color-mix(
+    in srgb,
+    var(--color-primary) 30%,
+    transparent
+  );
+  --color-primary-alpha-40: color-mix(
+    in srgb,
+    var(--color-primary) 40%,
+    transparent
+  );
+
+  // ============================================
+  // COULEURS NEUTRES (basées sur le bleu principal) - Mode sombre
+  // ============================================
+  // Variations neutres = bleu avec beaucoup de blanc/noir mélangé
+  --color-neutral-900: color-mix(
+    in srgb,
+    var(--color-primary),
+    white 93%
+  ); // Presque blanc avec teinte bleue (#f9fafb)
+  --color-neutral-700: color-mix(
+    in srgb,
+    var(--color-primary),
+    white 65%
+  ); // Gris clair avec teinte bleue (#9ca3af)
+  --color-neutral-400: color-mix(
+    in srgb,
+    var(--color-primary),
+    black 70%
+  ); // Gris moyen bordures (#374151)
+  --color-neutral-200: var(--color-neutral-400); // Même que bordures pour hover
+  --color-neutral-150: color-mix(
+    in srgb,
+    var(--color-primary),
+    black 78%
+  ); // Gris foncé sub-surface (#1c2431)
+  --color-neutral-100: color-mix(
+    in srgb,
+    var(--color-primary),
+    black 75%
+  ); // Gris foncé surface (#1f2937)
+  --color-neutral-50: color-mix(
+    in srgb,
+    var(--color-primary),
+    black 85%
+  ); // Presque noir avec teinte bleue (#111827)
+
+  // ============================================
+  // COULEURS SYSTÈME (basées sur la couleur principale)
+  // ============================================
+  --color-bg: var(--color-neutral-50);
+  --color-subSurface: var(--color-neutral-150);
+  --color-surface: var(--color-neutral-100);
+  --color-surface-hover: var(--color-neutral-200);
+  --color-text: var(--color-neutral-900);
+  --color-text-dim: var(--color-neutral-700);
+  --color-border: var(--color-neutral-400);
+
+  // ============================================
+  // VARIATIONS DE LUMINOSITÉ (Vert - Success) - Mode sombre
+  // ============================================
+  --color-success-900: color-mix(in srgb, var(--color-success) 100%, black 5%);
+  --color-success-800: color-mix(in srgb, var(--color-success) 100%, black 10%);
+  --color-success-700: color-mix(in srgb, var(--color-success) 100%, black 20%);
+  --color-success-600: var(--color-success); // Base
+  --color-success-500: color-mix(in srgb, var(--color-success) 100%, black 30%);
+  --color-success-400: color-mix(in srgb, var(--color-success) 100%, black 40%);
+  --color-success-300: color-mix(in srgb, var(--color-success) 100%, black 50%);
+  --color-success-200: color-mix(in srgb, var(--color-success) 100%, black 55%);
+  --color-success-100: color-mix(in srgb, var(--color-success) 100%, black 60%);
+
+  // ============================================
+  // VARIATIONS DANGER (Rouge vers Orange) - Mode sombre
+  // ============================================
+  --color-danger-900: color-mix(
+    in srgb,
+    var(--color-danger) 100%,
+    black 5%
+  ); // Rouge très clair
+  --color-danger-800: color-mix(
+    in srgb,
+    var(--color-danger) 100%,
+    black 10%
+  ); // Rouge clair
+  --color-danger-700: color-mix(
+    in srgb,
+    var(--color-danger) 100%,
+    black 20%
+  ); // Rouge moyen
+  --color-danger-600: var(--color-danger); // Rouge base
+  --color-danger-500: color-mix(
+    in srgb,
+    var(--color-danger) 85%,
+    #ff6b35 15%
+  ); // Rouge vers orange
+  --color-danger-400: color-mix(
+    in srgb,
+    var(--color-danger) 70%,
+    #ff8c42 30%
+  ); // Orange-rouge
+  --color-danger-300: color-mix(
+    in srgb,
+    var(--color-danger) 55%,
+    #ffa552 45%
+  ); // Orange clair
+  --color-danger-200: color-mix(
+    in srgb,
+    var(--color-danger) 40%,
+    #ffb366 60%
+  ); // Orange pâle
+  --color-danger-100: color-mix(
+    in srgb,
+    var(--color-danger) 25%,
+    #ffc280 75%
+  ); // Orange très pâle
+
+  // Alias pour la compatibilité (mapping vers le nouveau système)
+  --color-accent: var(--color-primary-600);
+  --color-accent-hover: var(--color-primary-800);
+
+  // Gradients (mapping vers le nouveau système - ordre inversé pour mode sombre)
+  --color-gradient-1: var(--color-primary-600);
+  --color-gradient-1-hover: var(--color-primary-800);
+  --color-gradient-1-active: var(--color-primary-500);
+
+  --color-gradient-2: var(--color-primary-500);
+  --color-gradient-2-hover: var(--color-primary-600);
+  --color-gradient-2-active: var(--color-primary-400);
+
+  --color-gradient-3: var(--color-primary-400);
+  --color-gradient-3-hover: var(--color-primary-500);
+  --color-gradient-3-active: var(--color-primary-300);
+
+  --color-gradient-4: var(--color-primary-300);
+  --color-gradient-4-hover: var(--color-primary-400);
+  --color-gradient-4-active: var(--color-primary-200);
+
+  --color-gradient-5: var(--color-primary-200);
+  --color-gradient-5-hover: var(--color-primary-300);
+  --color-gradient-5-active: var(--color-primary-100);
+
+  --color-gradient-6: var(--color-primary-100);
+  --color-gradient-6-hover: var(--color-primary-200);
+  --color-gradient-6-active: var(--color-primary-50);
+
+  --color-gradient-7: var(--color-primary-50);
+  --color-gradient-7-hover: var(--color-primary-100);
+  --color-gradient-7-active: var(--color-primary-200);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  transition: background 0.3s, color 0.3s;
+}
+
+.barSticky {
+  margin-bottom: 10px;
+  padding: 20px 0 10px 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.text-dim {
+  color: var(--color-text-dim);
+}
+
+.app {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: 60px 1fr;
+  grid-template-areas:
+    "header"
+    "main";
+}
+
+.app__header {
+  grid-area: header;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+
+  &-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+}
+
+.app__main {
+  grid-area: main;
+  padding: 2rem;
+}
+
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text);
+}
+
+.navBar {
+  width: 100%;
+  max-width: 1140px;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 0 auto 1rem auto;
+  flex-wrap: wrap;
+
+  .txn-form {
+    flex: 1;
+    min-width: 300px;
+  }
+
+  @media (max-width: 1200px) {
+    .txn-form {
+      flex: 1 1 100%;
+      order: 10;
+    }
+  }
+}
+
+.reset-filters {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: var(--color-text-dim);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    background-color: var(--color-surface-hover);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+// Filtre de période permanent
+.period-select {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 160px;
+  max-width: 200px;
+
+  &:hover {
+    border-color: var(--color-accent);
+    background-color: var(--color-surface-hover);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-primary-alpha-10);
+  }
+
+  option {
+    padding: 0.5rem;
+  }
+}
+
+.month-tabs {
+  width: auto;
+  max-width: 200px;
+  position: relative;
+
+  &__label {
+    padding: 5px 10px;
+    font-size: 0.875rem;
+  }
+
+  &__current {
+    padding: 5px 10px;
+    border-left: 1px solid var(--color-border);
+    font-size: 0.875rem;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    border-radius: 0.5rem;
+    cursor: pointer;
+  }
+
+  &__grid {
+    position: absolute;
+    padding: 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    top: 50px;
+    left: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)); // 3 colonnes par défaut
+    gap: 0.6rem 1rem;
+    margin: 0 auto;
+    background-color: var(--color-subSurface);
+    width: 350px;
+    max-height: 500px;
+    overflow-y: auto;
+    z-index: 1000;
+
+    // Variant pour le sélecteur de thèmes (plus de colonnes, plus large)
+    &--themes {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      width: 800px;
+      max-width: 90vw;
+    }
+  }
+
+  &__col {
+    display: grid;
+    align-content: center;
+    gap: 0.5rem;
+
+    &:first-child {
+      grid-column: 1 / -1;
+    }
+  }
+
+  &__theme-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-accent);
+    padding: 0.3rem 0;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 0.25rem;
+  }
+
+  &__item {
+    padding: 0.4rem 0.8rem;
+    border-radius: 25px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    cursor: pointer;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--color-text);
+    transition: background 0.2s, color 0.2s;
+
+    &:hover {
+      background: var(--color-surface-hover);
+    }
+
+    &.is-active {
+      background: var(--color-accent);
+      color: #fff;
+      border-color: var(--color-accent);
+    }
+  }
+
+  &__btn {
+    padding: 0.4rem 0.8rem;
+    border-radius: 25px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    cursor: pointer;
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--color-text);
+    transition: background 0.2s, color 0.2s;
+
+    &:hover {
+      background: var(--color-surface-hover);
+    }
+
+    &.active {
+      background: var(--color-accent);
+      color: #fff;
+      border-color: var(--color-accent);
+    }
+  }
+}
+
+.charts-dashboard {
+  margin: 1rem 0;
+
+  &_group {
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    max-width: 1440px;
+  }
+
+  &__controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      color: var(--color-text);
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        border-color: var(--color-accent);
+        background-color: var(--color-surface-hover);
+      }
+
+      input[type="checkbox"] {
+        cursor: pointer;
+        width: 1rem;
+        height: 1rem;
+        accent-color: var(--color-accent);
+      }
+    }
+  }
+
+  &__chart {
+    margin: 0 auto 2rem auto;
+    width: 100%;
+    height: 100%;
+  }
+
+  &__filters {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+
+    select {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      color: var(--color-text);
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        border-color: var(--color-accent);
+        background-color: var(--color-surface-hover);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: var(--color-accent);
+        box-shadow: 0 0 0 3px var(--color-primary-alpha-10);
+      }
+
+      option {
+        padding: 0.5rem;
+        color: var(--color-text);
+        background-color: var(--color-surface);
+      }
+    }
+  }
+}
+
+.txn-form {
+  max-width: 400px;
+  width: 100%;
+
+  &__header {
+    display: grid;
+    position: relative;
+    grid-template-columns: 1fr auto; // label à gauche, action (Annuler) à droite
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem;
+    margin: 0 0.25rem 0.25rem 0.25rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s ease-in-out;
+  }
+
+  &__label {
+    font-weight: 500;
+    padding: 5px 15px 5px 15px;
+  }
+
+  &__action {
+    color: var(--color-danger);
+    font-size: 0.875rem;
+  }
+
+  .form-container {
+    display: grid;
+    position: absolute;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem 1rem;
+    align-items: end;
+    width: 100%;
+    max-width: 400px;
+    padding: 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background-color: var(--color-subSurface);
+
+    /* Tous les champs occupent 2 colonnes par défaut */
+    > * {
+      grid-column: 1 / -1;
+    }
+
+    /* Montant à gauche, Radios à droite */
+    .form-amount {
+      position: relative;
+      grid-column: 1 / 2;
+    }
+    .form-movement {
+      grid-column: 2 / 3;
+
+      li {
+        margin: 0.5rem 0.3rem 0.5rem 0.3rem;
+        label {
+          padding: 0.5rem;
+          border: 1px solid var(--color-border);
+          background-color: var(--color-surface);
+          transition: background 0.2s ease-in-out;
+          border-radius: 0.2rem;
+
+          &:hover {
+            background-color: var(--color-surface-hover);
+          }
+        }
+        input[type="radio"]:checked + label {
+          background-color: var(--color-surface-hover);
+        }
+      }
+    }
+
+    /* Thème, Paiement, Désignation, Date, Submit => pleine largeur */
+    .form-date,
+    .form-theme,
+    .form-payment,
+    .form-designation,
+    .form-submit {
+      grid-column: 1 / -1;
+    }
+
+    .form-cell {
+      display: grid;
+      gap: 0.25rem;
+    }
+
+    input,
+    button {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--color-border);
+      border-radius: 0.375rem;
+      background: var(--color-surface);
+      color: var(--color-text);
+      font-size: 0.875rem;
+      width: 100%; /* pour occuper la cellule */
+    }
+
+    /* Radios */
+    .form-movement ul {
+      list-style: none;
+      display: flex;
+      gap: 0.5rem;
+      margin: 0;
+      padding: 0;
+    }
+    .form-movement input[type="radio"] {
+      display: none;
+    }
+
+    /* Bouton pleine largeur */
+    .form-submit button {
+      background: var(--color-accent);
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.2s;
+      width: 100%;
+    }
+    .form-submit button:hover {
+      background: var(--color-accent-hover);
+    }
+
+    .error {
+      color: var(--color-danger);
+      font-size: 0.75rem;
+    }
+  }
+
+  /* Optionnel : en mobile, passe tout en 1 colonne */
+  @media (max-width: 520px) {
+    .form-container {
+      grid-template-columns: 1fr;
+    }
+    .form-amount,
+    .form-movement {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.table-container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.table-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 25rem 10rem 1fr 7rem 7rem 7rem 6rem;
+  margin-bottom: 10px;
+
+  .table-header {
+    display: contents;
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.875rem;
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-border);
+      border-bottom: 2px solid var(--color-border);
+      padding: 0.75rem 0.5rem;
+      text-align: center;
+      color: var(--color-text);
+    }
+  }
+
+  .table-row-wrapper {
+    display: contents;
+  }
+
+  .table-row {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+
+    .moneyFormat {
+      display: flex;
+      justify-content: right !important;
+    }
+
+    .table-cell {
+      position: relative;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: center;
+
+      padding: 0.5rem;
+      // border-bottom: 1px solid var(--color-border);
+      text-align: center;
+
+      ul {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        padding: 0;
+        margin: 0;
+      }
+
+      li {
+        list-style: none;
+      }
+    }
+
+    .actions-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25rem;
+
+      .checkbox-action {
+        width: 1.2rem;
+        height: 1.2rem;
+        cursor: pointer;
+        margin-right: 0.25rem;
+        appearance: auto;
+        -webkit-appearance: auto;
+        -moz-appearance: auto;
+
+        /* Fallback pour les navigateurs qui ne supportent pas appearance: auto */
+        border: 2px solid var(--color-text);
+        border-radius: 0.2rem;
+        background-color: var(--color-surface);
+
+        &:checked {
+          background-color: var(--color-accent);
+          border-color: var(--color-accent);
+
+          /* Ajouter un checkmark */
+          &::after {
+            content: "✓";
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            display: block;
+            text-align: center;
+            line-height: 1.2rem;
+          }
+        }
+
+        &:hover {
+          border-color: var(--color-accent);
+        }
+      }
+    }
+  }
+
+  .table-row-wrapper:nth-child(even):not(.disabled):not(.editing) .table-cell {
+    background: var(--color-subSurface);
+  }
+
+  .table-row-wrapper.editing .table-row {
+    background: var(--color-surface);
+    position: relative;
+    z-index: 10;
+  }
+
+  .table-row-wrapper.disabled .table-row {
+    background: repeating-linear-gradient(
+      45deg,
+      var(--color-surface),
+      var(--color-surface) 10px,
+      var(--color-surface-hover) 10px,
+      var(--color-surface-hover) 20px
+    ) !important;
+  }
+
+  .table-row-wrapper.disabled .table-cell {
+    background: transparent !important;
+    color: var(--color-text-dim);
+    opacity: 0.7;
+  }
+
+  .btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover {
+      background: var(--color-surface-hover);
+    }
+
+    &.delete {
+      color: var(--color-danger);
+    }
+
+    &.save {
+      color: var(--color-accent);
+    }
+
+    &.cancel {
+      color: var(--color-text-dim);
+    }
+  }
+}
+
+.date-group {
+  margin-bottom: 1.5rem;
+  border: 2px solid var(--color-border);
+  border-radius: 0.5rem;
+  // overflow: hidden;
+
+  .date-header {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: var(--color-subSurface);
+    color: var(--color-text);
+    font-weight: 600;
+    font-size: 0.95rem;
+
+    .date-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      &::before {
+        content: "📅";
+        font-size: 1.1rem;
+      }
+    }
+  }
+}
+
+.no-data {
+  text-align: center;
+  font-style: italic;
+  margin-top: 1rem;
+}
+
+.action-buttons-fixed {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+  z-index: 900;
+
+  @media (max-width: 768px) {
+    bottom: 1rem;
+    right: 1rem;
+  }
+}
+
+.btnGraph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  color: var(--color-text);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  svg {
+    transition: transform 0.3s ease;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+.btnScroll {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  color: var(--color-text);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  svg {
+    transition: transform 0.3s ease;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
+/* Modal de confirmation */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 400px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: auto;
+
+  .modal-header {
+    padding: 1.5rem 1.5rem 0;
+
+    .modal-title {
+      margin: 0;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+  }
+
+  .modal-body {
+    padding: 1rem 1.5rem;
+
+    .modal-message {
+      margin: 0;
+      color: var(--color-text);
+      line-height: 1.5;
+    }
+  }
+
+  .modal-footer {
+    padding: 0 1.5rem 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+
+      &.btn-secondary {
+        background: var(--color-surface);
+        color: var(--color-text);
+        border-color: var(--color-border);
+
+        &:hover {
+          background: var(--color-surface-hover);
+        }
+      }
+
+      &.btn-danger {
+        background: var(--color-danger);
+        color: white;
+
+        &:hover {
+          background: var(--color-danger-700);
+        }
+
+        &:focus {
+          outline: 2px solid var(--color-danger);
+          outline-offset: 2px;
+        }
+      }
+    }
+  }
+}
+
+// Theme Manager Modal
+.theme-manager-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  overflow: auto;
+  backdrop-filter: blur(4px);
+}
+
+.theme-manager-modal {
+  min-height: 100vh;
+  background: var(--color-bg);
+
+  &__header {
+    position: sticky;
+    top: 0;
+    background: var(--color-surface);
+    padding: 1rem 2rem;
+    border-bottom: 2px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+
+    h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 0.375rem;
+      color: var(--color-text);
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: var(--color-surface-hover);
+        border-color: var(--color-accent);
+        color: var(--color-accent);
+      }
+    }
+  }
+}
+
+// Button Themes
+.btnThemes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  color: var(--color-text);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  svg {
+    transition: transform 0.3s ease;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
