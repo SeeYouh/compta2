@@ -1,10 +1,72 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import AmountInput from "./AmountInput";
 import { APP_LABELS } from "./utils";
 import FormatCurrency from "./utils/FormatCurrency";
 import PaymentSelector from "./PaymentSelector";
 import ThemeSelectorDropdown from "./ThemeSelectorDropdown";
+
+// Composant pour afficher le thème avec hover sur le sous-thème
+const ThemeDisplay = ({ theme, subTheme }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isTruncated, setIsTruncated] = useState(false);
+  const subThemeRef = useRef(null);
+
+  useEffect(() => {
+    const checkTruncation = () => {
+      if (subThemeRef.current) {
+        const isTrunc =
+          subThemeRef.current.scrollWidth > subThemeRef.current.clientWidth;
+        setIsTruncated(isTrunc);
+        console.log("Truncation check:", {
+          scrollWidth: subThemeRef.current.scrollWidth,
+          clientWidth: subThemeRef.current.clientWidth,
+          isTruncated: isTrunc,
+          subTheme,
+        });
+      }
+    };
+
+    checkTruncation();
+    window.addEventListener("resize", checkTruncation);
+    return () => window.removeEventListener("resize", checkTruncation);
+  }, [subTheme]);
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePosition({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  };
+
+  return (
+    <div className="theme-display">
+      <div className="theme-main">{theme}</div>
+      <div
+        ref={subThemeRef}
+        className="theme-sub"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onMouseMove={handleMouseMove}
+      >
+        {subTheme}
+        {isHovered && isTruncated && (
+          <div
+            className="theme-sub-tooltip"
+            style={{
+              left: `${mousePosition.x + 40}px`,
+              top: `${mousePosition.y + 20}px`,
+            }}
+          >
+            {subTheme}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 // Helpers simples pour gérer la date <input type="date"> (ISO) ↔ affichage FR
 const isoToFr = (iso) => {
@@ -161,10 +223,7 @@ const TransactionsTable = ({
                             }}
                           />
                         ) : (
-                          <ul>
-                            <li>{t.theme}</li>
-                            <li>{t.subTheme}</li>
-                          </ul>
+                          <ThemeDisplay theme={t.theme} subTheme={t.subTheme} />
                         )}
                       </div>
 

@@ -1,41 +1,86 @@
-// Styles pour les onglets d'années avec système cyclique de couleurs
+// Styles pour les onglets d'années en vertical, fixe à gauche
+.yearTabs {
+  position: fixed;
+  left: 1rem;
+  top: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  z-index: 100;
+
+  // Sur mobile, retour en horizontal en haut
+  @media (max-width: 768px) {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 0;
+    margin-bottom: 1rem;
+  }
+}
+
 .tab {
-  padding: 8px 16px;
+  padding: 0.5rem 1rem;
   border: none;
   cursor: pointer;
   background: var(--color-surface);
   color: var(--color-text);
   transition: all 0.2s ease;
   position: relative;
+  width: 70px;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid var(--color-border);
 
   &:hover {
     background: var(--color-surface-hover);
+    border-color: var(--color-accent);
   }
 
   &.active {
     background: var(--color-accent);
     color: white;
+    border-color: var(--color-accent);
+  }
+
+  // Mobile : retour au style horizontal
+  @media (max-width: 768px) {
+    width: auto;
+    min-width: 80px;
   }
 }
 
-// Premier onglet (Tous) - utilise directement color-accent
+// Premier onglet (Tous)
 .tab:first-child {
-  border-radius: 8px 0 0 0;
+  border-radius: 0.5rem 0.5rem 0 0;
   background: var(--color-accent);
   color: white;
+  border-color: var(--color-accent);
 
   &:hover {
     background: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
   }
 
   &.active {
     background: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+  }
+
+  // Mobile
+  @media (max-width: 768px) {
+    border-radius: 8px 0 0 0;
   }
 }
 
-// Dernier onglet - border-radius right top
+// Dernier onglet
 .tab:last-child {
-  border-radius: 0 8px 0 0;
+  border-radius: 0 0 0.5rem 0.5rem;
+
+  // Mobile
+  @media (max-width: 768px) {
+    border-radius: 0 8px 0 0;
+  }
 }
 
 // Système cyclique de couleurs pour les onglets d'années (7 couleurs qui se répètent)

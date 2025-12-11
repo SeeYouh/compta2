@@ -512,6 +512,13 @@ body {
 .app__main {
   grid-area: main;
   padding: 2rem;
+  margin-left: 100px; // Espace pour les onglets d'années (70px + gap)
+  margin-right: 120px; // Espace pour les boutons d'action à droite
+
+  @media (max-width: 768px) {
+    margin-left: 0; // Pas de marge sur mobile (onglets en haut)
+    margin-right: 0; // Pas de marge sur mobile (boutons en overlay)
+  }
 }
 
 .theme-toggle {
@@ -954,7 +961,7 @@ body {
 .table-grid {
   width: 100%;
   display: grid;
-  grid-template-columns: 25rem 10rem 1fr 7rem 7rem 7rem 6rem;
+  grid-template-columns: minmax(15rem, 2fr) minmax(8rem, 1fr) minmax(10rem, 2fr) 6rem 6rem 6rem 5rem;
   margin-bottom: 10px;
 
   .table-header {
@@ -997,7 +1004,6 @@ body {
       justify-content: center;
 
       padding: 0.5rem;
-      // border-bottom: 1px solid var(--color-border);
       text-align: center;
 
       ul {
@@ -1010,6 +1016,54 @@ body {
 
       li {
         list-style: none;
+      }
+
+      .theme-display {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.15rem;
+        width: 100%;
+        max-width: 95%;
+        text-align: left;
+        padding-left: 20px;
+      }
+
+      .theme-main {
+        font-weight: 500;
+        color: var(--color-text);
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .theme-sub {
+        font-size: 0.875rem;
+        color: var(--color-text-dim);
+        padding-left: 0.5rem;
+        font-style: italic;
+        width: calc(100% - 0.5rem);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .theme-sub-tooltip {
+        position: absolute;
+        padding: 0.5rem 0.75rem;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 0.375rem;
+        color: var(--color-text);
+        font-size: 0.875rem;
+        font-style: normal;
+        white-space: nowrap;
+        box-shadow: 0 4px 6px -1px var(--color-primary-alpha-10),
+          0 2px 4px -2px var(--color-primary-alpha-15);
+        z-index: 1000;
+        pointer-events: none;
       }
     }
 
