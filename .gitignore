@@ -32,9 +32,6 @@ lerna-debug.log*
 *~
 .DS_Store
 
-# GitHub workflows et documentation (configuration locale)
-.github/
-
 # Database backups and local data
 db.json
 db-backup.json
@@ -49,3 +46,8 @@ Thumbs.db
 *.tmp
 *.temp
 .cache/
+
+.github/*
+
+server/node_modules/
+server/.env
