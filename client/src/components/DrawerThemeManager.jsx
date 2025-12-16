@@ -73,7 +73,7 @@ export default function DrawerThemeManager({
   };
 
   // Ajout d'un nouveau thème
-  const handleAddTheme = () => {
+  const handleAddTheme = async () => {
     if (!newThemeName.trim()) return;
 
     const newId = generateThemeId(localThemes);
@@ -92,6 +92,17 @@ export default function DrawerThemeManager({
     setLocalThemes(updatedThemes);
     setNewThemeName("");
     setIsAddingTheme(false);
+
+    // Sauvegarde immédiate
+    try {
+      await saveThemes(updatedThemes);
+      onSave(updatedThemes);
+      setSaveMessage({ type: "success", text: "Thème ajouté" });
+      setTimeout(() => setSaveMessage(null), 2000);
+    } catch {
+      setSaveMessage({ type: "error", text: "Erreur de sauvegarde" });
+      setTimeout(() => setSaveMessage(null), 2000);
+    }
   };
 
   // Édition d'un thème
@@ -100,7 +111,7 @@ export default function DrawerThemeManager({
     setEditingValue(currentName);
   };
 
-  const saveEditTheme = () => {
+  const saveEditTheme = async () => {
     if (!editingValue.trim() || !editingThemeId) return;
 
     const updatedThemes = {
@@ -115,6 +126,17 @@ export default function DrawerThemeManager({
     setLocalThemes(updatedThemes);
     setEditingThemeId(null);
     setEditingValue("");
+
+    // Sauvegarde immédiate
+    try {
+      await saveThemes(updatedThemes);
+      onSave(updatedThemes);
+      setSaveMessage({ type: "success", text: "Thème modifié" });
+      setTimeout(() => setSaveMessage(null), 2000);
+    } catch {
+      setSaveMessage({ type: "error", text: "Erreur de sauvegarde" });
+      setTimeout(() => setSaveMessage(null), 2000);
+    }
   };
 
   // Suppression d'un thème
@@ -126,27 +148,42 @@ export default function DrawerThemeManager({
     });
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
+    let updatedThemes;
+
     if (deleteConfirm.type === "theme") {
       const { [deleteConfirm.id]: _removed, ...remainingThemes } = localThemes;
+      updatedThemes = remainingThemes;
       setLocalThemes(remainingThemes);
     } else if (deleteConfirm.type === "subtheme") {
       const { [deleteConfirm.subId]: _removed, ...remainingSubThemes } =
         localThemes[deleteConfirm.themeId].subThemes;
 
-      setLocalThemes({
+      updatedThemes = {
         ...localThemes,
         [deleteConfirm.themeId]: {
           ...localThemes[deleteConfirm.themeId],
           subThemes: remainingSubThemes,
         },
-      });
+      };
+      setLocalThemes(updatedThemes);
     }
     setDeleteConfirm(null);
+
+    // Sauvegarde immédiate
+    try {
+      await saveThemes(updatedThemes);
+      onSave(updatedThemes);
+      setSaveMessage({ type: "success", text: "Suppression réussie" });
+      setTimeout(() => setSaveMessage(null), 2000);
+    } catch {
+      setSaveMessage({ type: "error", text: "Erreur de sauvegarde" });
+      setTimeout(() => setSaveMessage(null), 2000);
+    }
   };
 
   // Ajout d'un sous-thème
-  const handleAddSubTheme = (themeId) => {
+  const handleAddSubTheme = async (themeId) => {
     if (!newSubThemeName.trim()) return;
 
     const theme = localThemes[themeId];
@@ -171,6 +208,17 @@ export default function DrawerThemeManager({
     setLocalThemes(updatedThemes);
     setNewSubThemeName("");
     setAddingSubThemeToId(null);
+
+    // Sauvegarde immédiate
+    try {
+      await saveThemes(updatedThemes);
+      onSave(updatedThemes);
+      setSaveMessage({ type: "success", text: "Sous-thème ajouté" });
+      setTimeout(() => setSaveMessage(null), 2000);
+    } catch {
+      setSaveMessage({ type: "error", text: "Erreur de sauvegarde" });
+      setTimeout(() => setSaveMessage(null), 2000);
+    }
   };
 
   // Édition d'un sous-thème
@@ -179,7 +227,7 @@ export default function DrawerThemeManager({
     setEditingValue(currentName);
   };
 
-  const saveEditSubTheme = (themeId, subThemeId) => {
+  const saveEditSubTheme = async (themeId, subThemeId) => {
     if (!editingValue.trim()) return;
 
     const updatedThemes = {
@@ -200,6 +248,17 @@ export default function DrawerThemeManager({
     setLocalThemes(updatedThemes);
     setEditingSubThemeId(null);
     setEditingValue("");
+
+    // Sauvegarde immédiate
+    try {
+      await saveThemes(updatedThemes);
+      onSave(updatedThemes);
+      setSaveMessage({ type: "success", text: "Sous-thème modifié" });
+      setTimeout(() => setSaveMessage(null), 2000);
+    } catch {
+      setSaveMessage({ type: "error", text: "Erreur de sauvegarde" });
+      setTimeout(() => setSaveMessage(null), 2000);
+    }
   };
 
   // Suppression d'un sous-thème
@@ -210,22 +269,6 @@ export default function DrawerThemeManager({
       subId: subThemeId,
       name: localThemes[themeId].subThemes[subThemeId].name,
     });
-  };
-
-  // Sauvegarde
-  const handleSave = async () => {
-    try {
-      await saveThemes(localThemes);
-      onSave(localThemes);
-      setSaveMessage({
-        type: "success",
-        text: "Thèmes sauvegardés avec succès !",
-      });
-      setTimeout(() => setSaveMessage(null), 3000);
-    } catch {
-      setSaveMessage({ type: "error", text: "Erreur lors de la sauvegarde" });
-      setTimeout(() => setSaveMessage(null), 3000);
-    }
   };
 
   if (!isOpen) return null;
@@ -245,9 +288,6 @@ export default function DrawerThemeManager({
         <div className="drawer-theme-manager__header">
           <h2>Gérer les thèmes</h2>
           <div className="drawer-theme-manager__header-actions">
-            <button className="btn btn--save" onClick={handleSave}>
-              Sauvegarder
-            </button>
             <button className="btn btn--close" onClick={onClose}>
               ✕
             </button>
@@ -327,22 +367,44 @@ export default function DrawerThemeManager({
                     {/* Nom du thème */}
                     <div className="theme-card__header">
                       {editingThemeId === theme.id ? (
-                        <input
-                          type="text"
-                          value={editingValue}
-                          onChange={(e) => setEditingValue(e.target.value)}
-                          className="theme-card__input"
-                          autoFocus
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") saveEditTheme();
-                            if (e.key === "Escape") {
+                        <div className="theme-card__edit-container">
+                          <input
+                            type="text"
+                            value={editingValue}
+                            onChange={(e) => setEditingValue(e.target.value)}
+                            className="theme-card__input"
+                            autoFocus
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") saveEditTheme();
+                              if (e.key === "Escape") {
+                                setEditingThemeId(null);
+                                setEditingValue("");
+                              }
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          <button
+                            className="btn btn--confirm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              saveEditTheme();
+                            }}
+                            title="Valider"
+                          >
+                            ✓
+                          </button>
+                          <button
+                            className="btn btn--cancel"
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setEditingThemeId(null);
                               setEditingValue("");
-                            }
-                          }}
-                          onBlur={saveEditTheme}
-                          onClick={(e) => e.stopPropagation()}
-                        />
+                            }}
+                            title="Annuler"
+                          >
+                            ✕
+                          </button>
+                        </div>
                       ) : (
                         <h3
                           className="theme-card__title"
@@ -387,26 +449,46 @@ export default function DrawerThemeManager({
                           <div key={subTheme.id} className="subtheme-pill">
                             {editingSubThemeId ===
                             `${theme.id}-${subTheme.id}` ? (
-                              <input
-                                type="text"
-                                value={editingValue}
-                                onChange={(e) =>
-                                  setEditingValue(e.target.value)
-                                }
-                                className="subtheme-pill__input"
-                                autoFocus
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter")
-                                    saveEditSubTheme(theme.id, subTheme.id);
-                                  if (e.key === "Escape") {
-                                    setEditingSubThemeId(null);
-                                    setEditingValue("");
+                              <>
+                                <input
+                                  type="text"
+                                  value={editingValue}
+                                  onChange={(e) =>
+                                    setEditingValue(e.target.value)
                                   }
-                                }}
-                                onBlur={() =>
-                                  saveEditSubTheme(theme.id, subTheme.id)
-                                }
-                              />
+                                  className="subtheme-pill__input"
+                                  autoFocus
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter")
+                                      saveEditSubTheme(theme.id, subTheme.id);
+                                    if (e.key === "Escape") {
+                                      setEditingSubThemeId(null);
+                                      setEditingValue("");
+                                    }
+                                  }}
+                                />
+                                <div className="subtheme-pill__actions">
+                                  <button
+                                    className="btn btn--confirm"
+                                    onClick={() =>
+                                      saveEditSubTheme(theme.id, subTheme.id)
+                                    }
+                                    title="Valider"
+                                  >
+                                    ✓
+                                  </button>
+                                  <button
+                                    className="btn btn--cancel"
+                                    onClick={() => {
+                                      setEditingSubThemeId(null);
+                                      setEditingValue("");
+                                    }}
+                                    title="Annuler"
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                              </>
                             ) : (
                               <>
                                 <span className="subtheme-pill__name">

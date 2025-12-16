@@ -29,7 +29,7 @@ import TransactionForm from "../components/TransactionForm";
 import TransactionsTable from "../components/TransactionsTable";
 import { useLastUpdate } from "../components/hooks/useLastUpdate";
 import { useSettings } from "../components/hooks/useSettings";
-import { useThemes } from "../components/hooks/useThemes";
+import { useThemes } from "../contexts/useThemes";
 import { useTransactionForm } from "../components/hooks/useTransactionForm";
 import { useTransactions } from "../components/hooks/useTransactions";
 import YearTabs from "../components/filters/YearTabs";

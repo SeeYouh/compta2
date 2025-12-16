@@ -19,12 +19,6 @@ const ThemeDisplay = ({ theme, subTheme }) => {
         const isTrunc =
           subThemeRef.current.scrollWidth > subThemeRef.current.clientWidth;
         setIsTruncated(isTrunc);
-        console.log("Truncation check:", {
-          scrollWidth: subThemeRef.current.scrollWidth,
-          clientWidth: subThemeRef.current.clientWidth,
-          isTruncated: isTrunc,
-          subTheme,
-        });
       }
     };
 

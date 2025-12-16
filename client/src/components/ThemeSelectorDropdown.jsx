@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 
 import { useClickOutside } from "./hooks/useClickOutside";
-import { useThemes } from "./hooks/useThemes";
+import { useThemes } from "../contexts/useThemes";
 
 const ThemeSelectorDropdown = ({ value, onChange }) => {
   // value attendu : { theme: themeId, subTheme: subThemeId }

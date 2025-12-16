@@ -5,6 +5,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
 import App from "./pages/App";
+import { ThemesProvider } from "./contexts/ThemesContext";
 
 function initTheme() {
   const stored = localStorage.getItem("theme");
@@ -22,6 +23,8 @@ initTheme();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <App />
+    <ThemesProvider>
+      <App />
+    </ThemesProvider>
   </StrictMode>
 );
