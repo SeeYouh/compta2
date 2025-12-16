@@ -1,14 +1,11 @@
-import {
-  useCallback,
-  useState,
-} from 'react';
+import { useCallback, useState } from "react";
 
-import { FIELD_RULES } from '../utils/index';
+import { FIELD_RULES } from "../utils/index";
 
 const initialForm = {
   date: "",
-  theme: "",
-  subTheme: "",
+  themeId: "",
+  subThemeId: "",
   payment: "",
   designation: "",
   amount: "",
@@ -46,8 +43,8 @@ export function useTransactionForm() {
     const date = `${day}/${month}/${year}`;
     return {
       date,
-      theme: formData.theme,
-      subTheme: formData.subTheme,
+      themeId: formData.themeId,
+      subThemeId: formData.subThemeId,
       payment: formData.payment,
       designation: formData.designation,
       recette: formData.bankMovement === "recette" ? formData.amount : "",

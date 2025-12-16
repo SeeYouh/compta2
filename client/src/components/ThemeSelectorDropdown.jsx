@@ -1,21 +1,34 @@
 import React, { useRef, useState } from "react";
 
-import themesData from "./utils/labelCategory.json";
 import { useClickOutside } from "./hooks/useClickOutside";
+import { useThemes } from "./hooks/useThemes";
 
 const ThemeSelectorDropdown = ({ value, onChange }) => {
-  // value attendu : { theme: string, subTheme: string }
+  // value attendu : { theme: themeId, subTheme: subThemeId }
+  const {
+    getThemeName,
+    getSubThemeName,
+    getThemesArray,
+    getSubThemesArray,
+    loading,
+  } = useThemes();
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   useClickOutside(ref, () => setOpen(false));
 
+  const themeName = getThemeName(value?.theme);
+  const subThemeName = getSubThemeName(value?.theme, value?.subTheme);
   const currentLabel =
-    value?.theme && value?.subTheme
-      ? `${value.theme} - ${value.subTheme}`
+    themeName && subThemeName
+      ? `${themeName} - ${subThemeName}`
       : "Sélectionner";
 
-  const handleSelect = (theme, subTheme) => {
-    onChange?.({ theme, subTheme });
+  if (loading) {
+    return <div className="month-tabs__current">Chargement...</div>;
+  }
+
+  const handleSelect = (themeId, subThemeId) => {
+    onChange?.({ theme: themeId, subTheme: subThemeId });
     setOpen(false);
   };
 
@@ -26,12 +39,14 @@ const ThemeSelectorDropdown = ({ value, onChange }) => {
     }
   };
 
-  const onOptionKey = (theme, subTheme) => (e) => {
+  const onOptionKey = (themeId, subThemeId) => (e) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      handleSelect(theme, subTheme);
+      handleSelect(themeId, subThemeId);
     }
   };
+
+  const themesArray = getThemesArray();
 
   return (
     <div ref={ref} className="month-tabs">
@@ -55,30 +70,33 @@ const ThemeSelectorDropdown = ({ value, onChange }) => {
         aria-labelledby="theme-selector-trigger"
         hidden={!open}
       >
-        {Object.entries(themesData).map(([theme, subThemes]) => (
-          <div key={theme} className="month-tabs__col">
-            <div className="month-tabs__theme-title">{theme}</div>
-            {subThemes.map((subTheme) => (
-              <button
-                key={subTheme}
-                type="button"
-                role="option"
-                aria-selected={
-                  value?.theme === theme && value?.subTheme === subTheme
-                }
-                className={`month-tabs__item ${
-                  value?.theme === theme && value?.subTheme === subTheme
-                    ? "is-active"
-                    : ""
-                }`}
-                onClick={() => handleSelect(theme, subTheme)}
-                onKeyDown={onOptionKey(theme, subTheme)}
-              >
-                {subTheme}
-              </button>
-            ))}
-          </div>
-        ))}
+        {themesArray.map((theme) => {
+          const subThemesArray = getSubThemesArray(theme.id);
+          return (
+            <div key={theme.id} className="month-tabs__col">
+              <div className="month-tabs__theme-title">{theme.name}</div>
+              {subThemesArray.map((subTheme) => (
+                <button
+                  key={subTheme.id}
+                  type="button"
+                  role="option"
+                  aria-selected={
+                    value?.theme === theme.id && value?.subTheme === subTheme.id
+                  }
+                  className={`month-tabs__item ${
+                    value?.theme === theme.id && value?.subTheme === subTheme.id
+                      ? "is-active"
+                      : ""
+                  }`}
+                  onClick={() => handleSelect(theme.id, subTheme.id)}
+                  onKeyDown={onOptionKey(theme.id, subTheme.id)}
+                >
+                  {subTheme.name}
+                </button>
+              ))}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

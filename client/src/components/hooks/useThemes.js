@@ -1,28 +1,40 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+
+import { getThemes } from "../utils/themesApi";
 
 /**
  * Hook pour charger et gérer les thèmes/sous-thèmes
- * @returns {Object} { themes, getThemeName, getSubThemeName, getThemeById, getSubThemeById, loading, error }
+ * @returns {Object} { themes, getThemeName, getSubThemeName, getThemeById, getSubThemeById, loading, error, refresh }
  */
 export function useThemes() {
   const [themesData, setThemesData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    // Charger themes.json comme fichier statique
-    fetch("/themes.json")
-      .then((res) => res.json())
-      .then((data) => {
-        setThemesData(data.themes);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Erreur chargement thèmes:", err);
-        setError(err);
-        setLoading(false);
-      });
+  const loadThemes = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await getThemes();
+      setThemesData(data);
+      setError(null);
+    } catch (err) {
+      console.error("Erreur chargement thèmes:", err);
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadThemes();
+  }, [loadThemes]);
+
+  /**
+   * Force le rechargement des thèmes depuis le serveur
+   */
+  const refresh = useCallback(() => {
+    loadThemes();
+  }, [loadThemes]);
 
   /**
    * Récupère le nom d'un thème par son ID
@@ -88,5 +100,6 @@ export function useThemes() {
     getSubThemesArray,
     loading,
     error,
+    refresh,
   };
 }

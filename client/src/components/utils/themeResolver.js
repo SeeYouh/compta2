@@ -17,10 +17,25 @@ export function enrichTransaction(transaction, themes) {
   const theme = themes[themeId];
   const subTheme = theme?.subThemes?.[subThemeId];
 
+  // Gestion de la compatibilité : si pas d'IDs, utiliser les noms directs (anciennes données)
+  let themeName, subThemeName;
+
+  if (themeId && theme) {
+    // Nouveau système avec IDs
+    themeName = theme.name;
+    subThemeName = subTheme?.name || "Sans catégorie";
+  } else {
+    // Ancien système avec noms directs (fallback)
+    themeName =
+      transaction.theme || transaction.theme_legacy || "Non catégorisé";
+    subThemeName =
+      transaction.subTheme || transaction.subTheme_legacy || "Sans catégorie";
+  }
+
   return {
     ...transaction,
-    theme: theme?.name || transaction.theme_legacy || "Non catégorisé",
-    subTheme: subTheme?.name || transaction.subTheme_legacy || "Sans catégorie",
+    theme: themeName,
+    subTheme: subThemeName,
   };
 }
 

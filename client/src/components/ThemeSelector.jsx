@@ -1,10 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import styles from "../sass/components/ThemeSelector.module.scss";
-import themesData from "./utils/labelCategory.json";
+import { useThemes } from "./hooks/useThemes";
 
 const ThemeSelector = ({ value, onChange }) => {
-  // value attendu : { theme: string, subTheme: string }
+  // value attendu : { theme: themeId, subTheme: subThemeId }
+  const {
+    themes,
+    getThemeName,
+    getSubThemeName,
+    getThemesArray,
+    getSubThemesArray,
+    loading,
+  } = useThemes();
+
   const [selectedTheme, setSelectedTheme] = useState(value?.theme || "");
   const [selectedSubTheme, setSelectedSubTheme] = useState(
     value?.subTheme || ""
@@ -23,17 +32,18 @@ const ThemeSelector = ({ value, onChange }) => {
   }, [value?.theme, value?.subTheme]);
 
   // Calculer la position du sous-menu
-  const handleMouseEnter = (theme) => {
-    setHoveredTheme(theme);
+  const handleMouseEnter = (themeId) => {
+    setHoveredTheme(themeId);
 
-    const menuItem = menuItemRefs.current[theme];
+    const menuItem = menuItemRefs.current[themeId];
     const menu = menuRef.current;
 
     if (!menuItem || !menu) return;
 
     const itemRect = menuItem.getBoundingClientRect();
     const menuRect = menu.getBoundingClientRect();
-    const subMenuHeight = themesData[theme].length * 40; // Estimation hauteur item ~40px
+    const subThemesArray = getSubThemesArray(themeId);
+    const subMenuHeight = subThemesArray.length * 40; // Estimation hauteur item ~40px
 
     const itemPositionInMenu = itemRect.top - menuRect.top;
 
@@ -49,15 +59,16 @@ const ThemeSelector = ({ value, onChange }) => {
     const shouldAlignBottom = wouldOverflowBottom && !wouldOverflowTop;
 
     setSubMenuPosition({
-      [theme]: shouldAlignBottom ? "bottom" : "top",
+      [themeId]: shouldAlignBottom ? "bottom" : "top",
     });
   };
 
-  const handleSelectSubTheme = (theme, subTheme) => {
-    setSelectedTheme(theme);
-    setSelectedSubTheme(subTheme);
+  const handleSelectSubTheme = (themeId, subThemeId) => {
+    setSelectedTheme(themeId);
+    setSelectedSubTheme(subThemeId);
     setMenuOpen(false);
-    onChange?.({ theme, subTheme });
+    // Envoie les IDs au formulaire
+    onChange?.({ theme: themeId, subTheme: subThemeId });
   };
 
   // Fermeture du menu au clic en dehors
@@ -71,44 +82,57 @@ const ThemeSelector = ({ value, onChange }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  if (loading) {
+    return (
+      <div className={styles.wrapper}>
+        <div className={styles.selector}>Chargement...</div>
+      </div>
+    );
+  }
+
+  const themesArray = getThemesArray();
+
   return (
     <div className={styles.wrapper} ref={wrapperRef}>
       <div className={styles.selector} onClick={() => setMenuOpen((p) => !p)}>
-        {selectedTheme || "Catégories"}
+        {getThemeName(selectedTheme) || "Catégories"}
       </div>
 
       <div className={`${styles.selector} ${styles.subThemeDisplay}`}>
-        {selectedSubTheme || "Sous-catégories"}
+        {getSubThemeName(selectedTheme, selectedSubTheme) || "Sous-catégories"}
       </div>
 
       {menuOpen && (
         <div className={styles.menu} ref={menuRef}>
           <ul className={styles.mainMenu}>
-            {Object.keys(themesData).map((theme) => (
+            {themesArray.map((theme) => (
               <li
-                key={theme}
-                ref={(el) => (menuItemRefs.current[theme] = el)}
+                key={theme.id}
+                ref={(el) => (menuItemRefs.current[theme.id] = el)}
                 className={styles.menuItem}
-                onMouseEnter={() => handleMouseEnter(theme)}
+                onMouseEnter={() => handleMouseEnter(theme.id)}
                 onMouseLeave={() => setHoveredTheme(null)}
               >
-                {theme}
-                {hoveredTheme === theme && (
+                {theme.name}
+                {hoveredTheme === theme.id && (
                   <ul
                     className={styles.subMenu}
                     style={{
-                      top: subMenuPosition[theme] === "bottom" ? "auto" : "0",
+                      top:
+                        subMenuPosition[theme.id] === "bottom" ? "auto" : "0",
                       bottom:
-                        subMenuPosition[theme] === "bottom" ? "0" : "auto",
+                        subMenuPosition[theme.id] === "bottom" ? "0" : "auto",
                     }}
                   >
-                    {themesData[theme].map((subTheme) => (
+                    {getSubThemesArray(theme.id).map((subTheme) => (
                       <li
-                        key={subTheme}
+                        key={subTheme.id}
                         className={styles.subMenuItem}
-                        onClick={() => handleSelectSubTheme(theme, subTheme)}
+                        onClick={() =>
+                          handleSelectSubTheme(theme.id, subTheme.id)
+                        }
                       >
-                        {subTheme}
+                        {subTheme.name}
                       </li>
                     ))}
                   </ul>

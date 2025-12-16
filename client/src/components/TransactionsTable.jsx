@@ -97,8 +97,8 @@ const TransactionsTable = ({
     setDraft({
       // on conserve l'affichage FR en base, mais l'input "date" manipule l'ISO
       dateISO: frToIso(t.date || ""),
-      theme: t.theme || "",
-      subTheme: t.subTheme || "",
+      themeId: t.themeId || "",
+      subThemeId: t.subThemeId || "",
       payment: t.payment || "",
       designation: t.designation || "",
       recette: t.recette ?? "",
@@ -127,8 +127,8 @@ const TransactionsTable = ({
     if (!editingId || !draft) return;
     const patch = {
       date: isoToFr(draft.dateISO || ""),
-      theme: draft.theme,
-      subTheme: draft.subTheme,
+      themeId: draft.themeId,
+      subThemeId: draft.subThemeId,
       payment: draft.payment,
       designation: draft.designation,
       recette: draft.recette === "" ? null : Number(draft.recette),
@@ -214,12 +214,12 @@ const TransactionsTable = ({
                         {isEditing ? (
                           <ThemeSelectorDropdown
                             value={{
-                              theme: draft.theme,
-                              subTheme: draft.subTheme,
+                              theme: draft.themeId,
+                              subTheme: draft.subThemeId,
                             }}
                             onChange={({ theme, subTheme }) => {
-                              setField("theme", theme);
-                              setField("subTheme", subTheme);
+                              setField("themeId", theme);
+                              setField("subThemeId", subTheme);
                             }}
                           />
                         ) : (

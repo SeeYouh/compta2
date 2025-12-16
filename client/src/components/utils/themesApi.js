@@ -1,33 +1,71 @@
 /**
- * API pour sauvegarder les thèmes
- * Sauvegarde dans themes.json via un endpoint du serveur
+ * API pour gérer les thèmes via le backend Express/MongoDB
  */
 
-const THEMES_FILE_PATH = "/themes.json";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 /**
- * Sauvegarde les thèmes
- * Pour l'instant, télécharge un nouveau fichier themes.json
- * À terme, il faudra un endpoint API pour écrire directement
+ * Récupère tous les thèmes depuis l'API
+ */
+export async function getThemes() {
+  const response = await fetch(`${API_BASE_URL}/themes`);
+  if (!response.ok) {
+    throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+/**
+ * Sauvegarde tous les thèmes
+ * Utilise PUT pour remplacer l'objet complet
  */
 export async function saveThemes(themes) {
-  const data = { themes };
-  const json = JSON.stringify(data, null, 2);
+  const response = await fetch(`${API_BASE_URL}/themes`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(themes),
+  });
 
-  // Créer un blob et le télécharger
-  const blob = new Blob([json], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "themes.json";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  if (!response.ok) {
+    throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+  }
 
-  alert(
-    "⚠️ Fichier themes.json téléchargé !\n\nRemplacez le fichier :\n- client/themes.json\n- client/public/themes.json\n\npuis rechargez la page."
-  );
+  return response.json();
+}
 
-  return true;
+/**
+ * Ajoute ou met à jour un thème spécifique
+ */
+export async function upsertTheme(themeId, themeData) {
+  const response = await fetch(`${API_BASE_URL}/themes/${themeId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(themeData),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Supprime un thème
+ */
+export async function deleteTheme(themeId) {
+  const response = await fetch(`${API_BASE_URL}/themes/${themeId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Erreur ${response.status}: ${response.statusText}`);
+  }
+
+  return response.json();
 }

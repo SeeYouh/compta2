@@ -215,8 +215,7 @@ export default function DrawerThemeManager({
   // Sauvegarde
   const handleSave = async () => {
     try {
-      const themesData = { themes: localThemes };
-      await saveThemes(themesData);
+      await saveThemes(localThemes);
       onSave(localThemes);
       setSaveMessage({
         type: "success",

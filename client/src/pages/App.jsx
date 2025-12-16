@@ -15,6 +15,7 @@ import {
 import { filterByPeriod } from "../components/utils/periodFilter";
 import IconGraphActivated from "../assets/IconGraphActivated";
 import IcongraphDisable from "../assets/IconGraph";
+import { migrateTransactions } from "../components/utils/themeMigration";
 import MonthTabs from "../components/MonthTabs";
 import { parseFRDate } from "../components/utils/date";
 import PaymentFilterMenu from "../components/filters/PaymentFilterMenu";
@@ -40,7 +41,7 @@ const App = () => {
     remove,
     update,
   } = useTransactions();
-  const { themes, loading: themesLoading } = useThemes();
+  const { themes, refresh: refreshThemes } = useThemes();
   const { formData, errors, handleChange, validate, reset, toPayload } =
     useTransactionForm();
   const {
@@ -49,10 +50,13 @@ const App = () => {
     updatePeriodFilter,
   } = useSettings();
 
-  // Enrichir les transactions avec les noms de thèmes/sous-thèmes
+  // Migrer puis enrichir les transactions
   const transactions = useMemo(() => {
     if (!themes) return rawTransactions;
-    return enrichTransactions(rawTransactions, themes);
+    // 1. Migrer les anciennes transactions (noms -> IDs)
+    const migrated = migrateTransactions(rawTransactions, themes);
+    // 2. Enrichir avec les noms pour l'affichage
+    return enrichTransactions(migrated, themes);
   }, [rawTransactions, themes]);
 
   // Hook pour le temps écoulé depuis la dernière modification
@@ -120,9 +124,14 @@ const App = () => {
   }, []);
 
   // Fonction pour sauvegarder les thèmes
-  const handleSaveThemes = useCallback(async (updatedThemes) => {
-    await saveThemes(updatedThemes);
-  }, []);
+  const handleSaveThemes = useCallback(
+    async (updatedThemes) => {
+      await saveThemes(updatedThemes);
+      // Rafraîchir les thèmes après sauvegarde
+      refreshThemes();
+    },
+    [refreshThemes]
+  );
   const onUpdate = useCallback(
     async (id, patch) => {
       await update(id, patch);

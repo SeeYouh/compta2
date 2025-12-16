@@ -1,12 +1,9 @@
-import {
-  useRef,
-  useState,
-} from 'react';
+import { useRef, useState } from "react";
 
-import AmountInput from './AmountInput';
-import { APP_LABELS } from './utils';
-import PaymentSelector from './PaymentSelector';
-import ThemeSelector from './ThemeSelector';
+import AmountInput from "./AmountInput";
+import { APP_LABELS } from "./utils";
+import PaymentSelector from "./PaymentSelector";
+import ThemeSelector from "./ThemeSelector";
 
 function TransactionForm({ formData, errors, onChange, onSubmit }) {
   const [open, setOpen] = useState(false);
@@ -52,10 +49,10 @@ function TransactionForm({ formData, errors, onChange, onSubmit }) {
 
           <div className="form-cell form-theme">
             <ThemeSelector
-              value={{ theme: formData.theme, subTheme: formData.subTheme }}
+              value={{ theme: formData.themeId, subTheme: formData.subThemeId }}
               onChange={({ theme, subTheme }) => {
-                onChange("theme", theme);
-                onChange("subTheme", subTheme);
+                onChange("themeId", theme);
+                onChange("subThemeId", subTheme);
               }}
             />
             {errors.theme && <p className="error">{errors.theme}</p>}
