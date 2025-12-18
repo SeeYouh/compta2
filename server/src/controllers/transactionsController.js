@@ -1,3 +1,6 @@
+import { v4 as uuidv4 } from "uuid";
+
+import { Theme } from "../models/Theme.js";
 import { Transaction } from "../models/Transaction.js";
 
 /**
@@ -19,6 +22,7 @@ export const getTransactions = async (req, res) => {
 /**
  * POST /api/transactions
  * Crée une nouvelle transaction
+ * Si le sous-thème a linkedAccountId, crée automatiquement une transaction liée
  */
 export const createTransaction = async (req, res) => {
   try {
@@ -30,17 +34,68 @@ export const createTransaction = async (req, res) => {
       !transactionData.themeId ||
       !transactionData.subThemeId ||
       !transactionData.payment ||
-      !transactionData.designation
+      !transactionData.designation ||
+      !transactionData.accountId
     ) {
       return res.status(400).json({
         error: "Champs requis manquants",
       });
     }
 
+    // Récupérer le thème pour vérifier si le sous-thème a un lien
+    const theme = await Theme.findOne({
+      id: transactionData.themeId,
+      accountId: transactionData.accountId,
+    });
+
+    if (!theme) {
+      return res.status(404).json({ error: "Thème introuvable" });
+    }
+
+    const subTheme = theme.subThemes.get(transactionData.subThemeId);
+    if (!subTheme) {
+      return res.status(404).json({ error: "Sous-thème introuvable" });
+    }
+
+    // Créer la transaction principale
     const transaction = await Transaction.create({
       ...transactionData,
       updatedAt: transactionData.updatedAt || Date.now(),
     });
+
+    // Si le sous-thème a un lien vers un autre compte, créer la transaction liée
+    if (
+      subTheme.linkedAccountId &&
+      subTheme.linkedThemeId &&
+      subTheme.linkedSubThemeId
+    ) {
+      const transferId = `transfer-${uuidv4()}`;
+
+      // Ajouter le transferId à la transaction principale
+      transaction.transferId = transferId;
+      transaction.linkedAccountId = subTheme.linkedAccountId;
+      await transaction.save();
+
+      // Calculer le montant opposé (recette <-> dépense)
+      const linkedRecette = transactionData.depense || null;
+      const linkedDepense = transactionData.recette || null;
+
+      // Créer la transaction liée (montant opposé)
+      await Transaction.create({
+        id: `transaction-${uuidv4()}`,
+        accountId: subTheme.linkedAccountId,
+        date: transactionData.date,
+        themeId: subTheme.linkedThemeId,
+        subThemeId: subTheme.linkedSubThemeId,
+        payment: transactionData.payment,
+        designation: transactionData.designation,
+        recette: linkedRecette,
+        depense: linkedDepense,
+        transferId: transferId,
+        linkedAccountId: transactionData.accountId,
+        updatedAt: Date.now(),
+      });
+    }
 
     res.status(201).json(transaction);
   } catch (error) {

@@ -7,6 +7,10 @@ const TransactionSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    accountId: {
+      type: String,
+      required: true,
+    },
     date: {
       type: String,
       required: true,
@@ -40,6 +44,14 @@ const TransactionSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    transferId: {
+      type: String,
+      default: null,
+    },
+    linkedAccountId: {
+      type: String,
+      default: null,
+    },
     updatedAt: {
       type: Number,
     },
@@ -50,9 +62,11 @@ const TransactionSchema = new mongoose.Schema(
 );
 
 // Index pour améliorer les performances des requêtes
+TransactionSchema.index({ accountId: 1 });
 TransactionSchema.index({ date: -1 });
 TransactionSchema.index({ themeId: 1 });
 TransactionSchema.index({ disabled: 1 });
+TransactionSchema.index({ transferId: 1 });
 
 // Méthode pour formater les données avant envoi au client
 TransactionSchema.set("toJSON", {

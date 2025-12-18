@@ -2,19 +2,13 @@ import { Theme } from "../models/Theme.js";
 
 /**
  * GET /api/themes
- * Récupère tous les thèmes sous forme d'objet indexé par ID
+ * Récupère tous les thèmes sous forme de tableau
+ * (chaque compte peut avoir des thèmes avec les mêmes IDs, donc on retourne un tableau)
  */
 export const getThemes = async (req, res) => {
   try {
     const themes = await Theme.find({});
-
-    // Convertir le tableau en objet indexé par ID
-    const themesObject = {};
-    themes.forEach((theme) => {
-      themesObject[theme.id] = theme.toJSON();
-    });
-
-    res.json(themesObject);
+    res.json(themes.map((theme) => theme.toJSON()));
   } catch (error) {
     console.error("Erreur getThemes:", error);
     res
@@ -41,6 +35,7 @@ export const updateAllThemes = async (req, res) => {
     // Créer les nouveaux thèmes
     const themesToInsert = Object.values(themesObject).map((theme) => ({
       id: theme.id,
+      accountId: theme.accountId,
       name: theme.name,
       slug: theme.slug,
       subThemes: new Map(Object.entries(theme.subThemes || {})),

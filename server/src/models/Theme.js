@@ -16,6 +16,18 @@ const SubThemeSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    linkedAccountId: {
+      type: String,
+      default: null,
+    },
+    linkedThemeId: {
+      type: String,
+      default: null,
+    },
+    linkedSubThemeId: {
+      type: String,
+      default: null,
+    },
   },
   { _id: false }
 );
@@ -25,7 +37,10 @@ const ThemeSchema = new mongoose.Schema(
     id: {
       type: String,
       required: true,
-      unique: true,
+    },
+    accountId: {
+      type: String,
+      required: true,
     },
     name: {
       type: String,
@@ -47,6 +62,9 @@ const ThemeSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Index composé pour permettre le même id sur différents comptes
+ThemeSchema.index({ id: 1, accountId: 1 }, { unique: true });
 
 // Utiliser l'id personnalisé comme clé primaire
 ThemeSchema.set("toJSON", {
