@@ -10,6 +10,7 @@ const MotionDiv = motion.div;
 export default function AppShell({
   sidebar,
   headerRight,
+  accountTabs,
   children,
   lastUpdateText,
 }) {
@@ -22,6 +23,9 @@ export default function AppShell({
             <span className="text-dim">
               · {APP_LABELS.lastUpdatePrefix} {lastUpdateText}
             </span>
+          )}
+          {accountTabs && (
+            <div style={{ marginLeft: "2rem" }}>{accountTabs}</div>
           )}
         </div>
         <div className="app__header-right">{headerRight}</div>

@@ -1,18 +1,21 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { getThemes } from "../components/utils/themesApi";
 import { ThemesContext } from "./createThemesContext";
+import { useAccounts } from "./useAccounts";
 
 export function ThemesProvider({ children }) {
-  const [themesData, setThemesData] = useState(null);
+  const [allThemesData, setAllThemesData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { activeAccountId } = useAccounts();
 
   const loadThemes = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getThemes();
-      setThemesData(data);
+      // L'API retourne maintenant un tableau de thèmes
+      setAllThemesData(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
       console.error("Erreur chargement thèmes:", err);
@@ -25,6 +28,19 @@ export function ThemesProvider({ children }) {
   useEffect(() => {
     loadThemes();
   }, [loadThemes]);
+
+  // Filtrer les thèmes selon le compte actif et convertir en objet
+  const themesData = useMemo(() => {
+    if (!allThemesData) return null;
+    if (!activeAccountId) return null;
+
+    // Filtrer par compte actif et convertir en objet indexé par ID
+    const filteredThemes = allThemesData.filter(
+      (theme) => theme.accountId === activeAccountId
+    );
+
+    return Object.fromEntries(filteredThemes.map((theme) => [theme.id, theme]));
+  }, [allThemesData, activeAccountId]);
 
   /**
    * Force le rechargement des thèmes depuis le serveur

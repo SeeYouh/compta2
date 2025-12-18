@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import ConfirmationModal from "./ConfirmationModal";
 import { saveThemes } from "./utils/themesApi";
+import { useAccounts } from "../contexts/useAccounts";
 
 export default function DrawerThemeManager({
   isOpen,
@@ -9,6 +10,7 @@ export default function DrawerThemeManager({
   themes,
   onSave,
 }) {
+  const { activeAccountId } = useAccounts();
   const [localThemes, setLocalThemes] = useState(themes || {});
   const [expandedThemeId, setExpandedThemeId] = useState(null);
   const [editingThemeId, setEditingThemeId] = useState(null);
@@ -83,6 +85,7 @@ export default function DrawerThemeManager({
       ...localThemes,
       [newId]: {
         id: newId,
+        accountId: activeAccountId,
         name: newThemeName.trim(),
         slug: slug,
         subThemes: {},
@@ -200,6 +203,9 @@ export default function DrawerThemeManager({
             id: newId,
             name: newSubThemeName.trim(),
             slug: slug,
+            linkedAccountId: null,
+            linkedThemeId: null,
+            linkedSubThemeId: null,
           },
         },
       },

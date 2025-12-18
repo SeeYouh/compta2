@@ -4,6 +4,7 @@ import { StrictMode } from "react";
 
 import { createRoot } from "react-dom/client";
 
+import { AccountsProvider } from "./contexts/AccountsContext";
 import App from "./pages/App";
 import { ThemesProvider } from "./contexts/ThemesContext";
 
@@ -23,8 +24,10 @@ initTheme();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <ThemesProvider>
-      <App />
-    </ThemesProvider>
+    <AccountsProvider>
+      <ThemesProvider>
+        <App />
+      </ThemesProvider>
+    </AccountsProvider>
   </StrictMode>
 );

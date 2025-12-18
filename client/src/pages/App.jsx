@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import AccountTabs from "../components/AccountTabs";
 import { APP_LABELS, TABLE_HEADERS } from "../components/utils";
 import AppShell from "../components/AppShell";
 import BalanceCalculator from "../components/BalanceCalculator";
@@ -27,6 +28,7 @@ import ThemeFilterMenu from "../components/filters/ThemeFilterMenu";
 import ThemeToggle from "../components/ThemeToggle";
 import TransactionForm from "../components/TransactionForm";
 import TransactionsTable from "../components/TransactionsTable";
+import { useAccounts } from "../contexts/useAccounts";
 import { useLastUpdate } from "../components/hooks/useLastUpdate";
 import { useSettings } from "../components/hooks/useSettings";
 import { useThemes } from "../contexts/useThemes";
@@ -42,6 +44,7 @@ const App = () => {
     update,
   } = useTransactions();
   const { themes, refresh: refreshThemes } = useThemes();
+  const { activeAccountId } = useAccounts();
   const { formData, errors, handleChange, validate, reset, toPayload } =
     useTransactionForm();
   const {
@@ -51,13 +54,19 @@ const App = () => {
   } = useSettings();
 
   // Migrer puis enrichir les transactions
-  const transactions = useMemo(() => {
+  const allTransactions = useMemo(() => {
     if (!themes) return rawTransactions;
     // 1. Migrer les anciennes transactions (noms -> IDs)
     const migrated = migrateTransactions(rawTransactions, themes);
     // 2. Enrichir avec les noms pour l'affichage
     return enrichTransactions(migrated, themes);
   }, [rawTransactions, themes]);
+
+  // Filtrer par compte actif
+  const transactions = useMemo(() => {
+    if (!activeAccountId) return allTransactions;
+    return allTransactions.filter((t) => t.accountId === activeAccountId);
+  }, [allTransactions, activeAccountId]);
 
   // Hook pour le temps écoulé depuis la dernière modification
   const lastUpdateText = useLastUpdate(transactions);
@@ -83,10 +92,12 @@ const App = () => {
       e.preventDefault();
       const newErrors = validate();
       if (Object.keys(newErrors).length) return;
-      await add(toPayload());
+      // Ajouter accountId à la transaction
+      const payload = { ...toPayload(), accountId: activeAccountId };
+      await add(payload);
       reset();
     },
-    [add, toPayload, reset, validate]
+    [add, toPayload, reset, validate, activeAccountId]
   );
 
   const onDelete = useCallback(
@@ -209,6 +220,7 @@ const App = () => {
           <ThemeToggle />
         </>
       }
+      accountTabs={<AccountTabs />}
       lastUpdateText={lastUpdateText}
     >
       <div className="barSticky">
