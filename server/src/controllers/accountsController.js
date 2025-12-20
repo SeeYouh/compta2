@@ -4,6 +4,73 @@ import { Account } from "../models/Account.js";
 import { Theme } from "../models/Theme.js";
 import { Transaction } from "../models/Transaction.js";
 
+const TRANSFER_THEME_ID = "theme-compte-transfer";
+
+/**
+ * Synchronise le thème "Compte" dans tous les comptes non-template
+ * Crée/met à jour les sous-thèmes pour pointer vers les autres comptes
+ */
+async function syncAccountTransferThemes() {
+  try {
+    const accounts = await Account.find({ isTemplate: false });
+
+    // Si un seul compte, supprimer le thème "Compte" partout (inutile)
+    if (accounts.length <= 1) {
+      await Theme.deleteMany({
+        id: TRANSFER_THEME_ID,
+        accountId: { $ne: "template" },
+      });
+      return;
+    }
+
+    // Pour chaque compte, créer/mettre à jour le thème "Compte"
+    for (const account of accounts) {
+      // Créer les sous-thèmes : tous les autres comptes
+      const otherAccounts = accounts
+        .filter((acc) => acc.id !== account.id)
+        .sort((a, b) => a.name.localeCompare(b.name, "fr"));
+
+      const subThemes = new Map(
+        otherAccounts.map((acc) => [
+          acc.id,
+          {
+            id: acc.id,
+            name: acc.name,
+            slug: acc.name.toLowerCase().replace(/\s+/g, "-"),
+            linkedAccountId: acc.id,
+            linkedThemeId: null,
+            linkedSubThemeId: null,
+          },
+        ])
+      );
+
+      // Vérifier si le thème existe déjà
+      const existingTheme = await Theme.findOne({
+        id: TRANSFER_THEME_ID,
+        accountId: account.id,
+      });
+
+      if (existingTheme) {
+        // Mettre à jour les sous-thèmes
+        existingTheme.subThemes = subThemes;
+        await existingTheme.save();
+      } else {
+        // Créer le thème
+        await Theme.create({
+          id: TRANSFER_THEME_ID,
+          accountId: account.id,
+          name: "Compte",
+          slug: "compte",
+          subThemes,
+        });
+      }
+    }
+  } catch (error) {
+    console.error("Erreur syncAccountTransferThemes:", error);
+    throw error;
+  }
+}
+
 /**
  * GET /api/accounts
  * Récupère tous les comptes utilisateurs (isTemplate: false)
@@ -55,6 +122,7 @@ export const getTemplateAccount = async (req, res) => {
 /**
  * POST /api/accounts
  * Créer un nouveau compte en dupliquant les thèmes du template
+ * + Ajouter/mettre à jour le thème "Compte" dans tous les comptes
  */
 export const createAccount = async (req, res) => {
   try {
@@ -96,6 +164,9 @@ export const createAccount = async (req, res) => {
 
     await Theme.insertMany(newThemes);
 
+    // Synchroniser le thème "Compte" dans tous les comptes
+    await syncAccountTransferThemes();
+
     res.status(201).json({
       account: newAccount,
       themesCount: newThemes.length,
@@ -110,15 +181,27 @@ export const createAccount = async (req, res) => {
 
 /**
  * PUT /api/accounts/:id
- * Modifier le nom d'un compte
+ * Modifier le nom et/ou la couleur d'un compte
  */
 export const updateAccount = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name, color } = req.body;
 
-    if (!name || name.trim().length === 0) {
-      return res.status(400).json({ error: "Le nom du compte est requis" });
+    if (!name && !color) {
+      return res
+        .status(400)
+        .json({ error: "Le nom ou la couleur doit être fourni" });
+    }
+
+    if (name && name.trim().length === 0) {
+      return res.status(400).json({ error: "Le nom ne peut pas être vide" });
+    }
+
+    if (color && !/^#[A-Fa-f0-9]{6}$/.test(color)) {
+      return res
+        .status(400)
+        .json({ error: "Format de couleur invalide (ex: #3b82f6)" });
     }
 
     const account = await Account.findOne({ id, isTemplate: false });
@@ -127,8 +210,17 @@ export const updateAccount = async (req, res) => {
       return res.status(404).json({ error: "Compte introuvable" });
     }
 
-    account.name = name.trim();
+    const nameChanged = name && name.trim() !== account.name;
+
+    if (name) account.name = name.trim();
+    if (color) account.color = color;
+
     await account.save();
+
+    // Si le nom a changé, synchroniser le thème "Compte" partout
+    if (nameChanged) {
+      await syncAccountTransferThemes();
+    }
 
     res.json(account);
   } catch (error) {
@@ -174,6 +266,9 @@ export const deleteAccount = async (req, res) => {
 
     // Supprimer le compte
     await Account.deleteOne({ id });
+
+    // Synchroniser le thème "Compte" dans tous les comptes restants
+    await syncAccountTransferThemes();
 
     res.json({
       message: "Compte supprimé avec succès",

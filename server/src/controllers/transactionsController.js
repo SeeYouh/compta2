@@ -63,30 +63,47 @@ export const createTransaction = async (req, res) => {
       updatedAt: transactionData.updatedAt || Date.now(),
     });
 
-    // Si le sous-thème a un lien vers un autre compte, créer la transaction liée
-    if (
-      subTheme.linkedAccountId &&
-      subTheme.linkedThemeId &&
-      subTheme.linkedSubThemeId
-    ) {
+    // Si linkedAccountId est fourni, créer automatiquement la transaction miroir (virement)
+    if (transactionData.linkedAccountId) {
       const transferId = `transfer-${uuidv4()}`;
 
       // Ajouter le transferId à la transaction principale
       transaction.transferId = transferId;
-      transaction.linkedAccountId = subTheme.linkedAccountId;
       await transaction.save();
 
-      // Calculer le montant opposé (recette <-> dépense)
+      // Récupérer le thème "Compte" du compte de destination pour le virement retour
+      const linkedTheme = await Theme.findOne({
+        accountId: transactionData.linkedAccountId,
+        name: "Compte", // Chercher le thème virtuel correspondant
+      });
+
+      // Déterminer les IDs du thème/sous-thème pour la transaction miroir
+      let linkedThemeId = "virtual-transfer-theme";
+      let linkedSubThemeId = transactionData.accountId;
+
+      // Si un thème "Compte" existe en DB pour le compte lié, l'utiliser
+      if (linkedTheme) {
+        linkedThemeId = linkedTheme.id;
+        // Chercher le sous-thème correspondant au compte source
+        const linkedSubTheme = Array.from(linkedTheme.subThemes.values()).find(
+          (st) => st.linkedAccountId === transactionData.accountId
+        );
+        if (linkedSubTheme) {
+          linkedSubThemeId = linkedSubTheme.id;
+        }
+      }
+
+      // Calculer le montant opposé (dépense -> recette, recette -> dépense)
       const linkedRecette = transactionData.depense || null;
       const linkedDepense = transactionData.recette || null;
 
-      // Créer la transaction liée (montant opposé)
+      // Créer la transaction miroir dans le compte de destination
       await Transaction.create({
         id: `transaction-${uuidv4()}`,
-        accountId: subTheme.linkedAccountId,
+        accountId: transactionData.linkedAccountId,
         date: transactionData.date,
-        themeId: subTheme.linkedThemeId,
-        subThemeId: subTheme.linkedSubThemeId,
+        themeId: linkedThemeId,
+        subThemeId: linkedSubThemeId,
         payment: transactionData.payment,
         designation: transactionData.designation,
         recette: linkedRecette,
@@ -94,6 +111,7 @@ export const createTransaction = async (req, res) => {
         transferId: transferId,
         linkedAccountId: transactionData.accountId,
         updatedAt: Date.now(),
+        disabled: false,
       });
     }
 

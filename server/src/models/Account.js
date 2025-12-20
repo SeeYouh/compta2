@@ -14,6 +14,11 @@ const AccountSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    color: {
+      type: String,
+      default: "#3b82f6",
+      match: /^#[A-Fa-f0-9]{6}$/,
+    },
     isTemplate: {
       type: Boolean,
       default: false,
