@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 
 import { FIELD_RULES } from "../utils/index";
+import { useThemes } from "../../contexts/useThemes";
 
 const initialForm = {
   date: "",
@@ -15,6 +16,7 @@ const initialForm = {
 export function useTransactionForm() {
   const [formData, setFormData] = useState(initialForm);
   const [errors, setErrors] = useState({});
+  const { getSubThemeById } = useThemes();
 
   const handleChange = useCallback((name, value) => {
     setFormData((p) => ({ ...p, [name]: value }));
@@ -41,6 +43,11 @@ export function useTransactionForm() {
   const toPayload = useCallback(() => {
     const [year, month, day] = formData.date.split("-");
     const date = `${day}/${month}/${year}`;
+
+    // Vérifier si le sous-thème sélectionné est un compte lié (virement)
+    const subTheme = getSubThemeById(formData.themeId, formData.subThemeId);
+    const linkedAccountId = subTheme?.linkedAccountId || null;
+
     return {
       date,
       themeId: formData.themeId,
@@ -49,9 +56,10 @@ export function useTransactionForm() {
       designation: formData.designation,
       recette: formData.bankMovement === "recette" ? formData.amount : "",
       depense: formData.bankMovement === "depense" ? formData.amount : "",
-      disabled: false, // Par défaut, les nouvelles transactions sont actives
+      disabled: false,
+      linkedAccountId, // Ajout du compte lié si c'est un virement
     };
-  }, [formData]);
+  }, [formData, getSubThemeById]);
 
   return { formData, errors, handleChange, validate, reset, toPayload };
 }

@@ -29,6 +29,18 @@ export function ThemesProvider({ children }) {
     loadThemes();
   }, [loadThemes]);
 
+  // Écouter les changements de comptes pour recharger les thèmes
+  useEffect(() => {
+    const handleAccountsUpdate = () => {
+      loadThemes();
+    };
+
+    window.addEventListener("accounts-updated", handleAccountsUpdate);
+    return () => {
+      window.removeEventListener("accounts-updated", handleAccountsUpdate);
+    };
+  }, [loadThemes]);
+
   // Filtrer les thèmes selon le compte actif et convertir en objet
   const themesData = useMemo(() => {
     if (!allThemesData) return null;

@@ -142,7 +142,11 @@ export const API_ERRORS = {
 // ============================================
 export const FIELD_RULES = [
   { field: "date", message: "La date est obligatoire." },
-  { field: "theme", message: "Le thème est obligatoire." },
+  {
+    field: "themeId",
+    validate: (data) => !data.themeId || !data.subThemeId,
+    message: "Le thème et le sous-thème sont obligatoires.",
+  },
   { field: "payment", message: "Le moyen de paiement est obligatoire." },
   { field: "designation", message: "La désignation est obligatoire." },
   {

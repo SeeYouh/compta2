@@ -24,10 +24,8 @@ export default function AppShell({
               · {APP_LABELS.lastUpdatePrefix} {lastUpdateText}
             </span>
           )}
-          {accountTabs && (
-            <div style={{ marginLeft: "2rem" }}>{accountTabs}</div>
-          )}
         </div>
+        {accountTabs && <div className="app__header-tabs">{accountTabs}</div>}
         <div className="app__header-right">{headerRight}</div>
       </header>
 

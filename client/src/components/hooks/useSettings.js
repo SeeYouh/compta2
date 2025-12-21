@@ -1,13 +1,8 @@
-import {
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useState } from "react";
 
-import { API_ERRORS } from '../utils';
+import { API_ERRORS } from "../utils";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3100";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const SETTINGS_ID = "user-preferences";
 
 export const useSettings = () => {
@@ -18,7 +13,9 @@ export const useSettings = () => {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/settings/${SETTINGS_ID}`);
+        const response = await fetch(
+          `${API_BASE_URL}/api/settings/${SETTINGS_ID}`
+        );
         if (response.ok) {
           const data = await response.json();
           setSettings(data);
@@ -28,7 +25,7 @@ export const useSettings = () => {
             id: SETTINGS_ID,
             periodFilter: "all", // 'all', '6weeks', '2months', '3months', 'currentMonth', 'previousMonth'
           };
-          const createResponse = await fetch(`${API_BASE_URL}/settings`, {
+          const createResponse = await fetch(`${API_BASE_URL}/api/settings`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(defaultSettings),
@@ -57,7 +54,7 @@ export const useSettings = () => {
       try {
         const updatedSettings = { ...settings, periodFilter };
         const response = await fetch(
-          `${API_BASE_URL}/settings/${SETTINGS_ID}`,
+          `${API_BASE_URL}/api/settings/${SETTINGS_ID}`,
           {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },

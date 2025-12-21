@@ -1,9 +1,6 @@
-import React, {
-  useEffect,
-  useRef,
-} from 'react';
+import React, { useEffect, useRef, useState } from "react";
 
-import { APP_LABELS } from './utils';
+import { APP_LABELS } from "./utils";
 
 function ConfirmationModal({
   isOpen,
@@ -13,16 +10,35 @@ function ConfirmationModal({
   message,
   confirmText = APP_LABELS.confirmButton,
   cancelText = APP_LABELS.confirmCancelButton,
+  requireTextConfirmation = false,
+  confirmationText = "",
+  confirmationPlaceholder = "Tapez pour confirmer",
 }) {
   const modalRef = useRef(null);
   const confirmButtonRef = useRef(null);
+  const inputRef = useRef(null);
+  const [inputValue, setInputValue] = useState("");
 
-  // Focus sur le bouton Confirmer quand le modal s'ouvre
+  const isConfirmDisabled =
+    requireTextConfirmation && inputValue !== confirmationText;
+
+  // Reset input when modal opens/closes
   useEffect(() => {
-    if (isOpen && confirmButtonRef.current) {
-      confirmButtonRef.current.focus();
+    if (!isOpen) {
+      setInputValue("");
     }
   }, [isOpen]);
+
+  // Focus sur l'input ou le bouton selon le mode
+  useEffect(() => {
+    if (isOpen) {
+      if (requireTextConfirmation && inputRef.current) {
+        inputRef.current.focus();
+      } else if (confirmButtonRef.current) {
+        confirmButtonRef.current.focus();
+      }
+    }
+  }, [isOpen, requireTextConfirmation]);
 
   // Gestion des touches clavier
   useEffect(() => {
@@ -31,14 +47,14 @@ function ConfirmationModal({
 
       if (e.key === "Escape") {
         onCancel();
-      } else if (e.key === "Enter") {
+      } else if (e.key === "Enter" && !isConfirmDisabled) {
         onConfirm();
       }
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onConfirm, onCancel]);
+  }, [isOpen, onConfirm, onCancel, isConfirmDisabled]);
 
   // Empêcher le scroll du body quand le modal est ouvert
   useEffect(() => {
@@ -76,6 +92,22 @@ function ConfirmationModal({
           <p id="modal-message" className="modal-message">
             {message}
           </p>
+          {requireTextConfirmation && (
+            <div className="modal-confirmation-input">
+              <label htmlFor="confirmation-input">
+                Tapez <strong>{confirmationText}</strong> pour confirmer :
+              </label>
+              <input
+                id="confirmation-input"
+                ref={inputRef}
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder={confirmationPlaceholder}
+                className="form-input"
+              />
+            </div>
+          )}
         </div>
 
         <div className="modal-footer">
@@ -91,6 +123,7 @@ function ConfirmationModal({
             className="btn btn-danger"
             onClick={onConfirm}
             ref={confirmButtonRef}
+            disabled={isConfirmDisabled}
           >
             {confirmText}
           </button>

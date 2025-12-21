@@ -27,13 +27,17 @@ async function createAccount(name) {
 }
 
 /**
- * Renomme un compte
+ * Renomme un compte et/ou change sa couleur
  */
-async function updateAccount(accountId, name) {
+async function updateAccount(accountId, name, color) {
+  const body = {};
+  if (name !== undefined) body.name = name;
+  if (color !== undefined) body.color = color;
+
   const response = await fetch(`${API_URL}/api/accounts/${accountId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name }),
+    body: JSON.stringify(body),
   });
   if (!response.ok) throw new Error("Erreur lors de la modification du compte");
   return response.json();
@@ -80,6 +84,17 @@ export function AccountsProvider({ children }) {
     loadAccounts();
   }, [loadAccounts]);
 
+  // Appliquer la couleur du compte actif à --color-primary
+  useEffect(() => {
+    const activeAccount = accounts.find((acc) => acc.id === activeAccountId);
+    if (activeAccount?.color) {
+      document.documentElement.style.setProperty(
+        "--color-primary",
+        activeAccount.color
+      );
+    }
+  }, [activeAccountId, accounts]);
+
   /**
    * Sélectionne un compte actif
    */
@@ -96,6 +111,7 @@ export function AccountsProvider({ children }) {
 
   /**
    * Crée un nouveau compte et recharge la liste
+   * Déclenche un événement pour recharger les thèmes
    */
   const handleCreateAccount = useCallback(
     async (name) => {
@@ -104,6 +120,8 @@ export function AccountsProvider({ children }) {
         await loadAccounts();
         // Activer le nouveau compte
         setActiveAccountId(result.account.id);
+        // Déclencher un événement pour recharger les thèmes
+        window.dispatchEvent(new Event("accounts-updated"));
         return result;
       } catch (err) {
         console.error("Erreur création compte:", err);
@@ -114,13 +132,16 @@ export function AccountsProvider({ children }) {
   );
 
   /**
-   * Renomme un compte et recharge la liste
+   * Renomme un compte et/ou change sa couleur, puis recharge la liste
+   * Déclenche un événement pour recharger les thèmes
    */
   const handleUpdateAccount = useCallback(
-    async (accountId, name) => {
+    async (accountId, name, color) => {
       try {
-        await updateAccount(accountId, name);
+        await updateAccount(accountId, name, color);
         await loadAccounts();
+        // Déclencher un événement pour recharger les thèmes
+        window.dispatchEvent(new Event("accounts-updated"));
       } catch (err) {
         console.error("Erreur modification compte:", err);
         throw err;
@@ -131,6 +152,7 @@ export function AccountsProvider({ children }) {
 
   /**
    * Supprime un compte et recharge la liste
+   * Déclenche un événement pour recharger les thèmes
    */
   const handleDeleteAccount = useCallback(
     async (accountId) => {
@@ -147,6 +169,9 @@ export function AccountsProvider({ children }) {
             setActiveAccountId(remainingAccounts[0].id);
           }
         }
+
+        // Déclencher un événement pour recharger les thèmes
+        window.dispatchEvent(new Event("accounts-updated"));
       } catch (err) {
         console.error("Erreur suppression compte:", err);
         throw err;

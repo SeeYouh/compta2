@@ -5,7 +5,6 @@ import { APP_LABELS, TABLE_HEADERS } from "../components/utils";
 import AppShell from "../components/AppShell";
 import BalanceCalculator from "../components/BalanceCalculator";
 import ChartsDashboard from "../components/ChartsDashboard";
-import ColorPicker from "../components/ColorPicker";
 import ConfirmationModal from "../components/ConfirmationModal";
 import DrawerThemeManager from "../components/DrawerThemeManager";
 import { enrichTransactions } from "../components/utils/themeResolver";
@@ -214,12 +213,7 @@ const App = () => {
 
   return (
     <AppShell
-      headerRight={
-        <>
-          <ColorPicker />
-          <ThemeToggle />
-        </>
-      }
+      headerRight={<ThemeToggle />}
       accountTabs={<AccountTabs />}
       lastUpdateText={lastUpdateText}
     >

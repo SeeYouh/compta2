@@ -1,8 +1,8 @@
-import { API_ERRORS } from './index';
+import { API_ERRORS } from "./index";
 
 // Configuration de l'URL de base à partir des variables d'environnement
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const BASE_URL = `${API_BASE_URL}/transactions`;
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const BASE_URL = `${API_BASE_URL}/api/transactions`;
 
 /**
  * Génère un UUID v4 compatible (128 bits)

@@ -488,9 +488,10 @@ body {
 }
 
 .app__header {
+  position: relative;
   grid-area: header;
   display: flex;
-  justify-content: space-between;
+  // justify-content: space-between;
   align-items: center;
   padding: 0 1rem;
   border-bottom: 1px solid var(--color-border);
@@ -500,12 +501,19 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    width: 400px;
+  }
+
+  &-tabs {
+    display: flex;
+    align-items: center;
+    margin-left: 2rem;
   }
 
   &-right {
-    display: flex;
-    align-items: center;
+    position: absolute;
     gap: 0.75rem;
+    right: 2%;
   }
 }
 
@@ -1324,6 +1332,44 @@ body {
       color: var(--color-text);
       line-height: 1.5;
     }
+
+    .modal-confirmation-input {
+      margin-top: 1rem;
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--color-text);
+
+        strong {
+          color: var(--color-danger);
+          font-weight: 600;
+        }
+      }
+
+      .form-input {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        color: var(--color-text);
+        outline: none;
+        transition: all 0.2s ease;
+
+        &:focus {
+          border-color: var(--color-danger);
+          box-shadow: 0 0 0 3px
+            color-mix(in srgb, var(--color-danger) 15%, transparent);
+        }
+
+        &::placeholder {
+          color: var(--color-text-secondary);
+        }
+      }
+    }
   }
 
   .modal-footer {
@@ -1355,13 +1401,18 @@ body {
         background: var(--color-danger);
         color: white;
 
-        &:hover {
+        &:hover:not(:disabled) {
           background: var(--color-danger-700);
         }
 
         &:focus {
           outline: 2px solid var(--color-danger);
           outline-offset: 2px;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
         }
       }
     }

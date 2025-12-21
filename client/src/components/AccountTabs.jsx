@@ -1,14 +1,27 @@
 import { useEffect, useRef, useState } from "react";
 
+import AccountTabMenu from "./AccountTabMenu";
+import ConfirmationModal from "./ConfirmationModal";
 import styles from "../sass/components/AccountTabs.module.scss";
 import { useAccounts } from "../contexts/useAccounts";
 
 const AccountTabs = () => {
-  const { accounts, activeAccountId, setActiveAccount, createAccount } =
-    useAccounts();
+  const {
+    accounts,
+    activeAccountId,
+    setActiveAccount,
+    createAccount,
+    updateAccount,
+    deleteAccount,
+  } = useAccounts();
   const [isCreating, setIsCreating] = useState(false);
   const [newName, setNewName] = useState("");
   const [error, setError] = useState("");
+  const [hoveredAccountId, setHoveredAccountId] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState({
+    isOpen: false,
+    account: null,
+  });
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -40,21 +53,74 @@ const AccountTabs = () => {
     setError("");
   };
 
+  const handleRename = async (accountId, newName) => {
+    try {
+      await updateAccount(accountId, newName);
+      setHoveredAccountId(null);
+    } catch (err) {
+      console.error("Erreur renommage:", err);
+    }
+  };
+
+  const handleDelete = async (accountId) => {
+    setDeleteConfirm({ isOpen: false, account: null });
+    try {
+      await deleteAccount(accountId);
+      setHoveredAccountId(null);
+    } catch (err) {
+      console.error("Erreur suppression:", err);
+    }
+  };
+
+  const handleDeleteRequest = (account) => {
+    setDeleteConfirm({ isOpen: true, account });
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteConfirm({ isOpen: false, account: null });
+  };
+
+  const handleColorChange = async (accountId, color) => {
+    try {
+      await updateAccount(accountId, undefined, color);
+    } catch (err) {
+      console.error("Erreur changement couleur:", err);
+    }
+  };
+
   return (
     <nav className={styles.accountTabs} role="tablist" aria-label="Comptes">
       {accounts.map((account) => (
-        <button
+        <div
           key={account.id}
-          type="button"
-          role="tab"
-          aria-selected={activeAccountId === account.id}
-          className={`${styles.tab} ${
-            activeAccountId === account.id ? styles.active : ""
-          }`}
-          onClick={() => setActiveAccount(account.id)}
+          className={styles.tabWrapper}
+          onMouseEnter={() => setHoveredAccountId(account.id)}
+          onMouseLeave={() => setHoveredAccountId(null)}
         >
-          {account.name}
-        </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={activeAccountId === account.id}
+            className={`${styles.tab} ${
+              activeAccountId === account.id ? styles.active : ""
+            }`}
+            style={{
+              borderColor: account.color || undefined,
+            }}
+            onClick={() => setActiveAccount(account.id)}
+          >
+            {account.name}
+          </button>
+
+          <AccountTabMenu
+            account={account}
+            isVisible={hoveredAccountId === account.id}
+            onRename={(name) => handleRename(account.id, name)}
+            onDeleteRequest={() => handleDeleteRequest(account)}
+            onColorChange={(color) => handleColorChange(account.id, color)}
+            onClose={() => setHoveredAccountId(null)}
+          />
+        </div>
       ))}
 
       {isCreating ? (
@@ -83,6 +149,23 @@ const AccountTabs = () => {
           +
         </button>
       )}
+
+      <ConfirmationModal
+        isOpen={deleteConfirm.isOpen}
+        onConfirm={() => handleDelete(deleteConfirm.account?.id)}
+        onCancel={handleCancelDelete}
+        title="Supprimer le compte"
+        message={
+          deleteConfirm.account
+            ? `Êtes-vous sûr de vouloir supprimer le compte "${deleteConfirm.account.name}" ?\n\nToutes les transactions liées seront également supprimées.`
+            : ""
+        }
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        requireTextConfirmation={true}
+        confirmationText={deleteConfirm.account?.name || ""}
+        confirmationPlaceholder="Nom du compte"
+      />
     </nav>
   );
 };
