@@ -156,19 +156,32 @@ export const updateTransaction = async (req, res) => {
 
 /**
  * DELETE /api/transactions/:id
- * Supprime une transaction
+ * Supprime une transaction et sa transaction liée si c'est un transfert inter-comptes
  */
 export const deleteTransaction = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const transaction = await Transaction.findOneAndDelete({ id });
+    // Récupérer la transaction à supprimer
+    const transaction = await Transaction.findOne({ id });
 
     if (!transaction) {
       return res.status(404).json({ error: "Transaction non trouvée" });
     }
 
-    res.json({ message: "Transaction supprimée", id });
+    // Si la transaction a un transferId, supprimer toutes les transactions liées
+    if (transaction.transferId) {
+      await Transaction.deleteMany({ transferId: transaction.transferId });
+      res.json({
+        message: "Transaction et transaction liée supprimées",
+        id,
+        transferId: transaction.transferId,
+      });
+    } else {
+      // Sinon, supprimer uniquement cette transaction
+      await Transaction.findOneAndDelete({ id });
+      res.json({ message: "Transaction supprimée", id });
+    }
   } catch (error) {
     console.error("Erreur deleteTransaction:", error);
     res.status(500).json({
