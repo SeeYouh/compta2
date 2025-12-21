@@ -4,6 +4,7 @@ import React from "react";
 import { motion } from "framer-motion";
 
 import { APP_LABELS } from "./utils";
+import { useAccounts } from "../contexts/useAccounts";
 
 const MotionDiv = motion.div;
 
@@ -14,11 +15,14 @@ export default function AppShell({
   children,
   lastUpdateText,
 }) {
+  const { activeAccount } = useAccounts();
+  const title = activeAccount?.name || APP_LABELS.appTitle;
+
   return (
     <div className="app">
       <header className="app__header">
         <div className="app__header-left">
-          <strong>{APP_LABELS.appTitle}</strong>
+          <strong>{title}</strong>
           {lastUpdateText && (
             <span className="text-dim">
               · {APP_LABELS.lastUpdatePrefix} {lastUpdateText}
