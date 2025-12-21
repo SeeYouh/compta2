@@ -3,6 +3,7 @@
 @use "./components/DrawerThemeManager.scss" as *;
 @use "./components/ColorPicker.scss" as *;
 @use "./utils/Utilities.scss" as *;
+@use "./pages/Auth.scss" as *;
 
 :root {
   // ============================================

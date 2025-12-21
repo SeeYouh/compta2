@@ -6,6 +6,37 @@ import ThemeToggle from "../components/ThemeToggle";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
+// Icônes SVG intégrées
+const EmailIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <path d="m2 7 10 6 10-6" />
+  </svg>
+);
+
+const LockIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </svg>
+);
+
 function Login() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -52,173 +83,98 @@ function Login() {
   };
 
   return (
-    <div
-      className="page-container"
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "var(--color-bg)",
-        padding: "2rem",
-      }}
-    >
-      <ThemeToggle />
-      <main
-        className="main-content"
-        style={{ width: "100%", maxWidth: "450px" }}
-      >
-        <section className="txn-form" style={{ padding: "2rem" }}>
-          <div
-            className="txn-form__header"
-            style={{ marginBottom: "2rem", textAlign: "center" }}
-          >
-            <div
-              className="txn-form__label"
-              style={{ fontSize: "1.75rem", fontWeight: "600" }}
-            >
-              Connexion
-            </div>
+    <div className="auth-page">
+      <div className="auth-page__theme-toggle">
+        <ThemeToggle />
+      </div>
+
+      <div className="auth-page__container">
+        <div className="auth-page__card">
+          <div className="auth-page__header">
+            <h1 className="auth-page__title">Bienvenue</h1>
+            <p className="auth-page__subtitle">
+              Connectez-vous pour accéder à votre compte
+            </p>
           </div>
 
-          <div className="txn-form__panel" style={{ display: "block" }}>
-            {error && (
-              <div
-                className="error-message"
-                style={{
-                  marginBottom: "1.5rem",
-                  padding: "0.75rem 1rem",
-                  background: "var(--color-danger-100)",
-                  color: "var(--color-danger-900)",
-                  borderRadius: "6px",
-                }}
-              >
-                {error}
-              </div>
-            )}
+          {error && <div className="auth-page__error">{error}</div>}
 
-            <form
-              onSubmit={handleSubmit}
-              className="form-container"
-              style={{ gap: "1.5rem" }}
-            >
-              <div className="form-cell">
-                <label
-                  htmlFor="email"
-                  style={{
-                    display: "block",
-                    marginBottom: "0.5rem",
-                    fontWeight: "500",
-                  }}
-                >
-                  Email
-                </label>
+          <form onSubmit={handleSubmit} className="auth-page__form">
+            <div className="auth-page__field">
+              <label htmlFor="email" className="auth-page__label">
+                Email
+              </label>
+              <div className="auth-page__input-wrapper">
+                <div className="auth-page__icon">
+                  <EmailIcon />
+                </div>
                 <input
                   type="email"
                   id="email"
+                  className="auth-page__input"
                   value={formData.email}
                   onChange={(e) => handleChange("email", e.target.value)}
+                  placeholder="votre@email.com"
                   required
                   autoComplete="email"
                   disabled={loading}
-                  style={{
-                    width: "100%",
-                    padding: "0.75rem",
-                    fontSize: "1rem",
-                  }}
                 />
               </div>
+            </div>
 
-              <div className="form-cell">
-                <label
-                  htmlFor="password"
-                  style={{
-                    display: "block",
-                    marginBottom: "0.5rem",
-                    fontWeight: "500",
-                  }}
-                >
-                  Mot de passe
-                </label>
+            <div className="auth-page__field">
+              <label htmlFor="password" className="auth-page__label">
+                Mot de passe
+              </label>
+              <div className="auth-page__input-wrapper">
+                <div className="auth-page__icon">
+                  <LockIcon />
+                </div>
                 <input
                   type="password"
                   id="password"
+                  className="auth-page__input"
                   value={formData.password}
                   onChange={(e) => handleChange("password", e.target.value)}
+                  placeholder="••••••••"
                   required
                   autoComplete="current-password"
                   disabled={loading}
                   minLength={6}
-                  style={{
-                    width: "100%",
-                    padding: "0.75rem",
-                    fontSize: "1rem",
-                  }}
                 />
               </div>
+            </div>
 
-              <div
-                className="form-cell form-submit"
-                style={{ marginTop: "0.5rem" }}
+            <div className="auth-page__link auth-page__link--forgot">
+              <button
+                type="button"
+                onClick={() => navigate("/forgot-password")}
               >
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{
-                    width: "100%",
-                    padding: "0.875rem",
-                    fontSize: "1rem",
-                  }}
-                >
-                  {loading ? "Connexion..." : "Se connecter"}
+                Mot de passe oublié ?
+              </button>
+            </div>
+
+            <div className="auth-page__submit">
+              <button
+                type="submit"
+                className="auth-page__button"
+                disabled={loading}
+              >
+                {loading ? "Connexion en cours..." : "Se connecter"}
+              </button>
+            </div>
+
+            <div className="auth-page__links">
+              <div className="auth-page__link auth-page__link--secondary">
+                Pas encore de compte ?{" "}
+                <button type="button" onClick={() => navigate("/register")}>
+                  Créer un compte
                 </button>
               </div>
-
-              <div
-                className="form-cell"
-                style={{ textAlign: "center", marginTop: "0.5rem" }}
-              >
-                <button
-                  type="button"
-                  onClick={() => navigate("/forgot-password")}
-                  className="link-button"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "var(--color-text-secondary)",
-                    cursor: "pointer",
-                    textDecoration: "underline",
-                    fontSize: "0.9rem",
-                  }}
-                >
-                  Mot de passe oublié ?
-                </button>
-              </div>
-
-              <div
-                className="form-cell"
-                style={{ textAlign: "center", marginTop: "1rem" }}
-              >
-                <button
-                  type="button"
-                  onClick={() => navigate("/register")}
-                  className="link-button"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "var(--color-primary)",
-                    cursor: "pointer",
-                    textDecoration: "underline",
-                    fontSize: "0.95rem",
-                  }}
-                >
-                  Pas encore de compte ? S'inscrire
-                </button>
-              </div>
-            </form>
-          </div>
-        </section>
-      </main>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
