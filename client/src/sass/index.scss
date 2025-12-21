@@ -63,6 +63,26 @@
     var(--color-primary) 100%,
     white 95%
   ); // #f8fafc
+  --color-primary-20: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 97%
+  ); // Encore plus clair
+  --color-primary-10: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 98%
+  ); // Presque blanc
+  --color-primary-5: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 99%
+  ); // Très très clair
+  --color-primary-4: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 99.5%
+  ); // Ultra clair
 
   // ============================================
   // COULEURS AVEC OPACITÉ (pour ombres, overlays)
@@ -288,6 +308,26 @@
     in srgb,
     var(--color-primary) 100%,
     black 60%
+  ); // #3730a3
+  --color-primary-20: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 80%
+  ); // #3730a3
+  --color-primary-10: color-mix(
+    in srgb,
+    var(--color-primary) 80%,
+    black 100%
+  ); // #3730a3
+  --color-primary-5: color-mix(
+    in srgb,
+    var(--color-primary) 40%,
+    black 100%
+  ); // #3730a3
+  --color-primary-4: color-mix(
+    in srgb,
+    var(--color-primary) 20%,
+    black 100%
   ); // #3730a3
 
   // ============================================

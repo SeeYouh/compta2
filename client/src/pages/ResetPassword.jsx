@@ -1,12 +1,59 @@
 import { useEffect, useState } from "react";
 
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import ThemeToggle from "../components/ThemeToggle";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-export default function ResetPassword() {
+// Icônes SVG intégrées
+const LockIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </svg>
+);
+
+const CheckCircleIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+    <polyline points="22 4 12 14.01 9 11.01" />
+  </svg>
+);
+
+const AlertCircleIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="12" cy="12" r="10" />
+    <line x1="12" y1="8" x2="12" y2="12" />
+    <line x1="12" y1="16" x2="12.01" y2="16" />
+  </svg>
+);
+
+function ResetPassword() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
@@ -19,11 +66,17 @@ export default function ResetPassword() {
   useEffect(() => {
     const tokenParam = searchParams.get("token");
     if (!tokenParam) {
-      setError("Token de réinitialisation manquant");
+      setError("Token de réinitialisation manquant ou invalide");
     } else {
       setToken(tokenParam);
     }
   }, [searchParams]);
+
+  const handleChange = (field, value) => {
+    if (field === "password") setPassword(value);
+    if (field === "confirmPassword") setConfirmPassword(value);
+    setError("");
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,167 +125,122 @@ export default function ResetPassword() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "2rem",
-      }}
-    >
-      <ThemeToggle
-        style={{ position: "absolute", top: "1rem", right: "1rem" }}
-      />
+    <div className="auth-page">
+      <div className="auth-page__theme-toggle">
+        <ThemeToggle />
+      </div>
 
-      <section
-        className="txn-form"
-        style={{ maxWidth: "450px", width: "100%", padding: "2rem" }}
-      >
-        <h1
-          style={{
-            marginBottom: "1.5rem",
-            textAlign: "center",
-            fontSize: "1.75rem",
-          }}
-        >
-          Nouveau mot de passe
-        </h1>
-
-        {success ? (
-          <div style={{ textAlign: "center" }}>
-            <p
-              style={{
-                color: "var(--success-color, #4CAF50)",
-                marginBottom: "1.5rem",
-              }}
-            >
-              ✅ Mot de passe réinitialisé avec succès !
-            </p>
-            <p style={{ fontSize: "0.9rem" }}>
-              Redirection vers la connexion...
+      <div className="auth-page__container">
+        <div className="auth-page__card">
+          <div className="auth-page__header">
+            <h1 className="auth-page__title">Nouveau mot de passe</h1>
+            <p className="auth-page__subtitle">
+              Créez un nouveau mot de passe sécurisé
             </p>
           </div>
-        ) : (
-          <form
-            onSubmit={handleSubmit}
-            style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}
-          >
-            {error && (
-              <div
-                style={{
-                  padding: "0.75rem",
-                  backgroundColor: "var(--error-bg, #ffebee)",
-                  color: "var(--error-color, #f44336)",
-                  borderRadius: "4px",
-                  fontSize: "0.9rem",
-                }}
-              >
-                {error}
-              </div>
-            )}
 
-            {!token ? (
-              <div style={{ textAlign: "center" }}>
-                <p
-                  style={{
-                    color: "var(--error-color, #f44336)",
-                    marginBottom: "1.5rem",
-                  }}
-                >
-                  Token de réinitialisation manquant ou invalide
-                </p>
-                <Link
-                  to="/forgot-password"
-                  style={{
-                    color: "var(--primary-color, #4CAF50)",
-                    textDecoration: "none",
-                  }}
+          {error && <div className="auth-page__error">{error}</div>}
+
+          {success && (
+            <div className="auth-page__success">
+              <CheckCircleIcon /> Mot de passe réinitialisé avec succès !
+              Redirection en cours...
+            </div>
+          )}
+
+          {!token ? (
+            <div className="auth-page__links">
+              <div className="auth-page__link auth-page__link--secondary">
+                <button
+                  type="button"
+                  onClick={() => navigate("/forgot-password")}
                 >
                   Faire une nouvelle demande
-                </Link>
+                </button>
               </div>
-            ) : (
-              <>
-                <div>
-                  <label
-                    htmlFor="password"
-                    style={{
-                      display: "block",
-                      marginBottom: "0.5rem",
-                      fontWeight: "500",
-                    }}
-                  >
+            </div>
+          ) : (
+            !success && (
+              <form onSubmit={handleSubmit} className="auth-page__form">
+                <div className="auth-page__field">
+                  <label htmlFor="password" className="auth-page__label">
                     Nouveau mot de passe
                   </label>
-                  <input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={6}
-                    style={{
-                      width: "100%",
-                      padding: "0.75rem",
-                      border: "1px solid var(--color-border)",
-                      borderRadius: "4px",
-                      fontSize: "1rem",
-                    }}
-                  />
+                  <div className="auth-page__input-wrapper">
+                    <div className="auth-page__icon">
+                      <LockIcon />
+                    </div>
+                    <input
+                      type="password"
+                      id="password"
+                      className="auth-page__input"
+                      value={password}
+                      onChange={(e) => handleChange("password", e.target.value)}
+                      placeholder="••••••••"
+                      required
+                      autoComplete="new-password"
+                      disabled={loading}
+                      minLength={6}
+                    />
+                  </div>
+                  <p className="auth-page__hint">
+                    <AlertCircleIcon />
+                    Minimum 6 caractères
+                  </p>
                 </div>
 
-                <div>
-                  <label
-                    htmlFor="confirmPassword"
-                    style={{
-                      display: "block",
-                      marginBottom: "0.5rem",
-                      fontWeight: "500",
-                    }}
-                  >
+                <div className="auth-page__field">
+                  <label htmlFor="confirmPassword" className="auth-page__label">
                     Confirmer le mot de passe
                   </label>
-                  <input
-                    id="confirmPassword"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                    minLength={6}
-                    style={{
-                      width: "100%",
-                      padding: "0.75rem",
-                      border: "1px solid var(--color-border)",
-                      borderRadius: "4px",
-                      fontSize: "1rem",
-                    }}
-                  />
+                  <div className="auth-page__input-wrapper">
+                    <div className="auth-page__icon">
+                      <LockIcon />
+                    </div>
+                    <input
+                      type="password"
+                      id="confirmPassword"
+                      className="auth-page__input"
+                      value={confirmPassword}
+                      onChange={(e) =>
+                        handleChange("confirmPassword", e.target.value)
+                      }
+                      placeholder="••••••••"
+                      required
+                      autoComplete="new-password"
+                      disabled={loading}
+                      minLength={6}
+                    />
+                  </div>
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={loading}
-                  style={{
-                    padding: "0.75rem",
-                    backgroundColor: "var(--primary-color, #4CAF50)",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "4px",
-                    fontSize: "1rem",
-                    cursor: loading ? "not-allowed" : "pointer",
-                    opacity: loading ? 0.6 : 1,
-                  }}
-                >
-                  {loading
-                    ? "Réinitialisation..."
-                    : "Réinitialiser le mot de passe"}
-                </button>
-              </>
-            )}
-          </form>
-        )}
-      </section>
+                <div className="auth-page__submit">
+                  <button
+                    type="submit"
+                    className="auth-page__button"
+                    disabled={loading}
+                  >
+                    {loading
+                      ? "Réinitialisation..."
+                      : "Réinitialiser le mot de passe"}
+                  </button>
+                </div>
+
+                <div className="auth-page__links">
+                  <div className="auth-page__link auth-page__link--secondary">
+                    Vous vous souvenez de votre mot de passe ?{" "}
+                    <button type="button" onClick={() => navigate("/login")}>
+                      Se connecter
+                    </button>
+                  </div>
+                </div>
+              </form>
+            )
+          )}
+        </div>
+      </div>
     </div>
   );
 }
+
+export default ResetPassword;
