@@ -1,8 +1,5 @@
 import { API_ERRORS } from "./index";
-
-// Configuration de l'URL de base à partir des variables d'environnement
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-const BASE_URL = `${API_BASE_URL}/api/transactions`;
+import { authFetch } from "./authFetch.js";
 
 /**
  * Génère un UUID v4 compatible (128 bits)
@@ -17,7 +14,7 @@ const generateUUID = () => {
 };
 
 export const getTransactions = async () => {
-  const res = await fetch(BASE_URL);
+  const res = await authFetch("/api/transactions");
   if (!res.ok) throw new Error(API_ERRORS.loadTransactions);
   return res.json();
 };
@@ -25,15 +22,14 @@ export const getTransactions = async () => {
 export const addTransaction = async (txn) => {
   const now = Date.now();
   const transactionWithTimestamps = {
-    id: generateUUID(), // Génère un UUID unique (ex: "550e8400-e29b-41d4-a716-446655440000")
+    id: generateUUID(),
     ...txn,
     createdAt: now,
     updatedAt: now,
   };
 
-  const res = await fetch(BASE_URL, {
+  const res = await authFetch("/api/transactions", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(transactionWithTimestamps),
   });
   if (!res.ok) throw new Error(API_ERRORS.addTransaction);
@@ -41,7 +37,7 @@ export const addTransaction = async (txn) => {
 };
 
 export const deleteTransaction = async (id) => {
-  const res = await fetch(`${BASE_URL}/${id}`, { method: "DELETE" });
+  const res = await authFetch(`/api/transactions/${id}`, { method: "DELETE" });
   if (!res.ok) throw new Error(API_ERRORS.deleteTransaction);
   return true;
 };
@@ -52,9 +48,8 @@ export const updateTransaction = async (id, updates) => {
     updatedAt: Date.now(),
   };
 
-  const res = await fetch(`${BASE_URL}/${id}`, {
-    method: "PATCH", // PATCH = partiel (JSON Server/REST standard)
-    headers: { "Content-Type": "application/json" },
+  const res = await authFetch(`/api/transactions/${id}`, {
+    method: "PATCH",
     body: JSON.stringify(updatesWithTimestamp),
   });
   if (!res.ok) throw new Error(API_ERRORS.updateTransaction);

@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { AccountsContext } from "./createAccountsContext";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+import { authFetch } from "../components/utils/authFetch";
 
 /**
  * Récupère tous les comptes utilisateurs
  */
 async function getAccounts() {
-  const response = await fetch(`${API_URL}/api/accounts`);
+  const response = await authFetch("/api/accounts");
   if (!response.ok) throw new Error("Erreur lors du chargement des comptes");
   return response.json();
 }
@@ -17,9 +16,8 @@ async function getAccounts() {
  * Crée un nouveau compte
  */
 async function createAccount(name) {
-  const response = await fetch(`${API_URL}/api/accounts`, {
+  const response = await authFetch("/api/accounts", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name }),
   });
   if (!response.ok) throw new Error("Erreur lors de la création du compte");
@@ -34,9 +32,8 @@ async function updateAccount(accountId, name, color) {
   if (name !== undefined) body.name = name;
   if (color !== undefined) body.color = color;
 
-  const response = await fetch(`${API_URL}/api/accounts/${accountId}`, {
+  const response = await authFetch(`/api/accounts/${accountId}`, {
     method: "PUT",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
   if (!response.ok) throw new Error("Erreur lors de la modification du compte");
@@ -47,7 +44,7 @@ async function updateAccount(accountId, name, color) {
  * Supprime un compte
  */
 async function deleteAccount(accountId) {
-  const response = await fetch(`${API_URL}/api/accounts/${accountId}`, {
+  const response = await authFetch(`/api/accounts/${accountId}`, {
     method: "DELETE",
   });
   if (!response.ok) throw new Error("Erreur lors de la suppression du compte");

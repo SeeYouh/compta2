@@ -29,6 +29,7 @@ import TransactionForm from "../components/TransactionForm";
 import TransactionsTable from "../components/TransactionsTable";
 import { useAccounts } from "../contexts/useAccounts";
 import { useLastUpdate } from "../components/hooks/useLastUpdate";
+import UserMenu from "../components/UserMenu";
 import { useSettings } from "../components/hooks/useSettings";
 import { useThemes } from "../contexts/useThemes";
 import { useTransactionForm } from "../components/hooks/useTransactionForm";
@@ -213,7 +214,12 @@ const App = () => {
 
   return (
     <AppShell
-      headerRight={<ThemeToggle />}
+      headerRight={
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <ThemeToggle />
+          <UserMenu />
+        </div>
+      }
       accountTabs={<AccountTabs />}
       lastUpdateText={lastUpdateText}
     >
