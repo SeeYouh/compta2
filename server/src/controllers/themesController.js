@@ -1,13 +1,24 @@
+import { getUserAccounts } from "../middleware/permissions.js";
 import { Theme } from "../models/Theme.js";
 
 /**
  * GET /api/themes
- * Récupère tous les thèmes sous forme de tableau
- * (chaque compte peut avoir des thèmes avec les mêmes IDs, donc on retourne un tableau)
+ * Récupère tous les thèmes des comptes accessibles par l'utilisateur + template
  */
 export const getThemes = async (req, res) => {
   try {
-    const themes = await Theme.find({});
+    // Récupérer tous les comptes accessibles par l'utilisateur
+    const accounts = await getUserAccounts(req.userId);
+    const accountIds = accounts.map((acc) => acc.id);
+
+    // Ajouter le template (accessible à tous)
+    const themes = await Theme.find({
+      $or: [
+        { accountId: { $in: accountIds } },
+        { accountId: /^account-template/ },
+      ],
+    });
+
     res.json(themes.map((theme) => theme.toJSON()));
   } catch (error) {
     console.error("Erreur getThemes:", error);

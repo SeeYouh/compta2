@@ -1,15 +1,24 @@
 import { v4 as uuidv4 } from "uuid";
 
+import { getUserAccounts } from "../middleware/permissions.js";
 import { Theme } from "../models/Theme.js";
 import { Transaction } from "../models/Transaction.js";
 
 /**
  * GET /api/transactions
- * Récupère toutes les transactions
+ * Récupère toutes les transactions des comptes accessibles par l'utilisateur
  */
 export const getTransactions = async (req, res) => {
   try {
-    const transactions = await Transaction.find({}).sort({ date: -1 });
+    // Récupérer tous les comptes accessibles par l'utilisateur
+    const accounts = await getUserAccounts(req.userId);
+    const accountIds = accounts.map((acc) => acc.id);
+
+    // Récupérer les transactions de ces comptes
+    const transactions = await Transaction.find({
+      accountId: { $in: accountIds },
+    }).sort({ date: -1 });
+
     res.json(transactions);
   } catch (error) {
     console.error("Erreur getTransactions:", error);

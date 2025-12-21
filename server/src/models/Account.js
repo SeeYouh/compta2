@@ -23,6 +23,34 @@ const AccountSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    userId: {
+      type: String,
+      required: false, // Optionnel pour compatibilité avec données existantes
+      default: null,
+    },
+    sharedWith: {
+      type: [
+        {
+          userId: {
+            type: String,
+            required: true,
+          },
+          permissions: {
+            type: {
+              canViewTransactions: { type: Boolean, default: false },
+              canCreateTransactions: { type: Boolean, default: false },
+              canEditTransactions: { type: Boolean, default: false },
+              canDeleteTransactions: { type: Boolean, default: false },
+              canManageThemes: { type: Boolean, default: false },
+              canRenameAccount: { type: Boolean, default: false },
+              canInviteUsers: { type: Boolean, default: false },
+            },
+            default: {},
+          },
+        },
+      ],
+      default: [],
+    },
   },
   {
     timestamps: true,
@@ -31,6 +59,8 @@ const AccountSchema = new mongoose.Schema(
 
 // Index pour recherche rapide
 AccountSchema.index({ isTemplate: 1 });
+AccountSchema.index({ userId: 1 });
+AccountSchema.index({ "sharedWith.userId": 1 });
 
 // Transformation JSON
 AccountSchema.set("toJSON", {

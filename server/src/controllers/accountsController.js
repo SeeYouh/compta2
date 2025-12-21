@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { Account } from "../models/Account.js";
+import { getUserAccounts } from "../middleware/permissions.js";
 import { Theme } from "../models/Theme.js";
 import { Transaction } from "../models/Transaction.js";
 
@@ -73,13 +74,12 @@ async function syncAccountTransferThemes() {
 
 /**
  * GET /api/accounts
- * Récupère tous les comptes utilisateurs (isTemplate: false)
+ * Récupère tous les comptes accessibles par l'utilisateur connecté
  */
 export const getAllAccounts = async (req, res) => {
   try {
-    const accounts = await Account.find({ isTemplate: false }).sort({
-      createdAt: 1,
-    });
+    // req.userId est défini par le middleware authenticate
+    const accounts = await getUserAccounts(req.userId);
 
     res.json(accounts);
   } catch (error) {
@@ -146,6 +146,8 @@ export const createAccount = async (req, res) => {
       id: `account-${uuidv4()}`,
       name: name.trim(),
       isTemplate: false,
+      userId: req.userId, // Associer au propriétaire
+      sharedWith: [],
     });
 
     // Récupérer les thèmes du template
