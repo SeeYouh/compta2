@@ -48,6 +48,10 @@ const UserSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    passwordResetRequests: {
+      type: [Date],
+      default: [],
+    },
   },
   {
     timestamps: true,

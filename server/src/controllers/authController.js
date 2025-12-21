@@ -240,6 +240,7 @@ export const resendVerification = async (req, res) => {
 /**
  * POST /api/auth/forgot-password
  * Demande de réinitialisation de mot de passe
+ * Rate limiting : 1 demande/5min, max 3 demandes/heure
  */
 export const forgotPassword = async (req, res) => {
   try {
@@ -259,10 +260,58 @@ export const forgotPassword = async (req, res) => {
       });
     }
 
+    const now = Date.now();
+    const fiveMinutes = 5 * 60 * 1000;
+    const oneHour = 60 * 60 * 1000;
+
+    // Nettoyer les demandes de plus d'une heure
+    user.passwordResetRequests = user.passwordResetRequests.filter(
+      (timestamp) => now - timestamp.getTime() < oneHour
+    );
+
+    // Vérifier la limite de 5 minutes depuis la dernière demande
+    if (user.passwordResetRequests.length > 0) {
+      const lastRequest =
+        user.passwordResetRequests[user.passwordResetRequests.length - 1];
+      const timeSinceLastRequest = now - lastRequest.getTime();
+
+      if (timeSinceLastRequest < fiveMinutes) {
+        const remainingMinutes = Math.ceil(
+          (fiveMinutes - timeSinceLastRequest) / 60000
+        );
+        return res.status(429).json({
+          error: `Veuillez patienter ${remainingMinutes} minute${
+            remainingMinutes > 1 ? "s" : ""
+          } avant de redemander un lien`,
+          remainingTime: Math.ceil((fiveMinutes - timeSinceLastRequest) / 1000),
+        });
+      }
+    }
+
+    // Vérifier la limite de 3 demandes par heure
+    if (user.passwordResetRequests.length >= 3) {
+      const oldestRequest = user.passwordResetRequests[0];
+      const timeSinceOldest = now - oldestRequest.getTime();
+      const remainingTime = oneHour - timeSinceOldest;
+
+      if (remainingTime > 0) {
+        const remainingMinutes = Math.ceil(remainingTime / 60000);
+        return res.status(429).json({
+          error: `Limite de 3 demandes par heure atteinte. Veuillez réessayer dans ${remainingMinutes} minute${
+            remainingMinutes > 1 ? "s" : ""
+          }`,
+          remainingTime: Math.ceil(remainingTime / 1000),
+        });
+      }
+    }
+
+    // Ajouter la nouvelle demande
+    user.passwordResetRequests.push(new Date(now));
+
     // Générer le token de réinitialisation
     const resetToken = crypto.randomBytes(32).toString("hex");
     user.passwordResetToken = resetToken;
-    user.passwordResetTokenExpires = new Date(Date.now() + 60 * 60 * 1000); // 1h
+    user.passwordResetTokenExpires = new Date(now + 60 * 60 * 1000); // 1h
     await user.save();
 
     // Envoyer l'email
