@@ -1,4 +1,45 @@
 // Styles communs pour les pages d'authentification (Login, Register, ForgotPassword, ResetPassword)
+
+// ============================================
+// VARIABLES D'ANIMATION DES GRADIENTS
+// ============================================
+// Durée de rotation complète (en secondes)
+$gradient-animation-duration: 40s;
+
+// Taille des gradients (en %)
+$gradient-size: 1200px;
+
+// Opacité des gradients
+$gradient-opacity: 0.3;
+
+// Distance du centre (ajuster pour modifier le rayon de rotation)
+$gradient-distance: 40%;
+
+// Durée de l'animation de la bordure (modifiable)
+$border-animation-duration: 40s;
+
+// Angle de départ de la bordure animée (pour caler l'animation)
+$border-start-angle: 50deg;
+
+// Longueur de la traînée lumineuse de la bordure (en %)
+// Valeurs recommandées : 15-40% (25% par défaut)
+$border-trail-length: 40%;
+
+// Largeur de la bande de bordure intérieure (Sass variable)
+$card-border-width: 2px;
+
+// Douceur / opacité relative de la bande (0 = invisible, 1 = pleine opacité)
+$card-border-softness: 0.5;
+
+// ============================================
+// VARIABLES DE BLUR DU FORMULAIRE
+// ============================================
+// Intensité du flou en arrière-plan du formulaire
+$card-backdrop-blur: 20px;
+
+// Opacité du fond de la carte (0 = transparent, 1 = opaque)
+$card-background-opacity: 0.3;
+
 .auth-page {
   min-height: 100vh;
   display: flex;
@@ -7,19 +48,48 @@
   padding: 2rem 1rem;
   position: relative;
   overflow: hidden;
+  background: var(--color-bg);
 
-  // Gradient de fond moderne
-  background: radial-gradient(
-      circle at 20% 80%,
+  // Premier gradient positionné à droite (position initiale)
+  &::before {
+    content: "";
+    position: absolute;
+    width: $gradient-size;
+    height: $gradient-size;
+    top: 50%;
+    left: 50%;
+    background: radial-gradient(
+      circle,
       var(--color-primary-100) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      circle at 80% 20%,
+      transparent 70%
+    );
+    opacity: $gradient-opacity;
+    animation: rotateGradients $gradient-animation-duration linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  // Second gradient positionné à gauche (position opposée à 180°)
+  &::after {
+    content: "";
+    position: absolute;
+    width: $gradient-size;
+    height: $gradient-size;
+    top: 50%;
+    left: 50%;
+    background: radial-gradient(
+      circle,
       var(--color-primary-50) 0%,
-      transparent 50%
-    ),
-    var(--color-bg);
+      transparent 70%
+    );
+    opacity: $gradient-opacity;
+    animation: rotateGradients $gradient-animation-duration linear infinite;
+    animation-delay: calc(
+      $gradient-animation-duration / -2
+    ); // Décalage de 180°
+    pointer-events: none;
+    z-index: 0;
+  }
 
   &__theme-toggle {
     position: absolute;
@@ -38,33 +108,103 @@
     width: 100%;
     max-width: 440px;
     animation: fadeInUp 0.6s ease-out;
+    position: relative;
+    z-index: 1;
   }
 
   &__card {
-    background: var(--color-surface);
+    --border-w: #{$card-border-width}; // largeur visuelle de la bordure animée
+    --border-softness: #{$card-border-softness};
+    /* angle de départ pour calibrer l'animation */
+    --a-start: #{$border-start-angle};
+    background: color-mix(
+      in srgb,
+      var(--color-surface) calc($card-background-opacity * 100%),
+      transparent
+    );
+    backdrop-filter: blur($card-backdrop-blur);
+    -webkit-backdrop-filter: blur($card-backdrop-blur);
     border-radius: 24px;
     padding: 3rem 2.5rem;
     box-shadow: 0 4px 6px var(--color-primary-alpha-10),
       0 10px 25px var(--color-primary-alpha-15);
     border: 1px solid var(--color-border);
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 
-    // Effet de brillance subtil en haut
-    &::before {
+    /* Bordure animée avec deux comètes opposées */
+    &::after {
       content: "";
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        var(--color-primary-500),
-        transparent
-      );
-      opacity: 0.5;
+      /* overlay à l'intérieur du card, on garde la bordure visible */
+      inset: 0;
+      border-radius: 24px;
+      padding: var(--border-w);
+      box-sizing: border-box;
+      pointer-events: none;
+      z-index: 3;
+
+      /* on reprend le style linéaire (teinte centrale), mais sous forme d'un segment conique
+         pour qu'il parcours tout le pourtour comme une lueur linéaire */
+      /* Deux bordures superposées : une principale et une opposée (180deg de décalage) */
+      background: conic-gradient(
+          from calc(var(--a-start, 0deg) + var(--a, 0deg) + 180deg),
+          transparent 0deg,
+          transparent calc($border-trail-length * 0.2),
+          color-mix(in srgb, var(--color-primary-200) 19%, transparent)
+            calc($border-trail-length * 0.4),
+          color-mix(in srgb, var(--color-primary-300) 32%, transparent)
+            calc($border-trail-length * 0.48),
+          color-mix(in srgb, var(--color-primary-400) 48%, transparent)
+            calc($border-trail-length * 0.56),
+          color-mix(in srgb, var(--color-primary-500) 64%, transparent)
+            calc($border-trail-length * 0.64),
+          var(--color-primary-500) calc($border-trail-length * 0.72),
+          color-mix(in srgb, var(--color-primary-500) 64%, transparent)
+            calc($border-trail-length * 0.8),
+          color-mix(in srgb, var(--color-primary-400) 48%, transparent)
+            calc($border-trail-length * 0.88),
+          color-mix(in srgb, var(--color-primary-300) 32%, transparent)
+            calc($border-trail-length * 0.96),
+          color-mix(in srgb, var(--color-primary-200) 19%, transparent)
+            calc($border-trail-length * 1.04),
+          transparent calc($border-trail-length * 1.2),
+          transparent 100%
+        ),
+        conic-gradient(
+          from calc(var(--a-start, 0deg) + var(--a, 0deg)),
+          transparent 0deg,
+          transparent calc($border-trail-length * 0.2),
+          color-mix(in srgb, var(--color-primary-200) 19%, transparent)
+            calc($border-trail-length * 0.4),
+          color-mix(in srgb, var(--color-primary-300) 32%, transparent)
+            calc($border-trail-length * 0.48),
+          color-mix(in srgb, var(--color-primary-400) 48%, transparent)
+            calc($border-trail-length * 0.56),
+          color-mix(in srgb, var(--color-primary-500) 64%, transparent)
+            calc($border-trail-length * 0.64),
+          var(--color-primary-500) calc($border-trail-length * 0.72),
+          color-mix(in srgb, var(--color-primary-500) 64%, transparent)
+            calc($border-trail-length * 0.8),
+          color-mix(in srgb, var(--color-primary-400) 48%, transparent)
+            calc($border-trail-length * 0.88),
+          color-mix(in srgb, var(--color-primary-300) 32%, transparent)
+            calc($border-trail-length * 0.96),
+          color-mix(in srgb, var(--color-primary-200) 19%, transparent)
+            calc($border-trail-length * 1.04),
+          transparent calc($border-trail-length * 1.2),
+          transparent 100%
+        );
+
+      /* masque pour ne garder que la bande intérieure (padding) et masquer le centre */
+      -webkit-mask: linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+
+      transform-origin: 50% 50%;
+      animation: borderSpin $border-animation-duration linear infinite;
     }
   }
 
@@ -370,6 +510,35 @@
   }
   75% {
     transform: translateX(10px);
+  }
+}
+
+/* Déclaration de la propriété animable pour l'angle du gradient */
+@property --a {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Animation qui change la variable --a pour faire tourner le gradient autour */
+@keyframes borderSpin {
+  from {
+    --a: 0deg;
+  }
+  to {
+    --a: 1turn;
+  }
+}
+
+// Animation de rotation des gradients
+// Les deux gradients tournent en orbite circulaire
+@keyframes rotateGradients {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) translateX($gradient-distance);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg)
+      translateX($gradient-distance);
   }
 }
 
