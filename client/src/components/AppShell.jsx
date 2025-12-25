@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 
 import { APP_LABELS } from "./utils";
 import { useAccounts } from "../contexts/useAccounts";
+import { useDocumentTitle } from "./hooks/useDocumentTitle";
 
 const MotionDiv = motion.div;
 
@@ -17,6 +18,9 @@ export default function AppShell({
 }) {
   const { activeAccount } = useAccounts();
   const title = activeAccount?.name || APP_LABELS.appTitle;
+
+  // Mettre à jour le titre du document
+  useDocumentTitle(activeAccount?.name);
 
   return (
     <div className="app">

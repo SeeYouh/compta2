@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { config } from "../config/env";
 import ThemeToggle from "../components/ThemeToggle";
+import { useDocumentTitle } from "../components/hooks/useDocumentTitle";
 
 const API_URL = config.apiUrl;
 
@@ -63,6 +64,8 @@ function ResetPassword() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [token, setToken] = useState("");
+
+  useDocumentTitle("Réinitialisation du mot de passe");
 
   useEffect(() => {
     const tokenParam = searchParams.get("token");

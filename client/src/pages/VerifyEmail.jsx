@@ -4,12 +4,15 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { config } from "../config/env";
 import ThemeToggle from "../components/ThemeToggle";
+import { useDocumentTitle } from "../components/hooks/useDocumentTitle";
 
 export default function VerifyEmail() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState("verifying"); // verifying, success, error
   const [message, setMessage] = useState("");
+
+  useDocumentTitle("Vérification email");
 
   useEffect(() => {
     const token = searchParams.get("token");

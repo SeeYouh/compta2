@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { config } from "../config/env";
 import ThemeToggle from "../components/ThemeToggle";
+import { useDocumentTitle } from "../components/hooks/useDocumentTitle";
 
 const API_URL = config.apiUrl;
 
@@ -44,6 +45,8 @@ export default function ForgotPassword() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useDocumentTitle("Mot de passe oublié");
 
   const handleSubmit = async (e) => {
     e.preventDefault();

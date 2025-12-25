@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { config } from "../config/env";
 import ThemeToggle from "../components/ThemeToggle";
+import { useDocumentTitle } from "../components/hooks/useDocumentTitle";
 
 const API_URL = config.apiUrl;
 
@@ -46,6 +47,8 @@ function Login() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useDocumentTitle("Connexion");
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
