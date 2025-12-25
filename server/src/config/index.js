@@ -2,16 +2,22 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const { MONGODB_USER, MONGODB_PASSWORD, MONGODB_ADDRESS } = process.env;
+const { MONGODB_USER, MONGODB_PASSWORD, MONGODB_ADDRESS, MONGODB_DATABASE } =
+  process.env;
 
-if (!MONGODB_USER || !MONGODB_PASSWORD || !MONGODB_ADDRESS) {
+if (
+  !MONGODB_USER ||
+  !MONGODB_PASSWORD ||
+  !MONGODB_ADDRESS ||
+  !MONGODB_DATABASE
+) {
   throw new Error("Variables MongoDB manquantes dans .env");
 }
 
 export const config = {
   mongodb: {
     uri: `mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_ADDRESS}`,
-    dbName: "compta",
+    dbName: MONGODB_DATABASE,
   },
   server: {
     port: process.env.PORT,
