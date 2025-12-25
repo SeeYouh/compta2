@@ -1,1 +1,513 @@
-@use "index.scss" as *;
+// ============================================
+// VARIABLES SCSS - ANIMATIONS ET STYLES
+// ============================================
+
+// --- Variables d'animation des gradients ---
+$gradient-animation-duration: 40s;
+$gradient-size: 1200px;
+$gradient-opacity: 1;
+$gradient-blur: 800px;
+$gradient-distance: 45%;
+
+// --- Variables de bordure animée ---
+$border-animation-duration: 40s;
+$border-start-angle: 100deg;
+$border-trail-length: 30%;
+$card-border-width: 2px;
+$card-border-softness: 0.5;
+
+// --- Variables de blur du formulaire ---
+$card-backdrop-blur: 40px;
+$card-background-opacity: 0.3;
+
+// ============================================
+// VARIABLES CSS - COULEURS ET THÈMES
+// ============================================
+
+:root {
+  // ============================================
+  // COULEURS DE BASE (à modifier pour changer les thèmes)
+  // ============================================
+  --color-primary: #3b82f6; // Bleu - Couleur principale du site
+  --color-success: #22c55e; // Vert - Pour les recettes
+  --color-danger: #ef4444; // Rouge - Pour les dépenses et suppressions
+
+  // ============================================
+  // VARIATIONS DE LUMINOSITÉ (Bleu principal)
+  // ============================================
+  // Plus sombre à plus clair (7 niveaux)
+  --color-primary-900: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 60%
+  ); // #1d4ed8
+  --color-primary-800: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 50%
+  ); // #1e40af
+  --color-primary-700: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 35%
+  ); // #2563eb
+  --color-primary-600: var(--color-primary); // #3b82f6 (base)
+  --color-primary-500: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 25%
+  ); // #60a5fa
+  --color-primary-400: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 45%
+  ); // #93c5fd
+  --color-primary-300: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 65%
+  ); // #bfdbfe
+  --color-primary-200: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 80%
+  ); // #dbeafe
+  --color-primary-100: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 90%
+  ); // #eff6ff
+  --color-primary-50: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 95%
+  ); // #f8fafc
+  --color-primary-20: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 97%
+  ); // Encore plus clair
+  --color-primary-10: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 98%
+  ); // Presque blanc
+  --color-primary-5: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 99%
+  ); // Très très clair
+  --color-primary-4: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 99.5%
+  ); // Ultra clair
+
+  // ============================================
+  // COULEURS AVEC OPACITÉ (pour ombres, overlays)
+  // ============================================
+  --color-primary-alpha-10: color-mix(
+    in srgb,
+    var(--color-primary) 10%,
+    transparent
+  );
+  --color-primary-alpha-15: color-mix(
+    in srgb,
+    var(--color-primary) 15%,
+    transparent
+  );
+  --color-primary-alpha-30: color-mix(
+    in srgb,
+    var(--color-primary) 30%,
+    transparent
+  );
+  --color-primary-alpha-40: color-mix(
+    in srgb,
+    var(--color-primary) 40%,
+    transparent
+  );
+
+  // ============================================
+  // COULEURS NEUTRES (basées sur le bleu principal)
+  // ============================================
+  // Variations neutres = bleu avec beaucoup de blanc/noir mélangé
+  --color-neutral-900: color-mix(
+    in srgb,
+    var(--color-primary),
+    black 85%
+  ); // Noir avec teinte bleue (#111827)
+  --color-neutral-700: color-mix(
+    in srgb,
+    var(--color-primary),
+    black 60%
+  ); // Gris foncé avec teinte bleue (#6b7280)
+  --color-neutral-400: color-mix(
+    in srgb,
+    var(--color-primary),
+    white 85%
+  ); // Gris clair bordures (#e5e7eb)
+  --color-neutral-200: color-mix(
+    in srgb,
+    var(--color-primary),
+    white 90%
+  ); // Gris très clair hover (#f3f4f6)
+  --color-neutral-150: color-mix(
+    in srgb,
+    var(--color-primary),
+    white 92%
+  ); // Gris très clair sub-surface (#f5f7f9)
+  --color-neutral-100: color-mix(
+    in srgb,
+    var(--color-primary),
+    white 93%
+  ); // Gris très clair surface (#f9fafb)
+  --color-neutral-50: color-mix(
+    in srgb,
+    var(--color-primary),
+    white 95%
+  ); // Presque blanc avec teinte bleue (#fafafa)
+
+  // ============================================
+  // COULEURS SYSTÈME (basées sur la couleur principale)
+  // ============================================
+  --color-bg: var(--color-neutral-50);
+  --color-subSurface: var(--color-neutral-150);
+  --color-surface: var(--color-neutral-100);
+  --color-surface-hover: var(--color-neutral-200);
+  --color-text: var(--color-neutral-900);
+  --color-text-dim: var(--color-neutral-700);
+  --color-border: var(--color-neutral-400);
+
+  // ============================================
+  // VARIATIONS DE LUMINOSITÉ (Vert - Success)
+  // ============================================
+  --color-success-900: color-mix(in srgb, var(--color-success) 100%, black 60%);
+  --color-success-800: color-mix(in srgb, var(--color-success) 100%, black 50%);
+  --color-success-700: color-mix(in srgb, var(--color-success) 100%, black 35%);
+  --color-success-600: var(--color-success);
+  --color-success-500: color-mix(in srgb, var(--color-success) 100%, white 15%);
+  --color-success-400: color-mix(in srgb, var(--color-success) 100%, white 35%);
+  --color-success-300: color-mix(in srgb, var(--color-success) 100%, white 50%);
+  --color-success-200: color-mix(in srgb, var(--color-success) 100%, white 70%);
+  --color-success-100: color-mix(in srgb, var(--color-success) 100%, white 85%);
+
+  // ============================================
+  // VARIATIONS DANGER (Rouge vers Orange - Dépenses)
+  // ============================================
+  --color-danger-900: color-mix(
+    in srgb,
+    var(--color-danger) 100%,
+    black 60%
+  ); // Rouge très foncé
+  --color-danger-800: color-mix(
+    in srgb,
+    var(--color-danger) 100%,
+    black 50%
+  ); // Rouge foncé
+  --color-danger-700: color-mix(
+    in srgb,
+    var(--color-danger) 100%,
+    black 35%
+  ); // Rouge moyen foncé
+  --color-danger-600: var(--color-danger); // Rouge base
+  --color-danger-500: color-mix(
+    in srgb,
+    var(--color-danger) 85%,
+    #ff6b35 15%
+  ); // Rouge vers orange
+  --color-danger-400: color-mix(
+    in srgb,
+    var(--color-danger) 70%,
+    #ff8c42 30%
+  ); // Orange-rouge
+  --color-danger-300: color-mix(
+    in srgb,
+    var(--color-danger) 55%,
+    #ffa552 45%
+  ); // Orange clair
+  --color-danger-200: color-mix(
+    in srgb,
+    var(--color-danger) 40%,
+    #ffb366 60%
+  ); // Orange pâle
+  --color-danger-100: color-mix(
+    in srgb,
+    var(--color-danger) 25%,
+    #ffc280 75%
+  ); // Orange très pâle
+
+  // Alias pour la compatibilité (mapping vers le nouveau système)
+  --color-accent: var(--color-primary-600);
+  --color-accent-hover: var(--color-primary-700);
+
+  // Gradients (mapping vers le nouveau système)
+  --color-gradient-1: var(--color-primary-600);
+  --color-gradient-1-hover: var(--color-primary-500);
+  --color-gradient-1-active: var(--color-primary-700);
+
+  --color-gradient-2: var(--color-primary-500);
+  --color-gradient-2-hover: var(--color-primary-600);
+  --color-gradient-2-active: var(--color-primary-700);
+
+  --color-gradient-3: var(--color-primary-400);
+  --color-gradient-3-hover: var(--color-primary-500);
+  --color-gradient-3-active: var(--color-primary-600);
+
+  --color-gradient-4: var(--color-primary-300);
+  --color-gradient-4-hover: var(--color-primary-400);
+  --color-gradient-4-active: var(--color-primary-500);
+
+  --color-gradient-5: var(--color-primary-200);
+  --color-gradient-5-hover: var(--color-primary-300);
+  --color-gradient-5-active: var(--color-primary-400);
+
+  --color-gradient-6: var(--color-primary-100);
+  --color-gradient-6-hover: var(--color-primary-200);
+  --color-gradient-6-active: var(--color-primary-300);
+
+  --color-gradient-7: var(--color-primary-50);
+  --color-gradient-7-hover: var(--color-primary-100);
+  --color-gradient-7-active: var(--color-primary-200);
+}
+
+[data-theme="dark"] {
+  // ============================================
+  // COULEURS DE BASE (Mode sombre)
+  // ============================================
+  --color-primary: #3b82f6; // Bleu - Couleur principale du site
+  --color-success: #22c55e; // Vert - Pour les recettes
+  --color-danger: #ef4444; // Rouge - Pour les dépenses et suppressions
+
+  // ============================================
+  // VARIATIONS DE LUMINOSITÉ (Bleu principal) - Mode sombre
+  // ============================================
+  // En mode sombre, on inverse la logique : plus de noir = plus clair dans l'UI
+  --color-primary-900: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 50%
+  ); // #93c5fd (très clair)
+  --color-primary-800: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 35%
+  ); // #60a5fa
+  --color-primary-700: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    white 20%
+  ); // #5b9cf7
+  --color-primary-600: var(--color-primary); // #3b82f6 (base)
+  --color-primary-500: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 15%
+  ); // #2563eb
+  --color-primary-400: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 30%
+  ); // #1d4ed8
+  --color-primary-300: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 40%
+  ); // #1e40af
+  --color-primary-200: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 50%
+  ); // #1e3a8a
+  --color-primary-100: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 55%
+  ); // #312e81
+  --color-primary-50: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 60%
+  ); // #3730a3
+  --color-primary-20: color-mix(
+    in srgb,
+    var(--color-primary) 100%,
+    black 80%
+  ); // #3730a3
+  --color-primary-10: color-mix(
+    in srgb,
+    var(--color-primary) 80%,
+    black 100%
+  ); // #3730a3
+  --color-primary-5: color-mix(
+    in srgb,
+    var(--color-primary) 40%,
+    black 100%
+  ); // #3730a3
+  --color-primary-4: color-mix(
+    in srgb,
+    var(--color-primary) 20%,
+    black 100%
+  ); // #3730a3
+
+  // ============================================
+  // COULEURS AVEC OPACITÉ (pour ombres, overlays)
+  // ============================================
+  --color-primary-alpha-10: color-mix(
+    in srgb,
+    var(--color-primary) 10%,
+    transparent
+  );
+  --color-primary-alpha-15: color-mix(
+    in srgb,
+    var(--color-primary) 15%,
+    transparent
+  );
+  --color-primary-alpha-30: color-mix(
+    in srgb,
+    var(--color-primary) 30%,
+    transparent
+  );
+  --color-primary-alpha-40: color-mix(
+    in srgb,
+    var(--color-primary) 40%,
+    transparent
+  );
+
+  // ============================================
+  // COULEURS NEUTRES (basées sur le bleu principal) - Mode sombre
+  // ============================================
+  // Variations neutres = bleu avec beaucoup de blanc/noir mélangé
+  --color-neutral-900: color-mix(
+    in srgb,
+    var(--color-primary),
+    white 93%
+  ); // Presque blanc avec teinte bleue (#f9fafb)
+  --color-neutral-700: color-mix(
+    in srgb,
+    var(--color-primary),
+    white 65%
+  ); // Gris clair avec teinte bleue (#9ca3af)
+  --color-neutral-400: color-mix(
+    in srgb,
+    var(--color-primary),
+    black 70%
+  ); // Gris moyen bordures (#374151)
+  --color-neutral-200: var(--color-neutral-400); // Même que bordures pour hover
+  --color-neutral-150: color-mix(
+    in srgb,
+    var(--color-primary),
+    black 78%
+  ); // Gris foncé sub-surface (#1c2431)
+  --color-neutral-100: color-mix(
+    in srgb,
+    var(--color-primary),
+    black 75%
+  ); // Gris foncé surface (#1f2937)
+  --color-neutral-50: color-mix(
+    in srgb,
+    var(--color-primary),
+    black 85%
+  ); // Presque noir avec teinte bleue (#111827)
+
+  // ============================================
+  // COULEURS SYSTÈME (basées sur la couleur principale)
+  // ============================================
+  --color-bg: var(--color-neutral-50);
+  --color-subSurface: var(--color-neutral-150);
+  --color-surface: var(--color-neutral-100);
+  --color-surface-hover: var(--color-neutral-200);
+  --color-text: var(--color-neutral-900);
+  --color-text-dim: var(--color-neutral-700);
+  --color-border: var(--color-neutral-400);
+
+  // ============================================
+  // VARIATIONS DE LUMINOSITÉ (Vert - Success) - Mode sombre
+  // ============================================
+  --color-success-900: color-mix(in srgb, var(--color-success) 100%, black 5%);
+  --color-success-800: color-mix(in srgb, var(--color-success) 100%, black 10%);
+  --color-success-700: color-mix(in srgb, var(--color-success) 100%, black 20%);
+  --color-success-600: var(--color-success); // Base
+  --color-success-500: color-mix(in srgb, var(--color-success) 100%, black 30%);
+  --color-success-400: color-mix(in srgb, var(--color-success) 100%, black 40%);
+  --color-success-300: color-mix(in srgb, var(--color-success) 100%, black 50%);
+  --color-success-200: color-mix(in srgb, var(--color-success) 100%, black 55%);
+  --color-success-100: color-mix(in srgb, var(--color-success) 100%, black 60%);
+
+  // ============================================
+  // VARIATIONS DANGER (Rouge vers Orange) - Mode sombre
+  // ============================================
+  --color-danger-900: color-mix(
+    in srgb,
+    var(--color-danger) 100%,
+    black 5%
+  ); // Rouge très clair
+  --color-danger-800: color-mix(
+    in srgb,
+    var(--color-danger) 100%,
+    black 10%
+  ); // Rouge clair
+  --color-danger-700: color-mix(
+    in srgb,
+    var(--color-danger) 100%,
+    black 20%
+  ); // Rouge moyen
+  --color-danger-600: var(--color-danger); // Rouge base
+  --color-danger-500: color-mix(
+    in srgb,
+    var(--color-danger) 85%,
+    #ff6b35 15%
+  ); // Rouge vers orange
+  --color-danger-400: color-mix(
+    in srgb,
+    var(--color-danger) 70%,
+    #ff8c42 30%
+  ); // Orange-rouge
+  --color-danger-300: color-mix(
+    in srgb,
+    var(--color-danger) 55%,
+    #ffa552 45%
+  ); // Orange clair
+  --color-danger-200: color-mix(
+    in srgb,
+    var(--color-danger) 40%,
+    #ffb366 60%
+  ); // Orange pâle
+  --color-danger-100: color-mix(
+    in srgb,
+    var(--color-danger) 25%,
+    #ffc280 75%
+  ); // Orange très pâle
+
+  // Alias pour la compatibilité (mapping vers le nouveau système)
+  --color-accent: var(--color-primary-600);
+  --color-accent-hover: var(--color-primary-800);
+
+  // Gradients (mapping vers le nouveau système - ordre inversé pour mode sombre)
+  --color-gradient-1: var(--color-primary-600);
+  --color-gradient-1-hover: var(--color-primary-800);
+  --color-gradient-1-active: var(--color-primary-500);
+
+  --color-gradient-2: var(--color-primary-500);
+  --color-gradient-2-hover: var(--color-primary-600);
+  --color-gradient-2-active: var(--color-primary-400);
+
+  --color-gradient-3: var(--color-primary-400);
+  --color-gradient-3-hover: var(--color-primary-500);
+  --color-gradient-3-active: var(--color-primary-300);
+
+  --color-gradient-4: var(--color-primary-300);
+  --color-gradient-4-hover: var(--color-primary-400);
+  --color-gradient-4-active: var(--color-primary-200);
+
+  --color-gradient-5: var(--color-primary-200);
+  --color-gradient-5-hover: var(--color-primary-300);
+  --color-gradient-5-active: var(--color-primary-100);
+
+  --color-gradient-6: var(--color-primary-100);
+  --color-gradient-6-hover: var(--color-primary-200);
+  --color-gradient-6-active: var(--color-primary-50);
+
+  --color-gradient-7: var(--color-primary-50);
+  --color-gradient-7-hover: var(--color-primary-100);
+  --color-gradient-7-active: var(--color-primary-200);
+}

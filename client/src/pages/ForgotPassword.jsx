@@ -2,9 +2,10 @@ import { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
+import { config } from "../config/env";
 import ThemeToggle from "../components/ThemeToggle";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = config.apiUrl;
 
 // Icônes SVG intégrées
 const EmailIcon = () => (

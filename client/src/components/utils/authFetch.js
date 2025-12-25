@@ -2,7 +2,9 @@
  * Helper pour faire des requêtes API avec authentification JWT
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+import { config } from "../../config/env";
+
+const API_BASE_URL = config.apiUrl;
 
 /**
  * Récupère le token JWT du localStorage

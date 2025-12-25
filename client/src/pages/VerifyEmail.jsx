@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useNavigate, useSearchParams } from "react-router-dom";
 
+import { config } from "../config/env";
 import ThemeToggle from "../components/ThemeToggle";
 
 export default function VerifyEmail() {
@@ -20,7 +21,7 @@ export default function VerifyEmail() {
     }
 
     // Vérifier l'email avec le token
-    fetch(`http://localhost:5000/api/auth/verify-email/${token}`)
+    fetch(`${config.apiUrl}/api/auth/verify-email/${token}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.token) {

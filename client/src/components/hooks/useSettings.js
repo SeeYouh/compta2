@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { API_ERRORS } from "../utils";
+import { config } from "../../config/env";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE_URL = config.apiUrl;
 const SETTINGS_ID = "user-preferences";
 
 export const useSettings = () => {

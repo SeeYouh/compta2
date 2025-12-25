@@ -1,46 +1,4 @@
-// ============================================
-// VARIABLES D'ANIMATION DES GRADIENTS
-// ============================================
-// Durée de rotation complète (en secondes)
-$gradient-animation-duration: 40s;
-
-// Taille des gradients (en %)
-$gradient-size: 1200px;
-
-// Opacité des gradients
-$gradient-opacity: 1;
-
-// Intensité du flou des gradients d'arrière-plan (en px)
-// Valeurs recommandées : 80-150px
-$gradient-blur: 800px;
-
-// Distance du centre (ajuster pour modifier le rayon de rotation)
-$gradient-distance: 45%;
-
-// Durée de l'animation de la bordure (modifiable)
-$border-animation-duration: 40s;
-
-// Angle de départ de la bordure animée (pour caler l'animation)
-$border-start-angle: 100deg;
-
-// Longueur de la traînée lumineuse de la bordure (en %)
-// Valeurs recommandées : 15-40% (25% par défaut)
-$border-trail-length: 30%;
-
-// Largeur de la bande de bordure intérieure (Sass variable)
-$card-border-width: 2px;
-
-// Douceur / opacité relative de la bande (0 = invisible, 1 = pleine opacité)
-$card-border-softness: 0.5;
-
-// ============================================
-// VARIABLES DE BLUR DU FORMULAIRE
-// ============================================
-// Intensité du flou en arrière-plan du formulaire
-$card-backdrop-blur: 40px;
-
-// Opacité du fond de la carte (0 = transparent, 1 = opaque)
-$card-background-opacity: 0.3;
+@use "../utils/variable" as *;
 
 .auth-page {
   min-height: 100vh;
