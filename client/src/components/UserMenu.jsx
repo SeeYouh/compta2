@@ -22,6 +22,11 @@ export default function UserMenu() {
     navigate("/login");
   };
 
+  const handleNavigateToSettings = () => {
+    navigate("/labels-settings");
+    setIsOpen(false);
+  };
+
   return (
     <div className={styles.userMenu} ref={menuRef}>
       <button
@@ -38,6 +43,10 @@ export default function UserMenu() {
             <div className={styles.userName}>{userName}</div>
             <div className={styles.userEmail}>{user.email}</div>
           </div>
+          <hr className={styles.divider} />
+          <button className={styles.menuButton} onClick={handleNavigateToSettings}>
+            Personnaliser les labels
+          </button>
           <hr className={styles.divider} />
           <button className={styles.logoutButton} onClick={handleLogout}>
             Déconnexion

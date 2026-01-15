@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { API_ERRORS } from "../utils";
-import { config } from "../../config/env";
+import { authFetch } from "../utils/authFetch";
 
-const API_BASE_URL = config.apiUrl;
 const SETTINGS_ID = "user-preferences";
 
 export const useSettings = () => {
@@ -14,8 +13,8 @@ export const useSettings = () => {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/api/settings/${SETTINGS_ID}`
+        const response = await authFetch(
+          `/api/settings/${SETTINGS_ID}`
         );
         if (response.ok) {
           const data = await response.json();
@@ -24,11 +23,10 @@ export const useSettings = () => {
           // Créer les paramètres par défaut si ils n'existent pas
           const defaultSettings = {
             id: SETTINGS_ID,
-            periodFilter: "all", // 'all', '6weeks', '2months', '3months', 'currentMonth', 'previousMonth'
+            periodFilter: "all",
           };
-          const createResponse = await fetch(`${API_BASE_URL}/api/settings`, {
+          const createResponse = await authFetch(`/api/settings`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(defaultSettings),
           });
           const created = await createResponse.json();
@@ -54,11 +52,10 @@ export const useSettings = () => {
     async (periodFilter) => {
       try {
         const updatedSettings = { ...settings, periodFilter };
-        const response = await fetch(
-          `${API_BASE_URL}/api/settings/${SETTINGS_ID}`,
+        const response = await authFetch(
+          `/api/settings/${SETTINGS_ID}`,
           {
             method: "PATCH",
-            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ periodFilter }),
           }
         );

@@ -69,18 +69,34 @@ function Login() {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
+        const data = await response.json();
         throw new Error(data.error || "Erreur de connexion");
       }
+
+      const data = await response.json();
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
       navigate("/");
     } catch (err) {
-      setError(err.message);
+      console.error("Erreur de connexion détaillée:", {
+        message: err.message,
+        url: `${API_URL}/api/auth/login`,
+        error: err,
+      });
+
+      if (
+        err.message.includes("Failed to fetch") ||
+        err.message.includes("NetworkError")
+      ) {
+        setError(
+          `Impossible de contacter le serveur sur ${API_URL}. Vérifiez que le serveur est démarré et que l'URL est correcte.`
+        );
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
