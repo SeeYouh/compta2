@@ -30,6 +30,12 @@ const corsOptions = {
   maxAge: 86400,
 };
 
+console.log("🔒 Configuration CORS:", {
+  env: config.server.env,
+  origin: corsOptions.origin,
+  corsOriginFromEnv: config.cors.origin,
+});
+
 app.use(cors(corsOptions));
 
 // Rate limiting
