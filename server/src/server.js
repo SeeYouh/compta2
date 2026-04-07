@@ -1,12 +1,18 @@
 import cors from "cors";
 import express from "express";
+import { fileURLToPath } from "url";
 import helmet from "helmet";
+import path from "path";
 import rateLimit from "express-rate-limit";
 
 import { config } from "./config/index.js";
 import { connectDB } from "./config/database.js";
 import { errorHandler, notFound } from "./middleware/errorHandler.js";
 import routes from "./routes/index.js";
+
+// Configuration pour ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -57,6 +63,21 @@ app.use("/api", routes);
 app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
+
+// En production : servir les fichiers statiques React
+if (config.server.env === "production") {
+  const clientBuildPath = path.join(__dirname, "../../client/dist");
+
+  // Servir les fichiers statiques
+  app.use(express.static(clientBuildPath));
+
+  // Wildcard pour React Router : toutes les routes non-API renvoient index.html
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(clientBuildPath, "index.html"));
+  });
+
+  console.log("📦 Fichiers React servis depuis:", clientBuildPath);
+}
 
 // Gestion des erreurs
 app.use(notFound);
