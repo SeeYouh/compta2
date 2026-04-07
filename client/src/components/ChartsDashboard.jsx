@@ -1,10 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   ArcElement,
@@ -14,20 +8,13 @@ import {
   Legend,
   LinearScale,
   Tooltip,
-} from 'chart.js';
-import {
-  Bar,
-  Doughnut,
-} from 'react-chartjs-2';
+} from "chart.js";
+import { Bar, Doughnut } from "react-chartjs-2";
 
-import {
-  APP_LABELS,
-  CHART_COLORS,
-  MONTHS,
-} from './utils';
-import { filterByMonth } from './utils/transactionsDerivers';
-import FormatCurrency from './utils/FormatCurrency';
-import { parseFRDate } from './utils/date';
+import { APP_LABELS, CHART_COLORS, MONTHS } from "./utils";
+import { filterByMonth } from "./utils/transactionsDerivers";
+import FormatCurrency from "./utils/FormatCurrency";
+import { parseFRDate } from "./utils/date";
 
 const TOOLTIP_LABELS_PLUGIN = {
   id: "tooltipInlineLabels",
@@ -785,6 +772,31 @@ export default function ChartsDashboard({ transactions, filters }) {
       }
 
       const categoryLabel = tooltip.dataPoints[0].label;
+      const stack = tooltip.dataPoints[0].dataset.stack; // "stackA" ou "stackB"
+      const isStackA = stack === "stackA";
+
+      // Filtre temporel selon le stack survolé
+      let periodFilter;
+      if (compareMonths) {
+        const targetMonth = isStackA ? monthA : monthB;
+        periodFilter = (t) => {
+          const d = parseFRDate(t.date);
+          return (
+            !Number.isNaN(d) &&
+            d.getFullYear() === filters.year &&
+            d.getMonth() === targetMonth
+          );
+        };
+      } else {
+        const targetYear = isStackA ? yearA : yearB;
+        periodFilter = (t) => {
+          const d = parseFRDate(t.date);
+          if (Number.isNaN(d)) return false;
+          if (d.getFullYear() !== targetYear) return false;
+          if (monthSelected && d.getMonth() !== filters.month) return false;
+          return true;
+        };
+      }
 
       const catFilter = themeSelected
         ? (t) => (t.subTheme || APP_LABELS.defaultCategory) === categoryLabel
@@ -795,6 +807,7 @@ export default function ChartsDashboard({ transactions, filters }) {
       for (const t of transactions) {
         if (t.disabled) continue;
         if (!catFilter(t)) continue;
+        if (!periodFilter(t)) continue;
         const des = t.designation || "Sans désignation";
         const r = Number(t.recette || 0);
         const d = Number(t.depense || 0);
@@ -829,13 +842,30 @@ export default function ChartsDashboard({ transactions, filters }) {
         return;
       }
 
+      const periodLabel = compareMonths
+        ? isStackA
+          ? MONTHS[monthA]
+          : MONTHS[monthB]
+        : String(isStackA ? yearA : yearB);
+      const tooltipTitle = `${categoryLabel} — ${periodLabel}`;
+
       setTooltipState((prev) => {
         const { x, y } = mousePosRef.current;
-        if (prev?.title === categoryLabel) return { ...prev, x, y };
-        return { x, y, title: categoryLabel, slices };
+        if (prev?.title === tooltipTitle) return { ...prev, x, y };
+        return { x, y, title: tooltipTitle, slices };
       });
     },
-    [transactions, themeSelected],
+    [
+      transactions,
+      themeSelected,
+      compareMonths,
+      monthA,
+      monthB,
+      yearA,
+      yearB,
+      filters,
+      monthSelected,
+    ],
   );
 
   const handlePieTooltip = useCallback(
