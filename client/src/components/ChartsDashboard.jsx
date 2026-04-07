@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import {
   ArcElement,
@@ -8,13 +14,20 @@ import {
   Legend,
   LinearScale,
   Tooltip,
-} from "chart.js";
-import { Bar, Doughnut } from "react-chartjs-2";
+} from 'chart.js';
+import {
+  Bar,
+  Doughnut,
+} from 'react-chartjs-2';
 
-import { APP_LABELS, CHART_COLORS, MONTHS } from "./utils";
-import { filterByMonth } from "./utils/transactionsDerivers";
-import FormatCurrency from "./utils/FormatCurrency";
-import { parseFRDate } from "./utils/date";
+import {
+  APP_LABELS,
+  CHART_COLORS,
+  MONTHS,
+} from './utils';
+import { filterByMonth } from './utils/transactionsDerivers';
+import FormatCurrency from './utils/FormatCurrency';
+import { parseFRDate } from './utils/date';
 
 const TOOLTIP_LABELS_PLUGIN = {
   id: "tooltipInlineLabels",
@@ -1045,7 +1058,7 @@ export default function ChartsDashboard({ transactions, filters }) {
         <div
           className="chart-tooltip-pie"
           style={(() => {
-            const W = 660;
+            const W = 740;
             const H = 530;
             const gap = 16;
             const { x, y } = tooltipState;
@@ -1078,7 +1091,7 @@ export default function ChartsDashboard({ transactions, filters }) {
                 maintainAspectRatio: false,
                 animation: false,
                 layout: {
-                  padding: { top: 30, bottom: 60, left: 100, right: 100 },
+                  padding: { top: 40, bottom: 70, left: 160, right: 160 },
                 },
                 plugins: {
                   legend: { display: false },
