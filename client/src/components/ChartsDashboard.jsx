@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import {
   ArcElement,
@@ -8,13 +14,63 @@ import {
   Legend,
   LinearScale,
   Tooltip,
-} from "chart.js";
-import { Bar, Doughnut } from "react-chartjs-2";
+} from 'chart.js';
+import {
+  Bar,
+  Doughnut,
+} from 'react-chartjs-2';
 
-import { APP_LABELS, CHART_COLORS, MONTHS } from "./utils";
-import { filterByMonth } from "./utils/transactionsDerivers";
-import FormatCurrency from "./utils/FormatCurrency";
-import { parseFRDate } from "./utils/date";
+import {
+  APP_LABELS,
+  CHART_COLORS,
+  MONTHS,
+} from './utils';
+import { filterByMonth } from './utils/transactionsDerivers';
+import FormatCurrency from './utils/FormatCurrency';
+import { parseFRDate } from './utils/date';
+
+const TOOLTIP_LABELS_PLUGIN = {
+  id: "tooltipInlineLabels",
+  afterDatasetsDraw(chart) {
+    const { ctx, data } = chart;
+    const meta = chart.getDatasetMeta(0);
+    if (!meta?.data?.length) return;
+
+    const textColor =
+      getComputedStyle(document.documentElement)
+        .getPropertyValue("--color-text")
+        .trim() || "#333";
+
+    ctx.save();
+    meta.data.forEach((arc, i) => {
+      const arcSize = arc.endAngle - arc.startAngle;
+      if (arcSize < 0.12) return;
+
+      const midAngle = (arc.startAngle + arc.endAngle) / 2;
+      const labelRadius = arc.outerRadius + 28;
+      const lx = arc.x + Math.cos(midAngle) * labelRadius;
+      const ly = arc.y + Math.sin(midAngle) * labelRadius;
+
+      const label = (data.labels[i] || "").toString();
+      const truncated =
+        label.length > 15 ? label.substring(0, 14) + "…" : label;
+      const value = data.datasets[0].data[i];
+      const color = data.datasets[0].backgroundColor[i];
+
+      ctx.textAlign = Math.cos(midAngle) >= 0 ? "left" : "right";
+      ctx.textBaseline = "middle";
+
+      ctx.font = "bold 13px system-ui, sans-serif";
+      ctx.fillStyle = color;
+      ctx.fillText(truncated, lx, ly - 9);
+
+      ctx.font = "12px system-ui, sans-serif";
+      ctx.fillStyle = textColor;
+      ctx.fillText(FormatCurrency(value), lx, ly + 9);
+    });
+    ctx.restore();
+  },
+};
 
 ChartJS.register(
   BarElement,
@@ -22,7 +78,7 @@ ChartJS.register(
   LinearScale,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement,
 );
 
 /**
@@ -33,6 +89,16 @@ ChartJS.register(
 export default function ChartsDashboard({ transactions, filters }) {
   const [showBar, setShowBar] = useState(true);
   const [showPie, setShowPie] = useState(true);
+  const [tooltipState, setTooltipState] = useState(null);
+  const mousePosRef = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const onMove = (e) => {
+      mousePosRef.current = { x: e.clientX, y: e.clientY };
+    };
+    document.addEventListener("mousemove", onMove);
+    return () => document.removeEventListener("mousemove", onMove);
+  }, []);
 
   // Sélecteurs "mois" pour la comparaison quand on est en mode mois
   const [monthA, setMonthA] = useState(0);
@@ -87,14 +153,14 @@ export default function ChartsDashboard({ transactions, filters }) {
           const d = parseFRDate(t.date);
           return !Number.isNaN(d) && d.getFullYear() === selectedYear;
         }),
-        monthA
+        monthA,
       );
       const txB = filterByMonth(
         transactions.filter((t) => {
           const d = parseFRDate(t.date);
           return !Number.isNaN(d) && d.getFullYear() === selectedYear;
         }),
-        monthB
+        monthB,
       );
 
       if (themeSelected) {
@@ -150,20 +216,20 @@ export default function ChartsDashboard({ transactions, filters }) {
             (st) => {
               allSubThemes.add(st);
               Object.keys(
-                dataByMonthSubThemeDesignation[monthKey][st].recettes
+                dataByMonthSubThemeDesignation[monthKey][st].recettes,
               ).forEach((d) => allDesignations.add(d));
               Object.keys(
-                dataByMonthSubThemeDesignation[monthKey][st].depenses
+                dataByMonthSubThemeDesignation[monthKey][st].depenses,
               ).forEach((d) => allDesignations.add(d));
-            }
+            },
           );
         });
 
         const labels = Array.from(allSubThemes).sort((a, b) =>
-          a.localeCompare(b, "fr")
+          a.localeCompare(b, "fr"),
         );
         const designations = Array.from(allDesignations).sort((a, b) =>
-          a.localeCompare(b, "fr")
+          a.localeCompare(b, "fr"),
         );
 
         const datasets = [];
@@ -276,19 +342,19 @@ export default function ChartsDashboard({ transactions, filters }) {
           Object.keys(dataByMonthThemeSubTheme[monthKey]).forEach((th) => {
             allThemes.add(th);
             Object.keys(
-              dataByMonthThemeSubTheme[monthKey][th].recettes
+              dataByMonthThemeSubTheme[monthKey][th].recettes,
             ).forEach((st) => allSubThemes.add(st));
             Object.keys(
-              dataByMonthThemeSubTheme[monthKey][th].depenses
+              dataByMonthThemeSubTheme[monthKey][th].depenses,
             ).forEach((st) => allSubThemes.add(st));
           });
         });
 
         const labels = Array.from(allThemes).sort((a, b) =>
-          a.localeCompare(b, "fr")
+          a.localeCompare(b, "fr"),
         );
         const subThemes = Array.from(allSubThemes).sort((a, b) =>
-          a.localeCompare(b, "fr")
+          a.localeCompare(b, "fr"),
         );
 
         const datasets = [];
@@ -417,21 +483,21 @@ export default function ChartsDashboard({ transactions, filters }) {
               (st) => {
                 allSubThemes.add(st);
                 Object.keys(
-                  dataByYearSubThemeDesignation[yearKey][st].recettes
+                  dataByYearSubThemeDesignation[yearKey][st].recettes,
                 ).forEach((d) => allDesignations.add(d));
                 Object.keys(
-                  dataByYearSubThemeDesignation[yearKey][st].depenses
+                  dataByYearSubThemeDesignation[yearKey][st].depenses,
                 ).forEach((d) => allDesignations.add(d));
-              }
+              },
             );
           }
         });
 
         const labels = Array.from(allSubThemes).sort((a, b) =>
-          a.localeCompare(b, "fr")
+          a.localeCompare(b, "fr"),
         );
         const designations = Array.from(allDesignations).sort((a, b) =>
-          a.localeCompare(b, "fr")
+          a.localeCompare(b, "fr"),
         );
 
         // Créer un dataset par désignation - Recettes d'abord (en bas), puis dépenses (au-dessus)
@@ -554,20 +620,20 @@ export default function ChartsDashboard({ transactions, filters }) {
             Object.keys(dataByYearThemeSubTheme[yearKey]).forEach((th) => {
               allThemes.add(th);
               Object.keys(
-                dataByYearThemeSubTheme[yearKey][th].recettes
+                dataByYearThemeSubTheme[yearKey][th].recettes,
               ).forEach((st) => allSubThemes.add(st));
               Object.keys(
-                dataByYearThemeSubTheme[yearKey][th].depenses
+                dataByYearThemeSubTheme[yearKey][th].depenses,
               ).forEach((st) => allSubThemes.add(st));
             });
           }
         });
 
         const labels = Array.from(allThemes).sort((a, b) =>
-          a.localeCompare(b, "fr")
+          a.localeCompare(b, "fr"),
         );
         const subThemes = Array.from(allSubThemes).sort((a, b) =>
-          a.localeCompare(b, "fr")
+          a.localeCompare(b, "fr"),
         );
 
         // Créer un dataset par sous-thème - Recettes d'abord (en bas), puis dépenses (au-dessus)
@@ -678,10 +744,10 @@ export default function ChartsDashboard({ transactions, filters }) {
 
     // Créer des labels séparés avec préfixe
     const recetteLabels = Object.keys(recettes).map(
-      (k) => `${APP_LABELS.chartLabelRecettes} ${k}`
+      (k) => `${APP_LABELS.chartLabelRecettes} ${k}`,
     );
     const depenseLabels = Object.keys(depenses).map(
-      (k) => `${APP_LABELS.chartLabelDepenses} ${k}`
+      (k) => `${APP_LABELS.chartLabelDepenses} ${k}`,
     );
     const labels = [...recetteLabels, ...depenseLabels];
 
@@ -692,11 +758,11 @@ export default function ChartsDashboard({ transactions, filters }) {
     // Couleurs vertes pour recettes, rouges pour dépenses
     const recetteColors = recetteLabels.map(
       (_, i) =>
-        CHART_COLORS.recettes.palette[i % CHART_COLORS.recettes.palette.length]
+        CHART_COLORS.recettes.palette[i % CHART_COLORS.recettes.palette.length],
     );
     const depenseColors = depenseLabels.map(
       (_, i) =>
-        CHART_COLORS.depenses.palette[i % CHART_COLORS.depenses.palette.length]
+        CHART_COLORS.depenses.palette[i % CHART_COLORS.depenses.palette.length],
     );
     const backgroundColor = [...recetteColors, ...depenseColors];
 
@@ -710,6 +776,120 @@ export default function ChartsDashboard({ transactions, filters }) {
       ],
     };
   }, [transactions, themeSelected]);
+
+  const handleBarTooltip = useCallback(
+    ({ tooltip }) => {
+      if (tooltip.opacity === 0) {
+        setTooltipState(null);
+        return;
+      }
+
+      const categoryLabel = tooltip.dataPoints[0].label;
+
+      const catFilter = themeSelected
+        ? (t) => (t.subTheme || APP_LABELS.defaultCategory) === categoryLabel
+        : (t) => (t.theme || APP_LABELS.defaultTheme) === categoryLabel;
+
+      const recetteGroups = {};
+      const depenseGroups = {};
+      for (const t of transactions) {
+        if (t.disabled) continue;
+        if (!catFilter(t)) continue;
+        const des = t.designation || "Sans désignation";
+        const r = Number(t.recette || 0);
+        const d = Number(t.depense || 0);
+        if (r > 0) recetteGroups[des] = (recetteGroups[des] || 0) + r;
+        if (d > 0) depenseGroups[des] = (depenseGroups[des] || 0) + d;
+      }
+
+      const recetteSlices = Object.entries(recetteGroups).map(
+        ([label, value], i) => ({
+          label,
+          value,
+          color:
+            CHART_COLORS.recettes.palette[
+              i % CHART_COLORS.recettes.palette.length
+            ],
+        }),
+      );
+      const depenseSlices = Object.entries(depenseGroups).map(
+        ([label, value], i) => ({
+          label,
+          value,
+          color:
+            CHART_COLORS.depenses.palette[
+              i % CHART_COLORS.depenses.palette.length
+            ],
+        }),
+      );
+      const slices = [...recetteSlices, ...depenseSlices];
+
+      if (slices.length === 0) {
+        setTooltipState(null);
+        return;
+      }
+
+      setTooltipState((prev) => {
+        const { x, y } = mousePosRef.current;
+        if (prev?.title === categoryLabel) return { ...prev, x, y };
+        return { x, y, title: categoryLabel, slices };
+      });
+    },
+    [transactions, themeSelected],
+  );
+
+  const handlePieTooltip = useCallback(
+    ({ tooltip }) => {
+      if (tooltip.opacity === 0) {
+        setTooltipState(null);
+        return;
+      }
+
+      const sliceLabel = tooltip.dataPoints[0].label;
+      const isRecette = sliceLabel.startsWith(APP_LABELS.chartLabelRecettes);
+      const prefix = `${
+        isRecette
+          ? APP_LABELS.chartLabelRecettes
+          : APP_LABELS.chartLabelDepenses
+      } `;
+      const categoryLabel = sliceLabel.slice(prefix.length);
+
+      const catFilter = themeSelected
+        ? (t) => (t.subTheme || APP_LABELS.defaultCategory) === categoryLabel
+        : (t) => (t.theme || APP_LABELS.defaultTheme) === categoryLabel;
+
+      const groups = {};
+      for (const t of transactions) {
+        if (t.disabled) continue;
+        if (!catFilter(t)) continue;
+        const amt = isRecette ? Number(t.recette || 0) : Number(t.depense || 0);
+        if (amt <= 0) continue;
+        const des = t.designation || "Sans désignation";
+        groups[des] = (groups[des] || 0) + amt;
+      }
+
+      const palette = isRecette
+        ? CHART_COLORS.recettes.palette
+        : CHART_COLORS.depenses.palette;
+      const slices = Object.entries(groups).map(([label, value], i) => ({
+        label,
+        value,
+        color: palette[i % palette.length],
+      }));
+
+      if (slices.length === 0) {
+        setTooltipState(null);
+        return;
+      }
+
+      setTooltipState((prev) => {
+        const { x, y } = mousePosRef.current;
+        if (prev?.title === categoryLabel) return { ...prev, x, y };
+        return { x, y, title: categoryLabel, slices };
+      });
+    },
+    [transactions, themeSelected],
+  );
 
   return (
     <div className="charts-dashboard">
@@ -797,10 +977,8 @@ export default function ChartsDashboard({ transactions, filters }) {
                 plugins: {
                   legend: { display: false },
                   tooltip: {
-                    callbacks: {
-                      label: (ctx) =>
-                        `${ctx.dataset.label}: ${FormatCurrency(ctx.parsed.y)}`,
-                    },
+                    enabled: false,
+                    external: handleBarTooltip,
                   },
                 },
                 scales: {
@@ -823,10 +1001,8 @@ export default function ChartsDashboard({ transactions, filters }) {
                 plugins: {
                   legend: { display: false },
                   tooltip: {
-                    callbacks: {
-                      label: (ctx) =>
-                        `${ctx.label}: ${FormatCurrency(ctx.parsed)}`,
-                    },
+                    enabled: false,
+                    external: handlePieTooltip,
                   },
                 },
               }}
@@ -834,6 +1010,55 @@ export default function ChartsDashboard({ transactions, filters }) {
           </div>
         )}
       </div>
+
+      {tooltipState && (
+        <div
+          className="chart-tooltip-pie"
+          style={(() => {
+            const W = 660;
+            const H = 530;
+            const gap = 16;
+            const { x, y } = tooltipState;
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            let left = x + gap;
+            if (left + W > vw - 10) left = x - gap - W;
+            left = Math.max(10, left);
+            let top = y - H / 2;
+            top = Math.max(10, Math.min(top, vh - H - 10));
+            return { position: "fixed", left, top };
+          })()}
+        >
+          <p className="chart-tooltip-pie__title">{tooltipState.title}</p>
+          <div className="chart-tooltip-pie__donut">
+            <Doughnut
+              data={{
+                labels: tooltipState.slices.map((s) => s.label),
+                datasets: [
+                  {
+                    data: tooltipState.slices.map((s) => s.value),
+                    backgroundColor: tooltipState.slices.map((s) => s.color),
+                    borderWidth: 1,
+                  },
+                ],
+              }}
+              plugins={[TOOLTIP_LABELS_PLUGIN]}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                layout: {
+                  padding: { top: 30, bottom: 60, left: 100, right: 100 },
+                },
+                plugins: {
+                  legend: { display: false },
+                  tooltip: { enabled: false },
+                },
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
