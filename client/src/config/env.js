@@ -1,11 +1,13 @@
 /**
- * Configuration des variables d'environnement avec validation
- * Retourne une erreur claire si VITE_API_URL n'est pas définie
+ * Configuration des variables d'environnement avec détection automatique
+ * En production : utilise /api (même domaine)
+ * En développement : utilise VITE_API_URL depuis .env
  */
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.PROD ? "/api" : import.meta.env.VITE_API_URL;
 
-if (!API_URL) {
+// Validation uniquement en développement
+if (!import.meta.env.PROD && !import.meta.env.VITE_API_URL) {
   throw new Error(
     "❌ ERREUR CONFIGURATION : La variable VITE_API_URL n'est pas définie dans le fichier .env\n\n" +
       "Pour corriger ce problème :\n" +
