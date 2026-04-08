@@ -193,12 +193,13 @@ const TransactionsTable = ({
               {groupedTransactions[date].map((t) => {
                 const isEditing = editingId === t.id;
                 const isDisabled = t.disabled === true;
+                const isProjection = t.isProjection === true;
                 return (
                   <div
                     key={t.id}
                     className={`table-row-wrapper${
                       isEditing ? " editing" : ""
-                    }${isDisabled ? " disabled" : ""}`}
+                    }${isDisabled ? " disabled" : ""}${isProjection ? " projection" : ""}`}
                     onMouseEnter={() => onHover?.(t.id)}
                     onMouseLeave={() => onHover?.(null)}
                   >
@@ -284,7 +285,14 @@ const TransactionsTable = ({
 
                       {/* Actions */}
                       <div className="table-cell actions-cell">
-                        {isEditing ? (
+                        {isProjection ? (
+                          <span
+                            className="projection-badge"
+                            title="Estimation future"
+                          >
+                            ⏳
+                          </span>
+                        ) : isEditing ? (
                           <>
                             <button
                               type="button"

@@ -27,6 +27,11 @@ export default function UserMenu() {
     setIsOpen(false);
   };
 
+  const handleNavigateToProjections = () => {
+    navigate("/projections-settings");
+    setIsOpen(false);
+  };
+
   return (
     <div className={styles.userMenu} ref={menuRef}>
       <button
@@ -44,8 +49,17 @@ export default function UserMenu() {
             <div className={styles.userEmail}>{user.email}</div>
           </div>
           <hr className={styles.divider} />
-          <button className={styles.menuButton} onClick={handleNavigateToSettings}>
+          <button
+            className={styles.menuButton}
+            onClick={handleNavigateToSettings}
+          >
             Personnaliser les labels
+          </button>
+          <button
+            className={styles.menuButton}
+            onClick={handleNavigateToProjections}
+          >
+            Projections budgétaires
           </button>
           <hr className={styles.divider} />
           <button className={styles.logoutButton} onClick={handleLogout}>

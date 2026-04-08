@@ -13,6 +13,7 @@ import {
   sortByFRDate,
 } from "../components/utils/transactionsDerivers";
 import { filterByPeriod } from "../components/utils/periodFilter";
+import { getProjectionOccurrences } from "../components/utils/projectionsApi";
 import IconGraphActivated from "../assets/IconGraphActivated";
 import IcongraphDisable from "../assets/IconGraph";
 import { migrateTransactions } from "../components/utils/themeMigration";
@@ -80,6 +81,21 @@ const App = () => {
   const [showCharts, setShowCharts] = useState(false);
   const [showThemeManager, setShowThemeManager] = useState(false);
 
+  // Projections budgétaires
+  const [showProjections, setShowProjections] = useState(false);
+  const [projectionDisplayMonths, setProjectionDisplayMonths] = useState(6);
+  const [rawProjectionOccurrences, setRawProjectionOccurrences] = useState([]);
+
+  useEffect(() => {
+    if (!showProjections || !activeAccountId) {
+      setRawProjectionOccurrences([]);
+      return;
+    }
+    getProjectionOccurrences(activeAccountId, projectionDisplayMonths)
+      .then(setRawProjectionOccurrences)
+      .catch(() => setRawProjectionOccurrences([]));
+  }, [showProjections, activeAccountId, projectionDisplayMonths]);
+
   // État du modal de confirmation
   const [confirmModal, setConfirmModal] = useState({
     isOpen: false,
@@ -97,7 +113,7 @@ const App = () => {
       await add(payload);
       reset();
     },
-    [add, toPayload, reset, validate, activeAccountId]
+    [add, toPayload, reset, validate, activeAccountId],
   );
 
   const onDelete = useCallback(
@@ -110,7 +126,7 @@ const App = () => {
         transactionData: transaction,
       });
     },
-    [transactions]
+    [transactions],
   );
 
   // Fonction pour confirmer la suppression
@@ -141,13 +157,13 @@ const App = () => {
       // Rafraîchir les thèmes après sauvegarde
       refreshThemes();
     },
-    [refreshThemes]
+    [refreshThemes],
   );
   const onUpdate = useCallback(
     async (id, patch) => {
       await update(id, patch);
     },
-    [update]
+    [update],
   );
 
   // Années dynamiques
@@ -166,13 +182,21 @@ const App = () => {
   }, [years, selectedYear]);
 
   // Tri + solde (inchangé)
+  const enrichedProjectionOccurrences = useMemo(() => {
+    if (!themes || rawProjectionOccurrences.length === 0) return [];
+    return enrichTransactions(
+      rawProjectionOccurrences.map((o) => ({ ...o, isProjection: true })),
+      themes,
+    );
+  }, [rawProjectionOccurrences, themes]);
+
   const transactionsSorted = useMemo(
-    () => sortByFRDate(transactions),
-    [transactions]
+    () => sortByFRDate([...transactions, ...enrichedProjectionOccurrences]),
+    [transactions, enrichedProjectionOccurrences],
   );
   const transactionsWithBalance = useMemo(
     () => BalanceCalculator({ transactions: transactionsSorted }),
-    [transactionsSorted]
+    [transactionsSorted],
   );
 
   // Filtre permanent de période (appliqué en premier)
@@ -262,6 +286,33 @@ const App = () => {
           >
             {APP_LABELS.filterReset}
           </button>
+
+          <button
+            type="button"
+            className={`toggle-projections${showProjections ? " toggle-projections--active" : ""}`}
+            onClick={() => setShowProjections((v) => !v)}
+            title="Afficher / masquer les projections budgétaires"
+          >
+            📅 Projections
+          </button>
+
+          {showProjections && (
+            <select
+              className="projections-display-months"
+              value={projectionDisplayMonths}
+              onChange={(e) =>
+                setProjectionDisplayMonths(Number(e.target.value))
+              }
+              aria-label="Horizon d'affichage des projections"
+            >
+              <option value={0}>Désactivé</option>
+              <option value={1}>1 mois</option>
+              <option value={3}>3 mois</option>
+              <option value={6}>6 mois</option>
+              <option value={12}>12 mois</option>
+              <option value={24}>24 mois</option>
+            </select>
+          )}
 
           <TransactionForm
             formData={formData}

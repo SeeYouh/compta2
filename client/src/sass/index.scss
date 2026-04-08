@@ -140,6 +140,46 @@ body {
   }
 }
 
+.toggle-projections {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: var(--color-text-dim);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+    background-color: var(--color-surface-hover);
+  }
+
+  &--active {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+    background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  }
+}
+
+.projections-display-months {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
 // Filtre de période permanent
 .period-select {
   padding: 0.5rem 0.75rem;
@@ -730,6 +770,20 @@ body {
   .table-row-wrapper.disabled .table-cell {
     background: transparent !important;
     color: var(--color-text-dim);
+    opacity: 0.7;
+  }
+
+  .table-row-wrapper.projection .table-row {
+    border-left: 3px solid var(--color-primary);
+  }
+
+  .table-row-wrapper.projection .table-cell {
+    color: var(--color-text-dim);
+    font-style: italic;
+  }
+
+  .projection-badge {
+    font-size: 1rem;
     opacity: 0.7;
   }
 

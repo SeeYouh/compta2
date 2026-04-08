@@ -6,11 +6,12 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 
 import { AccountsProvider } from "./contexts/AccountsContext";
-import { LabelsProvider } from "./contexts/LabelsContext";
 import App from "./pages/App";
 import ForgotPassword from "./pages/ForgotPassword";
+import { LabelsProvider } from "./contexts/LabelsContext";
 import LabelsSettings from "./pages/LabelsSettings";
 import Login from "./pages/Login";
+import ProjectionsSettings from "./pages/ProjectionsSettings";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword";
@@ -26,7 +27,7 @@ function initTheme() {
   const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
   document.documentElement.setAttribute(
     "data-theme",
-    prefersDark ? "dark" : "light"
+    prefersDark ? "dark" : "light",
   );
 }
 initTheme();
@@ -53,6 +54,20 @@ createRoot(document.getElementById("root")).render(
           }
         />
         <Route
+          path="/projections-settings"
+          element={
+            <ProtectedRoute>
+              <LabelsProvider>
+                <AccountsProvider>
+                  <ThemesProvider>
+                    <ProjectionsSettings />
+                  </ThemesProvider>
+                </AccountsProvider>
+              </LabelsProvider>
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/*"
           element={
             <ProtectedRoute>
@@ -68,5 +83,5 @@ createRoot(document.getElementById("root")).render(
         />
       </Routes>
     </BrowserRouter>
-  </StrictMode>
+  </StrictMode>,
 );
