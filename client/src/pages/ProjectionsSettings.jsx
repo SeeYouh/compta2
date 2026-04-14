@@ -1,6 +1,6 @@
 import "./ProjectionsSettings.scss";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -80,6 +80,35 @@ export default function ProjectionsSettings() {
       showMessage("error", "Erreur lors du calcul des projections.");
     } finally {
       setComputing(false);
+    }
+  };
+
+  const [editingAmount, setEditingAmount] = useState(null); // { projId, field, value }
+  const amountInputRef = useRef(null);
+
+  const handleAmountClick = (proj) => {
+    const field = proj.recette != null ? "recette" : "depense";
+    setEditingAmount({ projId: proj.id, field, value: String(proj[field]) });
+  };
+
+  const handleAmountSave = async () => {
+    if (!editingAmount) return;
+    const { projId, field, value } = editingAmount;
+    const parsed = parseFloat(value.replace(",", "."));
+    if (isNaN(parsed) || parsed <= 0) {
+      setEditingAmount(null);
+      return;
+    }
+    setEditingAmount(null);
+    try {
+      const updated = await updateProjection(projId, { [field]: parsed });
+      setProjections((prev) =>
+        prev.map((p) =>
+          p.id === projId ? { ...p, [field]: updated[field] } : p,
+        ),
+      );
+    } catch {
+      showMessage("error", "Erreur lors de la mise à jour du montant.");
     }
   };
 
@@ -237,16 +266,70 @@ export default function ProjectionsSettings() {
                         ? `Jour ${proj.dayOfMonth}`
                         : `Mois ${proj.annualMonth}, jour ${proj.dayOfMonth}`}
                     </span>
-                    {proj.recette > 0 && (
-                      <span className="projections-settings__card-amount projections-settings__card-amount--recette">
-                        +{proj.recette.toFixed(2)} €
-                      </span>
-                    )}
-                    {proj.depense > 0 && (
-                      <span className="projections-settings__card-amount projections-settings__card-amount--depense">
-                        -{proj.depense.toFixed(2)} €
-                      </span>
-                    )}
+                    {proj.recette > 0 &&
+                      (editingAmount?.projId === proj.id ? (
+                        <input
+                          ref={amountInputRef}
+                          className="projections-settings__amount-input projections-settings__amount-input--recette"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={editingAmount.value}
+                          onChange={(e) =>
+                            setEditingAmount((s) => ({
+                              ...s,
+                              value: e.target.value,
+                            }))
+                          }
+                          onBlur={handleAmountSave}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") handleAmountSave();
+                            if (e.key === "Escape") setEditingAmount(null);
+                          }}
+                          autoFocus
+                        />
+                      ) : (
+                        <button
+                          type="button"
+                          className="projections-settings__card-amount projections-settings__card-amount--recette"
+                          onClick={() => handleAmountClick(proj)}
+                          title="Cliquer pour modifier"
+                        >
+                          +{proj.recette.toFixed(2)} €
+                        </button>
+                      ))}
+                    {proj.depense > 0 &&
+                      (editingAmount?.projId === proj.id ? (
+                        <input
+                          ref={amountInputRef}
+                          className="projections-settings__amount-input projections-settings__amount-input--depense"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={editingAmount.value}
+                          onChange={(e) =>
+                            setEditingAmount((s) => ({
+                              ...s,
+                              value: e.target.value,
+                            }))
+                          }
+                          onBlur={handleAmountSave}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") handleAmountSave();
+                            if (e.key === "Escape") setEditingAmount(null);
+                          }}
+                          autoFocus
+                        />
+                      ) : (
+                        <button
+                          type="button"
+                          className="projections-settings__card-amount projections-settings__card-amount--depense"
+                          onClick={() => handleAmountClick(proj)}
+                          title="Cliquer pour modifier"
+                        >
+                          -{proj.depense.toFixed(2)} €
+                        </button>
+                      ))}
                   </div>
 
                   <div className="projections-settings__card-controls">
