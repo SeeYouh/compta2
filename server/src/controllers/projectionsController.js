@@ -374,7 +374,8 @@ export const getProjections = async (req, res) => {
 export const updateProjection = async (req, res) => {
   try {
     const { id } = req.params;
-    const { horizonMonths, loop, active, designation } = req.body;
+    const { horizonMonths, loop, active, designation, recette, depense } =
+      req.body;
 
     const projection = await Projection.findOne({ id });
     if (!projection) {
@@ -395,6 +396,8 @@ export const updateProjection = async (req, res) => {
     if (loop !== undefined) projection.loop = loop;
     if (active !== undefined) projection.active = active;
     if (designation !== undefined) projection.designation = designation;
+    if (recette !== undefined) projection.recette = recette;
+    if (depense !== undefined) projection.depense = depense;
 
     // Recalcul des occurrences si l'horizon a changé
     if (horizonMonths !== undefined && horizonMonths !== oldHorizon) {
@@ -426,6 +429,15 @@ export const updateProjection = async (req, res) => {
       if (occurrences.length > 0) {
         await ProjectionOccurrence.insertMany(occurrences);
       }
+    } else if (recette !== undefined || depense !== undefined) {
+      // Montant modifié sans changement d'horizon : propager aux occurrences existantes
+      const updateFields = {};
+      if (recette !== undefined) updateFields.recette = recette;
+      if (depense !== undefined) updateFields.depense = depense;
+      await ProjectionOccurrence.updateMany(
+        { projectionId: id },
+        { $set: updateFields },
+      );
     }
 
     await projection.save();
