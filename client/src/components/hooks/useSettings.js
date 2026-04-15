@@ -29,8 +29,12 @@ export const useSettings = () => {
             method: "POST",
             body: JSON.stringify(defaultSettings),
           });
-          const created = await createResponse.json();
-          setSettings(created);
+          if (createResponse.ok) {
+            const created = await createResponse.json();
+            setSettings(created);
+          } else {
+            setSettings(defaultSettings);
+          }
         }
       } catch (error) {
         console.error("Erreur lors du chargement des paramètres:", error);

@@ -45,7 +45,18 @@ const App = () => {
     update,
   } = useTransactions();
   const { themes, refresh: refreshThemes } = useThemes();
-  const { activeAccountId } = useAccounts();
+  const { activeAccountId, activeAccount } = useAccounts();
+
+  // Calcul des permissions de l'utilisateur courant sur le compte actif
+  const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const accountPermissions = (() => {
+    if (!activeAccount) return null;
+    if (activeAccount.userId === currentUser.id) return null; // propriétaire : pas de restriction
+    const shared = activeAccount.sharedWith?.find(
+      (s) => s.userId === currentUser.id,
+    );
+    return shared?.permissions ?? null;
+  })();
   const { formData, errors, handleChange, validate, reset, toPayload } =
     useTransactionForm();
   const {
@@ -341,6 +352,7 @@ const App = () => {
         headers={TABLE_HEADERS}
         onDelete={onDelete}
         onUpdate={onUpdate}
+        accountPermissions={accountPermissions}
       />
 
       <ConfirmationModal

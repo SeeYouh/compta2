@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 import AccountTabMenu from "./AccountTabMenu";
 import ConfirmationModal from "./ConfirmationModal";
 import styles from "../sass/components/AccountTabs.module.scss";
 import { useAccounts } from "../contexts/useAccounts";
 
 const AccountTabs = () => {
+  const navigate = useNavigate();
   const {
     accounts,
     activeAccountId,
@@ -90,38 +93,48 @@ const AccountTabs = () => {
 
   return (
     <nav className={styles.accountTabs} role="tablist" aria-label="Comptes">
-      {accounts.map((account) => (
-        <div
-          key={account.id}
-          className={styles.tabWrapper}
-          onMouseEnter={() => setHoveredAccountId(account.id)}
-          onMouseLeave={() => setHoveredAccountId(null)}
-        >
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeAccountId === account.id}
-            className={`${styles.tab} ${
-              activeAccountId === account.id ? styles.active : ""
-            }`}
-            style={{
-              borderColor: account.color || undefined,
-            }}
-            onClick={() => setActiveAccount(account.id)}
+      {accounts.map((account) => {
+        const isShared = account.sharedWith?.length > 0;
+        return (
+          <div
+            key={account.id}
+            className={styles.tabWrapper}
+            onMouseEnter={() => setHoveredAccountId(account.id)}
+            onMouseLeave={() => setHoveredAccountId(null)}
           >
-            {account.name}
-          </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeAccountId === account.id}
+              className={`${styles.tab} ${
+                activeAccountId === account.id ? styles.active : ""
+              }`}
+              style={{
+                borderColor: account.color || undefined,
+              }}
+              onClick={() => setActiveAccount(account.id)}
+            >
+              {account.name}
+            </button>
 
-          <AccountTabMenu
-            account={account}
-            isVisible={hoveredAccountId === account.id}
-            onRename={(name) => handleRename(account.id, name)}
-            onDeleteRequest={() => handleDeleteRequest(account)}
-            onColorChange={(color) => handleColorChange(account.id, color)}
-            onClose={() => setHoveredAccountId(null)}
-          />
-        </div>
-      ))}
+            {isShared && (
+              <span className={styles.sharedBadge} title="Compte partagé">
+                👥
+              </span>
+            )}
+
+            <AccountTabMenu
+              account={account}
+              isVisible={hoveredAccountId === account.id}
+              onRename={(name) => handleRename(account.id, name)}
+              onDeleteRequest={() => handleDeleteRequest(account)}
+              onColorChange={(color) => handleColorChange(account.id, color)}
+              onShare={(id) => navigate(`/account-sharing/${id}`)}
+              onClose={() => setHoveredAccountId(null)}
+            />
+          </div>
+        );
+      })}
 
       {isCreating ? (
         <form onSubmit={handleSubmit} className={styles.createForm}>

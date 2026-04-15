@@ -82,9 +82,13 @@ const TransactionsTable = ({
   onHover,
   onDelete,
   onUpdate,
+  accountPermissions,
 }) => {
   const [editingId, setEditingId] = useState(null);
   const [draft, setDraft] = useState(null);
+
+  const canEdit = accountPermissions?.canEditTransactions !== false;
+  const canDelete = accountPermissions?.canDeleteTransactions !== false;
 
   const startEdit = (t) => {
     setEditingId(t.id);
@@ -313,38 +317,44 @@ const TransactionsTable = ({
                           </>
                         ) : (
                           <>
-                            <input
-                              type="checkbox"
-                              className="checkbox-action"
-                              checked={!isDisabled}
-                              onChange={() => toggleDisabled(t)}
-                              aria-label={
-                                isDisabled
-                                  ? APP_LABELS.ariaEnableTransaction
-                                  : APP_LABELS.ariaDisableTransaction
-                              }
-                              title={
-                                isDisabled
-                                  ? "Activer (inclure dans les calculs)"
-                                  : "Désactiver (exclure des calculs)"
-                              }
-                            />
-                            <button
-                              type="button"
-                              className="btn edit"
-                              onClick={() => startEdit(t)}
-                              aria-label={APP_LABELS.ariaEdit}
-                            >
-                              ✎
-                            </button>
-                            <button
-                              type="button"
-                              className="btn delete"
-                              onClick={() => onDelete(t.id)}
-                              aria-label={APP_LABELS.ariaDelete}
-                            >
-                              ✖
-                            </button>
+                            {canEdit && (
+                              <input
+                                type="checkbox"
+                                className="checkbox-action"
+                                checked={!isDisabled}
+                                onChange={() => toggleDisabled(t)}
+                                aria-label={
+                                  isDisabled
+                                    ? APP_LABELS.ariaEnableTransaction
+                                    : APP_LABELS.ariaDisableTransaction
+                                }
+                                title={
+                                  isDisabled
+                                    ? "Activer (inclure dans les calculs)"
+                                    : "Désactiver (exclure des calculs)"
+                                }
+                              />
+                            )}
+                            {canEdit && (
+                              <button
+                                type="button"
+                                className="btn edit"
+                                onClick={() => startEdit(t)}
+                                aria-label={APP_LABELS.ariaEdit}
+                              >
+                                ✎
+                              </button>
+                            )}
+                            {canDelete && (
+                              <button
+                                type="button"
+                                className="btn delete"
+                                onClick={() => onDelete(t.id)}
+                                aria-label={APP_LABELS.ariaDelete}
+                              >
+                                ✖
+                              </button>
+                            )}
                           </>
                         )}
                       </div>

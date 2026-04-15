@@ -32,6 +32,11 @@ export default function UserMenu() {
     setIsOpen(false);
   };
 
+  const handleNavigateToContacts = () => {
+    navigate("/contacts");
+    setIsOpen(false);
+  };
+
   return (
     <div className={styles.userMenu} ref={menuRef}>
       <button
@@ -60,6 +65,12 @@ export default function UserMenu() {
             onClick={handleNavigateToProjections}
           >
             Projections budgétaires
+          </button>
+          <button
+            className={styles.menuButton}
+            onClick={handleNavigateToContacts}
+          >
+            Contacts & invitations
           </button>
           <hr className={styles.divider} />
           <button className={styles.logoutButton} onClick={handleLogout}>

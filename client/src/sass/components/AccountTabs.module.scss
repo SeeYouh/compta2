@@ -81,3 +81,20 @@
   margin-top: 0.25rem;
   white-space: nowrap;
 }
+
+.sharedBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 14px;
+  height: 14px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  font-size: 8px;
+  color: white;
+  border: 1px solid var(--color-background);
+}

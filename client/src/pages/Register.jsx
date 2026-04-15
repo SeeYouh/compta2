@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { config } from "../config/env";
 import ThemeToggle from "../components/ThemeToggle";
@@ -71,6 +71,8 @@ const CheckCircleIcon = () => (
 
 function Register() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const invitationToken = searchParams.get("invitationToken");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -127,8 +129,13 @@ function Register() {
 
       setSuccess(
         data.message ||
-          "Inscription réussie ! Veuillez vérifier votre email pour activer votre compte."
+          "Inscription réussie ! Veuillez vérifier votre email pour activer votre compte.",
       );
+
+      // Conserver le token d'invitation pour l'accepter après connexion
+      if (invitationToken) {
+        localStorage.setItem("pendingInvitationToken", invitationToken);
+      }
 
       // Rediriger vers login après 3 secondes
       setTimeout(() => {

@@ -47,12 +47,37 @@ function Login() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showResend, setShowResend] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMessage, setResendMessage] = useState("");
 
   useDocumentTitle("Connexion");
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setError("");
+    setShowResend(false);
+    setResendMessage("");
+  };
+
+  const handleResend = async () => {
+    setResendLoading(true);
+    setResendMessage("");
+    try {
+      const response = await fetch(`${API_URL}/api/auth/resend-verification`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Erreur");
+      setResendMessage("Email renvoyé ! Vérifiez votre boîte de réception.");
+      setShowResend(false);
+    } catch (err) {
+      setResendMessage(err.message);
+    } finally {
+      setResendLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -71,6 +96,7 @@ function Login() {
 
       if (!response.ok) {
         const data = await response.json();
+        if (response.status === 403) setShowResend(true);
         throw new Error(data.error || "Erreur de connexion");
       }
 
@@ -78,6 +104,23 @@ function Login() {
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Accepter l'invitation en attente si présente
+      const pendingToken = localStorage.getItem("pendingInvitationToken");
+      if (pendingToken) {
+        localStorage.removeItem("pendingInvitationToken");
+        try {
+          await fetch(
+            `${API_URL}/api/sharing/invitations/${encodeURIComponent(pendingToken)}/accept`,
+            {
+              method: "POST",
+              headers: { Authorization: `Bearer ${data.token}` },
+            },
+          );
+        } catch {
+          // Silencieux : l'utilisateur peut toujours accéder à ses invitations plus tard
+        }
+      }
 
       navigate("/");
     } catch (err) {
@@ -92,7 +135,7 @@ function Login() {
         err.message.includes("NetworkError")
       ) {
         setError(
-          `Impossible de contacter le serveur sur ${API_URL}. Vérifiez que le serveur est démarré et que l'URL est correcte.`
+          `Impossible de contacter le serveur sur ${API_URL}. Vérifiez que le serveur est démarré et que l'URL est correcte.`,
         );
       } else {
         setError(err.message);
@@ -117,7 +160,26 @@ function Login() {
             </p>
           </div>
 
-          {error && <div className="auth-page__error">{error}</div>}
+          {error && (
+            <div className="auth-page__error">
+              {error}
+              {showResend && (
+                <button
+                  type="button"
+                  className="auth-page__resend-btn"
+                  onClick={handleResend}
+                  disabled={resendLoading}
+                >
+                  {resendLoading
+                    ? "Envoi…"
+                    : "Renvoyer l'email de vérification"}
+                </button>
+              )}
+            </div>
+          )}
+          {resendMessage && (
+            <div className="auth-page__success">{resendMessage}</div>
+          )}
 
           <form onSubmit={handleSubmit} className="auth-page__form">
             <div className="auth-page__field">

@@ -106,7 +106,8 @@
     -webkit-backdrop-filter: blur($card-backdrop-blur);
     border-radius: 24px;
     padding: 3rem 2.5rem;
-    box-shadow: 0 4px 6px var(--color-primary-alpha-10),
+    box-shadow:
+      0 4px 6px var(--color-primary-alpha-10),
       0 10px 25px var(--color-primary-alpha-15);
     border: 1px solid var(--color-border);
     position: relative;
@@ -127,7 +128,8 @@
       /* on reprend le style linéaire (teinte centrale), mais sous forme d'un segment conique
          pour qu'il parcours tout le pourtour comme une lueur linéaire */
       /* Deux bordures superposées : une principale et une opposée (180deg de décalage) */
-      background: conic-gradient(
+      background:
+        conic-gradient(
           from calc(var(--a-start, 0deg) + var(--a, 0deg) + 180deg),
           transparent 0deg,
           transparent calc($border-trail-length * 0.2),
@@ -177,10 +179,13 @@
         );
 
       /* masque pour ne garder que la bande intérieure (padding) et masquer le centre */
-      -webkit-mask: linear-gradient(#fff 0 0) content-box,
+      -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
         linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
       mask-composite: exclude;
 
       transform-origin: 50% 50%;
@@ -216,6 +221,32 @@
     font-size: 0.9375rem;
     border-left: 4px solid var(--color-danger);
     animation: shakeError 0.4s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  &__resend-btn {
+    align-self: flex-start;
+    background: none;
+    border: 1px solid var(--color-danger);
+    color: var(--color-danger-900);
+    border-radius: 8px;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover:not(:disabled) {
+      background: var(--color-danger);
+      color: white;
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
   }
 
   &__success {

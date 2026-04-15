@@ -5,8 +5,11 @@ import { StrictMode } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 
+import AcceptInvitation from "./pages/AcceptInvitation";
+import AccountSharingSettings from "./pages/AccountSharingSettings";
 import { AccountsProvider } from "./contexts/AccountsContext";
 import App from "./pages/App";
+import ContactsPage from "./pages/ContactsPage";
 import ForgotPassword from "./pages/ForgotPassword";
 import { LabelsProvider } from "./contexts/LabelsContext";
 import LabelsSettings from "./pages/LabelsSettings";
@@ -41,6 +44,7 @@ createRoot(document.getElementById("root")).render(
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/accept-invitation" element={<AcceptInvitation />} />
         <Route
           path="/labels-settings"
           element={
@@ -64,6 +68,28 @@ createRoot(document.getElementById("root")).render(
                   </ThemesProvider>
                 </AccountsProvider>
               </LabelsProvider>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/account-sharing/:accountId"
+          element={
+            <ProtectedRoute>
+              <LabelsProvider>
+                <AccountsProvider>
+                  <AccountSharingSettings />
+                </AccountsProvider>
+              </LabelsProvider>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/contacts"
+          element={
+            <ProtectedRoute>
+              <AccountsProvider>
+                <ContactsPage />
+              </AccountsProvider>
             </ProtectedRoute>
           }
         />
