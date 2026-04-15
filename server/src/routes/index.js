@@ -2,9 +2,11 @@ import express from "express";
 
 import accountsRoutes from "./accounts.js";
 import authRoutes from "./auth.js";
+import contactsRoutes from "./contacts.js";
 import labelsRoutes from "./labels.js";
 import projectionsRoutes from "./projections.js";
 import settingsRoutes from "./settings.js";
+import sharingRoutes from "./sharing.js";
 import themesRoutes from "./themes.js";
 import transactionsRoutes from "./transactions.js";
 
@@ -13,9 +15,11 @@ const router = express.Router();
 // Routes API
 router.use("/auth", authRoutes);
 router.use("/accounts", accountsRoutes);
+router.use("/contacts", contactsRoutes);
 router.use("/labels", labelsRoutes);
 router.use("/projections", projectionsRoutes);
 router.use("/settings", settingsRoutes);
+router.use("/sharing", sharingRoutes);
 router.use("/themes", themesRoutes);
 router.use("/transactions", transactionsRoutes);
 

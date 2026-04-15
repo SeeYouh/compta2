@@ -7,10 +7,14 @@ export const createEmailTransporter = () => {
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: parseInt(process.env.SMTP_PORT, 10),
-    secure: process.env.SMTP_SECURE === "true", // true pour port 465, false pour autres
+    secure: process.env.SMTP_SECURE === "true",
     auth: {
+      type: "LOGIN",
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASSWORD,
+    },
+    tls: {
+      rejectUnauthorized: false,
     },
   });
 };
@@ -173,5 +177,110 @@ export const sendPasswordResetEmail = async (email, name, token) => {
   } catch (error) {
     console.error("Erreur lors de l'envoi de l'email:", error);
     throw new Error("Impossible d'envoyer l'email de réinitialisation");
+  }
+};
+
+export const sendInvitationEmail = async (
+  email,
+  invitedByName,
+  accountName,
+  role,
+  token,
+) => {
+  const transporter = createEmailTransporter();
+  const acceptUrl = `${process.env.APP_URL}/accept-invitation?token=${token}`;
+  const roleLabel = role === "editor" ? "Éditeur" : "Lecteur";
+
+  const mailOptions = {
+    from: `"${process.env.SMTP_FROM_NAME}" <${process.env.SMTP_FROM_EMAIL}>`,
+    to: email,
+    subject: `${invitedByName} vous invite à accéder à un compte`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2>Invitation à partager un compte</h2>
+        <p>Bonjour,</p>
+        <p><strong>${invitedByName}</strong> vous invite à accéder au compte <strong>"${accountName}"</strong> en tant que <strong>${roleLabel}</strong>.</p>
+        <p>
+          <a href="${acceptUrl}" style="display: inline-block; padding: 12px 24px; background-color: #4f46e5; color: white; text-decoration: none; border-radius: 6px;">
+            Accepter l'invitation
+          </a>
+        </p>
+        <p style="color: #6b7280; font-size: 14px;">Ce lien expire dans 7 jours.</p>
+        <p style="color: #6b7280; font-size: 14px;">Si vous ne souhaitez pas accepter, ignorez cet email.</p>
+      </div>
+    `,
+    text: `
+      Bonjour,
+
+      ${invitedByName} vous invite à accéder au compte "${accountName}" en tant que ${roleLabel}.
+
+      Cliquez sur ce lien pour accepter l'invitation :
+      ${acceptUrl}
+
+      Ce lien expire dans 7 jours.
+
+      Si vous ne souhaitez pas accepter, ignorez cet email.
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`✉️ Email d'invitation envoyé à ${email}`);
+  } catch (error) {
+    console.error("Erreur lors de l'envoi de l'email d'invitation:", error);
+    throw new Error("Impossible d'envoyer l'email d'invitation");
+  }
+};
+
+export const sendInvitationToNewUserEmail = async (
+  email,
+  invitedByName,
+  accountName,
+  role,
+  token,
+) => {
+  const transporter = createEmailTransporter();
+  const registerUrl = `${process.env.APP_URL}/register?invitationToken=${token}`;
+  const roleLabel = role === "editor" ? "Éditeur" : "Lecteur";
+
+  const mailOptions = {
+    from: `"${process.env.SMTP_FROM_NAME}" <${process.env.SMTP_FROM_EMAIL}>`,
+    to: email,
+    subject: `${invitedByName} vous invite à rejoindre l'application`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2>Invitation à rejoindre l'application</h2>
+        <p>Bonjour,</p>
+        <p><strong>${invitedByName}</strong> vous invite à accéder au compte <strong>"${accountName}"</strong> en tant que <strong>${roleLabel}</strong>.</p>
+        <p>Pour accepter cette invitation, vous devez d'abord créer un compte :</p>
+        <p>
+          <a href="${registerUrl}" style="display: inline-block; padding: 12px 24px; background-color: #4f46e5; color: white; text-decoration: none; border-radius: 6px;">
+            Créer mon compte et accepter
+          </a>
+        </p>
+        <p style="color: #6b7280; font-size: 14px;">Ce lien expire dans 7 jours.</p>
+        <p style="color: #6b7280; font-size: 14px;">Si vous ne souhaitez pas participer, ignorez cet email.</p>
+      </div>
+    `,
+    text: `
+      Bonjour,
+
+      ${invitedByName} vous invite à accéder au compte "${accountName}" en tant que ${roleLabel}.
+
+      Pour accepter cette invitation, vous devez d'abord créer un compte :
+      ${registerUrl}
+
+      Ce lien expire dans 7 jours.
+
+      Si vous ne souhaitez pas participer, ignorez cet email.
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`✉️ Email d'invitation (nouveau user) envoyé à ${email}`);
+  } catch (error) {
+    console.error("Erreur lors de l'envoi de l'email d'invitation:", error);
+    throw new Error("Impossible d'envoyer l'email d'invitation");
   }
 };

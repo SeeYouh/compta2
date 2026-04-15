@@ -28,7 +28,7 @@ export const getSettings = async (req, res) => {
 
 /**
  * POST /api/settings
- * Crée de nouveaux paramètres pour l'utilisateur connecté
+ * Crée ou récupère les paramètres pour l'utilisateur connecté (upsert)
  */
 export const createSettings = async (req, res) => {
   try {
@@ -38,25 +38,13 @@ export const createSettings = async (req, res) => {
       return res.status(400).json({ error: "L'ID est requis" });
     }
 
-    // Vérifier si les paramètres existent déjà
-    const existing = await Settings.findOne({
-      id,
-      userId: req.userId
-    });
+    const settings = await Settings.findOneAndUpdate(
+      { id, userId: req.userId },
+      { $setOnInsert: { id, userId: req.userId, periodFilter: periodFilter || "all" } },
+      { upsert: true, new: true, setDefaultsOnInsert: true },
+    );
 
-    if (existing) {
-      return res.status(409).json({
-        error: "Ces paramètres existent déjà"
-      });
-    }
-
-    const settings = await Settings.create({
-      id,
-      userId: req.userId,
-      periodFilter: periodFilter || "all",
-    });
-
-    res.status(201).json(settings);
+    res.status(200).json(settings);
   } catch (error) {
     console.error("Erreur createSettings:", error);
     res.status(500).json({

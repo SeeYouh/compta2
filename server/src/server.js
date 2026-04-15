@@ -48,7 +48,11 @@ app.use(cors(corsOptions));
 const limiter = rateLimit({
   windowMs: config.rateLimit.windowMs,
   max: config.rateLimit.max,
-  message: "Trop de requêtes, veuillez réessayer plus tard",
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_req, res) => {
+    res.status(429).json({ error: "Trop de requ\u00eates, veuillez r\u00e9essayer plus tard" });
+  },
 });
 app.use("/api/", limiter);
 
