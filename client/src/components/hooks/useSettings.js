@@ -13,9 +13,7 @@ export const useSettings = () => {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const response = await authFetch(
-          `/api/settings/${SETTINGS_ID}`
-        );
+        const response = await authFetch(`/api/settings/${SETTINGS_ID}`);
         if (response.ok) {
           const data = await response.json();
           setSettings(data);
@@ -56,13 +54,10 @@ export const useSettings = () => {
     async (periodFilter) => {
       try {
         const updatedSettings = { ...settings, periodFilter };
-        const response = await authFetch(
-          `/api/settings/${SETTINGS_ID}`,
-          {
-            method: "PATCH",
-            body: JSON.stringify({ periodFilter }),
-          }
-        );
+        const response = await authFetch(`/api/settings/${SETTINGS_ID}`, {
+          method: "PATCH",
+          body: JSON.stringify({ periodFilter }),
+        });
         if (response.ok) {
           const data = await response.json();
           setSettings(data);
@@ -71,7 +66,7 @@ export const useSettings = () => {
         console.error(API_ERRORS.updatePeriodFilter, error);
       }
     },
-    [settings]
+    [settings],
   );
 
   return {

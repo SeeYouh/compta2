@@ -1,10 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   ArcElement,
@@ -14,20 +8,25 @@ import {
   Legend,
   LinearScale,
   Tooltip,
-} from 'chart.js';
-import {
-  Bar,
-  Doughnut,
-} from 'react-chartjs-2';
+} from "chart.js";
+import { Bar, Doughnut } from "react-chartjs-2";
 
-import {
-  APP_LABELS,
-  CHART_COLORS,
-  MONTHS,
-} from './utils';
-import { filterByMonth } from './utils/transactionsDerivers';
-import FormatCurrency from './utils/FormatCurrency';
-import { parseFRDate } from './utils/date';
+import { APP_LABELS, CHART_COLORS, MONTHS } from "./utils";
+import { filterByMonth } from "./utils/transactionsDerivers";
+import FormatCurrency from "./utils/FormatCurrency";
+import { parseFRDate } from "./utils/date";
+
+// ─── Réglages du plugin de labels du donut ────────────────────────────────────
+const DOUGHNUT_LABEL_OFFSET = 36; // px entre le bord du donut et le point d'ancrage du label
+const DOUGHNUT_LABEL_MARGIN = 8; // px de marge entre le label et le bord du canvas
+const DOUGHNUT_MIN_ARC = 0.12; // rad — arcs plus petits = pas de label affiché
+const DOUGHNUT_FONT_LABEL = "bold 13px system-ui, sans-serif";
+const DOUGHNUT_FONT_VALUE = "12px system-ui, sans-serif";
+const DOUGHNUT_LINE_OFFSET = 9; // px entre la ligne label et la ligne valeur
+
+// ─── Réglages du layout du donut ─────────────────────────────────────────────
+const DOUGHNUT_PADDING = { top: 40, bottom: 70, left: 160, right: 160 };
+// ─────────────────────────────────────────────────────────────────────────────
 
 const TOOLTIP_LABELS_PLUGIN = {
   id: "tooltipInlineLabels",
@@ -44,29 +43,50 @@ const TOOLTIP_LABELS_PLUGIN = {
     ctx.save();
     meta.data.forEach((arc, i) => {
       const arcSize = arc.endAngle - arc.startAngle;
-      if (arcSize < 0.12) return;
+      if (arcSize < DOUGHNUT_MIN_ARC) return;
 
       const midAngle = (arc.startAngle + arc.endAngle) / 2;
-      const labelRadius = arc.outerRadius + 28;
-      const lx = arc.x + Math.cos(midAngle) * labelRadius;
+      const cosA = Math.cos(midAngle);
+      const isRight = cosA >= 0;
+
+      const labelRadius = arc.outerRadius + DOUGHNUT_LABEL_OFFSET;
+      const lx = arc.x + cosA * labelRadius;
       const ly = arc.y + Math.sin(midAngle) * labelRadius;
 
       const label = (data.labels[i] || "").toString();
-      const truncated =
-        label.length > 15 ? label.substring(0, 14) + "…" : label;
       const value = data.datasets[0].data[i];
       const color = data.datasets[0].backgroundColor[i];
 
-      ctx.textAlign = Math.cos(midAngle) >= 0 ? "left" : "right";
+      ctx.textAlign = isRight ? "left" : "right";
       ctx.textBaseline = "middle";
+      ctx.font = DOUGHNUT_FONT_LABEL;
 
-      ctx.font = "bold 13px system-ui, sans-serif";
+      // Espace disponible jusqu'au bord du canvas
+      const availableWidth = isRight
+        ? chart.width - lx - DOUGHNUT_LABEL_MARGIN
+        : lx - DOUGHNUT_LABEL_MARGIN;
+
+      // Tronquer uniquement si le texte dépasse réellement l'espace disponible
+      let displayLabel = label;
+      if (
+        availableWidth > 20 &&
+        ctx.measureText(displayLabel).width > availableWidth
+      ) {
+        while (
+          displayLabel.length > 1 &&
+          ctx.measureText(displayLabel + "…").width > availableWidth
+        ) {
+          displayLabel = displayLabel.slice(0, -1);
+        }
+        displayLabel += "…";
+      }
+
       ctx.fillStyle = color;
-      ctx.fillText(truncated, lx, ly - 9);
+      ctx.fillText(displayLabel, lx, ly - DOUGHNUT_LINE_OFFSET);
 
-      ctx.font = "12px system-ui, sans-serif";
+      ctx.font = DOUGHNUT_FONT_VALUE;
       ctx.fillStyle = textColor;
-      ctx.fillText(FormatCurrency(value), lx, ly + 9);
+      ctx.fillText(FormatCurrency(value), lx, ly + DOUGHNUT_LINE_OFFSET);
     });
     ctx.restore();
   },
@@ -1091,7 +1111,7 @@ export default function ChartsDashboard({ transactions, filters }) {
                 maintainAspectRatio: false,
                 animation: false,
                 layout: {
-                  padding: { top: 40, bottom: 70, left: 160, right: 160 },
+                  padding: DOUGHNUT_PADDING,
                 },
                 plugins: {
                   legend: { display: false },

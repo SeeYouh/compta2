@@ -121,17 +121,32 @@
   }
 
   &__select {
-    padding: 0.55rem 0.85rem;
-    border: 1px solid var(--color-border);
+    padding: 0.55rem 2.25rem 0.55rem 0.85rem;
+    border: 1.5px solid var(--color-border);
     border-radius: 0.5rem;
-    background: var(--color-background);
+    background: var(--color-surface)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238899aa' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")
+      no-repeat right 0.65rem center;
     color: var(--color-text);
     font-size: 0.9rem;
     cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    flex: 1;
+    min-width: 140px;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.2s;
+
+    &:hover {
+      border-color: var(--color-primary);
+    }
 
     &:focus {
       outline: none;
       border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px
+        color-mix(in srgb, var(--color-primary) 20%, transparent);
     }
   }
 
