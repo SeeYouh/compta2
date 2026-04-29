@@ -23,7 +23,7 @@ await connectDB();
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
-  })
+  }),
 );
 
 // CORS - Autoriser toutes les origines en développement
@@ -51,7 +51,11 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (_req, res) => {
-    res.status(429).json({ error: "Trop de requ\u00eates, veuillez r\u00e9essayer plus tard" });
+    res
+      .status(429)
+      .json({
+        error: "Trop de requ\u00eates, veuillez r\u00e9essayer plus tard",
+      });
   },
 });
 app.use("/api/", limiter);

@@ -10,7 +10,7 @@ export const getSettings = async (req, res) => {
 
     const settings = await Settings.findOne({
       id,
-      userId: req.userId
+      userId: req.userId,
     });
 
     if (!settings) {
@@ -21,7 +21,7 @@ export const getSettings = async (req, res) => {
   } catch (error) {
     console.error("Erreur getSettings:", error);
     res.status(500).json({
-      error: "Erreur serveur lors de la récupération des paramètres"
+      error: "Erreur serveur lors de la récupération des paramètres",
     });
   }
 };
@@ -40,7 +40,13 @@ export const createSettings = async (req, res) => {
 
     const settings = await Settings.findOneAndUpdate(
       { id, userId: req.userId },
-      { $setOnInsert: { id, userId: req.userId, periodFilter: periodFilter || "all" } },
+      {
+        $setOnInsert: {
+          id,
+          userId: req.userId,
+          periodFilter: periodFilter || "all",
+        },
+      },
       { upsert: true, new: true, setDefaultsOnInsert: true },
     );
 
@@ -48,7 +54,7 @@ export const createSettings = async (req, res) => {
   } catch (error) {
     console.error("Erreur createSettings:", error);
     res.status(500).json({
-      error: "Erreur serveur lors de la création des paramètres"
+      error: "Erreur serveur lors de la création des paramètres",
     });
   }
 };
@@ -64,7 +70,7 @@ export const updateSettings = async (req, res) => {
 
     const settings = await Settings.findOne({
       id,
-      userId: req.userId
+      userId: req.userId,
     });
 
     if (!settings) {
@@ -81,7 +87,7 @@ export const updateSettings = async (req, res) => {
   } catch (error) {
     console.error("Erreur updateSettings:", error);
     res.status(500).json({
-      error: "Erreur serveur lors de la mise à jour des paramètres"
+      error: "Erreur serveur lors de la mise à jour des paramètres",
     });
   }
 };
@@ -96,7 +102,7 @@ export const deleteSettings = async (req, res) => {
 
     const settings = await Settings.findOneAndDelete({
       id,
-      userId: req.userId
+      userId: req.userId,
     });
 
     if (!settings) {
@@ -107,7 +113,7 @@ export const deleteSettings = async (req, res) => {
   } catch (error) {
     console.error("Erreur deleteSettings:", error);
     res.status(500).json({
-      error: "Erreur serveur lors de la suppression des paramètres"
+      error: "Erreur serveur lors de la suppression des paramètres",
     });
   }
 };

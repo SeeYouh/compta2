@@ -28,8 +28,12 @@ const SubThemeSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    autoCreated: {
+      type: Boolean,
+      default: false,
+    },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const ThemeSchema = new mongoose.Schema(
@@ -60,7 +64,7 @@ const ThemeSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Index composé pour permettre le même id sur différents comptes

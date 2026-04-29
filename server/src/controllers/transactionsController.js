@@ -1,8 +1,77 @@
 import { v4 as uuidv4 } from "uuid";
 
+import { Account } from "../models/Account.js";
 import { getUserAccounts } from "../middleware/permissions.js";
 import { Theme } from "../models/Theme.js";
 import { Transaction } from "../models/Transaction.js";
+
+/**
+ * S'assure que le thème "Compte" et le sous-thème correspondant au compte source
+ * existent dans le compte de destination. Crée le manquant si nécessaire.
+ * Retourne { themeId, subThemeId }.
+ */
+async function ensureTransferTheme(
+  destinationAccountId,
+  sourceAccountId,
+  sourceAccountName,
+) {
+  const TRANSFER_THEME_ID = "theme-compte";
+
+  let linkedTheme = await Theme.findOne({
+    accountId: destinationAccountId,
+    name: "Compte",
+  });
+
+  if (!linkedTheme) {
+    // Créer le thème "Compte" dans le compte de destination
+    const subThemeId = sourceAccountId;
+    linkedTheme = await Theme.create({
+      id: TRANSFER_THEME_ID,
+      accountId: destinationAccountId,
+      name: "Compte",
+      slug: "compte",
+      subThemes: new Map([
+        [
+          subThemeId,
+          {
+            id: subThemeId,
+            name: sourceAccountName,
+            slug: sourceAccountName.toLowerCase().replace(/\s+/g, "-"),
+            linkedAccountId: sourceAccountId,
+            linkedThemeId: null,
+            linkedSubThemeId: null,
+            autoCreated: true,
+          },
+        ],
+      ]),
+    });
+    return { themeId: linkedTheme.id, subThemeId };
+  }
+
+  // Le thème existe — chercher le sous-thème correspondant au compte source
+  const existingSubTheme = Array.from(linkedTheme.subThemes.values()).find(
+    (st) => st.linkedAccountId === sourceAccountId,
+  );
+
+  if (existingSubTheme) {
+    return { themeId: linkedTheme.id, subThemeId: existingSubTheme.id };
+  }
+
+  // Le sous-thème est manquant — le créer
+  const newSubThemeId = sourceAccountId;
+  linkedTheme.subThemes.set(newSubThemeId, {
+    id: newSubThemeId,
+    name: sourceAccountName,
+    slug: sourceAccountName.toLowerCase().replace(/\s+/g, "-"),
+    linkedAccountId: sourceAccountId,
+    linkedThemeId: null,
+    linkedSubThemeId: null,
+    autoCreated: true,
+  });
+  await linkedTheme.save();
+
+  return { themeId: linkedTheme.id, subThemeId: newSubThemeId };
+}
 
 /**
  * GET /api/transactions
@@ -72,41 +141,29 @@ export const createTransaction = async (req, res) => {
       updatedAt: transactionData.updatedAt || Date.now(),
     });
 
-    // Si linkedAccountId est fourni, créer automatiquement la transaction miroir (virement)
+    // Si linkedAccountId est fourni, créer la transaction miroir dans le compte de destination
+    // Les deux transactions sont indépendantes après création (pas de lien, suppression individuelle)
     if (transactionData.linkedAccountId) {
-      const transferId = `transfer-${uuidv4()}`;
-
-      // Ajouter le transferId à la transaction principale
-      transaction.transferId = transferId;
-      await transaction.save();
-
-      // Récupérer le thème "Compte" du compte de destination pour le virement retour
-      const linkedTheme = await Theme.findOne({
-        accountId: transactionData.linkedAccountId,
-        name: "Compte", // Chercher le thème virtuel correspondant
+      // Récupérer le nom du compte source pour nommer le sous-thème dans le compte de destination
+      const sourceAccount = await Account.findOne({
+        id: transactionData.accountId,
       });
+      const sourceAccountName =
+        sourceAccount?.name ?? transactionData.accountId;
 
-      // Déterminer les IDs du thème/sous-thème pour la transaction miroir
-      let linkedThemeId = "virtual-transfer-theme";
-      let linkedSubThemeId = transactionData.accountId;
-
-      // Si un thème "Compte" existe en DB pour le compte lié, l'utiliser
-      if (linkedTheme) {
-        linkedThemeId = linkedTheme.id;
-        // Chercher le sous-thème correspondant au compte source
-        const linkedSubTheme = Array.from(linkedTheme.subThemes.values()).find(
-          (st) => st.linkedAccountId === transactionData.accountId
+      // S'assurer que le thème/sous-thème existent dans le compte de destination
+      const { themeId: linkedThemeId, subThemeId: linkedSubThemeId } =
+        await ensureTransferTheme(
+          transactionData.linkedAccountId,
+          transactionData.accountId,
+          sourceAccountName,
         );
-        if (linkedSubTheme) {
-          linkedSubThemeId = linkedSubTheme.id;
-        }
-      }
 
       // Calculer le montant opposé (dépense -> recette, recette -> dépense)
       const linkedRecette = transactionData.depense || null;
       const linkedDepense = transactionData.recette || null;
 
-      // Créer la transaction miroir dans le compte de destination
+      // Créer la transaction miroir dans le compte de destination (indépendante)
       await Transaction.create({
         id: `transaction-${uuidv4()}`,
         accountId: transactionData.linkedAccountId,
@@ -117,8 +174,6 @@ export const createTransaction = async (req, res) => {
         designation: transactionData.designation,
         recette: linkedRecette,
         depense: linkedDepense,
-        transferId: transferId,
-        linkedAccountId: transactionData.accountId,
         updatedAt: Date.now(),
         disabled: false,
       });
@@ -165,32 +220,19 @@ export const updateTransaction = async (req, res) => {
 
 /**
  * DELETE /api/transactions/:id
- * Supprime une transaction et sa transaction liée si c'est un transfert inter-comptes
+ * Supprime uniquement cette transaction (les virements inter-comptes sont indépendants)
  */
 export const deleteTransaction = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Récupérer la transaction à supprimer
-    const transaction = await Transaction.findOne({ id });
+    const transaction = await Transaction.findOneAndDelete({ id });
 
     if (!transaction) {
       return res.status(404).json({ error: "Transaction non trouvée" });
     }
 
-    // Si la transaction a un transferId, supprimer toutes les transactions liées
-    if (transaction.transferId) {
-      await Transaction.deleteMany({ transferId: transaction.transferId });
-      res.json({
-        message: "Transaction et transaction liée supprimées",
-        id,
-        transferId: transaction.transferId,
-      });
-    } else {
-      // Sinon, supprimer uniquement cette transaction
-      await Transaction.findOneAndDelete({ id });
-      res.json({ message: "Transaction supprimée", id });
-    }
+    res.json({ message: "Transaction supprimée", id });
   } catch (error) {
     console.error("Erreur deleteTransaction:", error);
     res.status(500).json({

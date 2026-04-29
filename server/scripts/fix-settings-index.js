@@ -6,10 +6,10 @@
  * Utilisation : node scripts/fix-settings-index.js
  */
 
-import { readFileSync } from "fs";
-import { resolve, dirname } from "path";
+import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 import mongoose from "mongoose";
+import { readFileSync } from "fs";
 
 // Charger le .env depuis server/
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -21,7 +21,10 @@ const envVars = Object.fromEntries(
     .map((l) => {
       const idx = l.indexOf("=");
       const key = l.slice(0, idx).trim();
-      const val = l.slice(idx + 1).trim().replace(/^"|"$/g, "");
+      const val = l
+        .slice(idx + 1)
+        .trim()
+        .replace(/^"|"$/g, "");
       return [key, val];
     }),
 );
@@ -34,7 +37,10 @@ async function run() {
   const collection = db.collection("settings");
 
   const indexes = await collection.indexes();
-  console.log("Index actuels :", indexes.map((i) => i.name));
+  console.log(
+    "Index actuels :",
+    indexes.map((i) => i.name),
+  );
 
   if (indexes.some((i) => i.name === "id_1")) {
     await collection.dropIndex("id_1");

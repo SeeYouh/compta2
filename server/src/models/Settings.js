@@ -12,13 +12,21 @@ const SettingsSchema = new mongoose.Schema(
     },
     periodFilter: {
       type: String,
-      enum: ["all", "6weeks", "2months", "3months", "currentMonth", "previousMonth", "currentYear"],
+      enum: [
+        "all",
+        "6weeks",
+        "2months",
+        "3months",
+        "currentMonth",
+        "previousMonth",
+        "currentYear",
+      ],
       default: "all",
     },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Index composé pour éviter les doublons par utilisateur et id
