@@ -1,0 +1,13 @@
+{
+  "name": "compta",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "build": "yarn workspace client build",
+    "start": "yarn workspace server start"
+  }
+}
