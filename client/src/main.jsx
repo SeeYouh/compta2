@@ -22,9 +22,7 @@ import ResetPassword from "./pages/ResetPassword";
 import { ThemesProvider } from "./contexts/ThemesContext";
 import VerifyEmail from "./pages/VerifyEmail";
 
-const OrganigrammePage = lazy(
-  () => import("./pages/organigramme/OrganigrammePage.jsx"),
-);
+const TramePage = lazy(() => import("./pages/trame/TramePage.jsx"));
 
 function initTheme() {
   const stored = localStorage.getItem("theme");
@@ -46,7 +44,7 @@ createRoot(document.getElementById("root")).render(
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route
-          path="/dashboard"
+          path="/"
           element={
             <ProtectedRoute>
               <Dashboard />
@@ -54,11 +52,11 @@ createRoot(document.getElementById("root")).render(
           }
         />
         <Route
-          path="/organigramme"
+          path="/trame"
           element={
             <ProtectedRoute>
               <Suspense fallback={null}>
-                <OrganigrammePage />
+                <TramePage />
               </Suspense>
             </ProtectedRoute>
           }
@@ -117,7 +115,7 @@ createRoot(document.getElementById("root")).render(
           }
         />
         <Route
-          path="/*"
+          path="/synapse/*"
           element={
             <ProtectedRoute>
               <LabelsProvider>

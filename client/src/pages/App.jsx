@@ -257,7 +257,7 @@ const App = () => {
           <ThemeToggle />
           <UserMenu />
           <button
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/")}
             aria-label="Retour aux applications"
             style={{
               display: "flex",

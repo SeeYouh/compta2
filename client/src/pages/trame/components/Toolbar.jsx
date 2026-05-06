@@ -29,7 +29,7 @@ export default function Toolbar({ onAddNode, onSave }) {
     <>
       <button
         className="toolbar-close"
-        onClick={() => navigate("/dashboard")}
+        onClick={() => navigate("/")}
         aria-label="Retour aux applications"
         title="Retour aux applications"
       >

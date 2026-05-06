@@ -9,7 +9,7 @@ import UserMenu from "../components/UserMenu";
 const apps = [
   {
     id: "compta",
-    path: "/",
+    path: "/synapse",
     label: "Synapse Compta",
     description: "Gérez vos comptes, transactions et budgets",
     icon: (
@@ -30,9 +30,9 @@ const apps = [
     ),
   },
   {
-    id: "organigramme",
-    path: "/organigramme",
-    label: "Organigramme",
+    id: "trame",
+    path: "/trame",
+    label: "Trame",
     description: "Créez et visualisez vos organigrammes",
     icon: (
       <svg
