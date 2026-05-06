@@ -122,7 +122,7 @@ function Login() {
         }
       }
 
-      navigate("/");
+      navigate("/dashboard");
     } catch (err) {
       console.error("Erreur de connexion détaillée:", {
         message: err.message,

@@ -1,0 +1,41 @@
+// ── Arrière-plans ──────────────────────────────────────────────
+$app-bg: #0f1117;
+$surface: #1e2229;
+$surface-hover: #2d3748;
+$surface-active: #1a202c;
+$breadcrumb-bg: rgba(15, 20, 30, 0.85);
+
+// ── Bordures ────────────────────────────────────────────────────
+$border: rgba(255, 255, 255, 0.08);
+$border-hover: rgba(255, 255, 255, 0.15);
+$border-node: rgba(0, 0, 0, 0.15);
+$border-node-hover: rgba(0, 0, 0, 0.3);
+
+// ── Texte ───────────────────────────────────────────────────────
+$text: #e2e8f0;
+$text-muted: #94a3b8;
+$text-dim: #64748b;
+$text-node: #1a1a1a;
+
+// ── Accent ──────────────────────────────────────────────────────
+$accent: #3b82f6;
+$accent-glow: rgba(59, 130, 246, 0.25);
+$accent-light: #60a5fa;
+$accent-lighter: #93c5fd;
+
+// ── Danger ──────────────────────────────────────────────────────
+$danger: #f87171;
+$danger-bg: rgba(248, 113, 113, 0.1);
+
+// ── Ombres ──────────────────────────────────────────────────────
+$shadow-menu: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+// ── Rayons ──────────────────────────────────────────────────────
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 10px;
+$radius-pill: 20px;
+
+// ── Transitions ─────────────────────────────────────────────────
+$transition-fast: 0.15s ease;
+$transition-quick: 0.1s;

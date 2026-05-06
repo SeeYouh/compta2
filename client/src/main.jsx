@@ -1,6 +1,6 @@
 import "./sass/index.scss";
 
-import { StrictMode } from "react";
+import { lazy, StrictMode, Suspense } from "react";
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { createRoot } from "react-dom/client";
@@ -10,6 +10,7 @@ import AccountSharingSettings from "./pages/AccountSharingSettings";
 import { AccountsProvider } from "./contexts/AccountsContext";
 import App from "./pages/App";
 import ContactsPage from "./pages/ContactsPage";
+import Dashboard from "./pages/Dashboard";
 import ForgotPassword from "./pages/ForgotPassword";
 import { LabelsProvider } from "./contexts/LabelsContext";
 import LabelsSettings from "./pages/LabelsSettings";
@@ -20,6 +21,10 @@ import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword";
 import { ThemesProvider } from "./contexts/ThemesContext";
 import VerifyEmail from "./pages/VerifyEmail";
+
+const OrganigrammePage = lazy(
+  () => import("./pages/organigramme/OrganigrammePage.jsx"),
+);
 
 function initTheme() {
   const stored = localStorage.getItem("theme");
@@ -40,6 +45,24 @@ createRoot(document.getElementById("root")).render(
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/organigramme"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={null}>
+                <OrganigrammePage />
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
