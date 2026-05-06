@@ -51,11 +51,9 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (_req, res) => {
-    res
-      .status(429)
-      .json({
-        error: "Trop de requ\u00eates, veuillez r\u00e9essayer plus tard",
-      });
+    res.status(429).json({
+      error: "Trop de requ\u00eates, veuillez r\u00e9essayer plus tard",
+    });
   },
 });
 app.use("/api/", limiter);
@@ -93,14 +91,25 @@ app.use(errorHandler);
 
 // Démarrage du serveur
 const PORT = config.server.port;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`🚀 Serveur démarré sur le port ${PORT}`);
   console.log(`📍 Environnement: ${config.server.env}`);
   console.log(`🔗 API: http://localhost:${PORT}/api`);
 });
 
+server.on("error", (err) => {
+  if (err.code === "EADDRINUSE") {
+    console.error(
+      `❌ Le port ${PORT} est déjà utilisé. Arrêtez le processus existant avant de relancer.`,
+    );
+    process.exit(1);
+  } else {
+    throw err;
+  }
+});
+
 // Gestion de l'arrêt propre
 process.on("SIGTERM", () => {
   console.log("👋 SIGTERM reçu, arrêt du serveur...");
-  process.exit(0);
+  server.close(() => process.exit(0));
 });
