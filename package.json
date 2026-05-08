@@ -8,6 +8,6 @@
   ],
   "scripts": {
     "build": "yarn workspace client build",
-    "start": "yarn workspace server start"
+    "start": "node server/src/server.js"
   }
 }
