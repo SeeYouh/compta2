@@ -16,6 +16,9 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// Faire confiance au reverse proxy (nécessaire pour express-rate-limit sur hébergeur)
+app.set("trust proxy", 1);
+
 // Connexion à MongoDB
 await connectDB();
 
