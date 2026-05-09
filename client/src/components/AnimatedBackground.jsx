@@ -1,4 +1,7 @@
-import { useEffect, useRef } from 'react';
+import {
+  useEffect,
+  useRef,
+} from 'react';
 
 /**
  * Génère une valeur aléatoire dans une fourchette
@@ -56,7 +59,15 @@ function AnimatedBackground() {
   }, []);
 
   return (
-    <>
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        overflow: 'hidden',
+        pointerEvents: 'none',
+        zIndex: -10,
+      }}
+    >
       <div
         ref={blob1Ref}
         className="animated-blob animated-blob--1"
@@ -85,7 +96,7 @@ function AnimatedBackground() {
           transition: 'border-radius 29s ease-in-out',
         }}
       />
-    </>
+    </div>
   );
 }
 

@@ -10,6 +10,7 @@ import {
   getPendingInvitations,
 } from "../components/utils/sharingApi";
 import AppShell from "../components/AppShell";
+import Loader from "../components/Loader";
 import { useAccounts } from "../contexts/useAccounts";
 import { useDocumentTitle } from "../components/hooks/useDocumentTitle";
 
@@ -99,7 +100,7 @@ export default function PendingInvitations() {
         )}
 
         {loading ? (
-          <p className="pending-invitations__loading">Chargement…</p>
+          <Loader />
         ) : invitations.length === 0 ? (
           <div className="pending-invitations__empty">
             <p>Vous n'avez aucune invitation en attente.</p>

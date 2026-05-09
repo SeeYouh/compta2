@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "../sass/components/UserMenu.module.scss";
 import { useClickOutside } from "./hooks/useClickOutside";
 
-export default function UserMenu() {
+export default function SynapseUserMenu() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
@@ -23,6 +23,21 @@ export default function UserMenu() {
   };
 
   const handleNavigateToSettings = () => {
+    navigate("/labels-settings");
+    setIsOpen(false);
+  };
+
+  const handleNavigateToProjections = () => {
+    navigate("/projections-settings");
+    setIsOpen(false);
+  };
+
+  const handleNavigateToContacts = () => {
+    navigate("/contacts");
+    setIsOpen(false);
+  };
+
+  const handleNavigateToGlobalSettings = () => {
     navigate("/settings");
     setIsOpen(false);
   };
@@ -47,6 +62,24 @@ export default function UserMenu() {
           <button
             className={styles.menuButton}
             onClick={handleNavigateToSettings}
+          >
+            Personnaliser les labels
+          </button>
+          <button
+            className={styles.menuButton}
+            onClick={handleNavigateToProjections}
+          >
+            Projections budgétaires
+          </button>
+          <button
+            className={styles.menuButton}
+            onClick={handleNavigateToContacts}
+          >
+            Contacts & invitations
+          </button>
+          <button
+            className={styles.menuButton}
+            onClick={handleNavigateToGlobalSettings}
           >
             Paramètres
           </button>

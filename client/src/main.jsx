@@ -19,6 +19,7 @@ import ProjectionsSettings from "./pages/ProjectionsSettings";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword";
+import SettingsPage from "./pages/SettingsPage";
 import { ThemesProvider } from "./contexts/ThemesContext";
 import VerifyEmail from "./pages/VerifyEmail";
 
@@ -101,6 +102,16 @@ createRoot(document.getElementById("root")).render(
                   <AccountSharingSettings />
                 </AccountsProvider>
               </LabelsProvider>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <AccountsProvider>
+                <SettingsPage />
+              </AccountsProvider>
             </ProtectedRoute>
           }
         />

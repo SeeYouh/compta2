@@ -14,6 +14,7 @@ import {
   revokeInvitation,
   updateMemberRole,
 } from "../components/utils/sharingApi";
+import Loader from "../components/Loader";
 import { useAccounts } from "../contexts/useAccounts";
 
 const ROLE_LABELS = {
@@ -254,7 +255,7 @@ export default function AccountSharingSettings() {
         <section className="account-sharing__section">
           <h2 className="account-sharing__section-title">Membres</h2>
           {loading ? (
-            <p className="account-sharing__loading">Chargement…</p>
+            <Loader />
           ) : members.length === 0 ? (
             <p className="account-sharing__empty">
               Aucun membre pour l'instant

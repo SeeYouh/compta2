@@ -26,13 +26,13 @@ import PaymentFilterMenu from "../components/filters/PaymentFilterMenu";
 import PeriodFilter from "../components/filters/PeriodFilter";
 import { saveThemes } from "../components/utils/themesApi";
 import ScrollButton from "../components/ScrollButton";
+import SynapseUserMenu from "../components/SynapseUserMenu";
 import ThemeFilterMenu from "../components/filters/ThemeFilterMenu";
 import ThemeToggle from "../components/ThemeToggle";
 import TransactionForm from "../components/TransactionForm";
 import TransactionsTable from "../components/TransactionsTable";
 import { useAccounts } from "../contexts/useAccounts";
 import { useLastUpdate } from "../components/hooks/useLastUpdate";
-import UserMenu from "../components/UserMenu";
 import { useSettings } from "../components/hooks/useSettings";
 import { useThemes } from "../contexts/useThemes";
 import { useTransactionForm } from "../components/hooks/useTransactionForm";
@@ -255,7 +255,7 @@ const App = () => {
       headerRight={
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           <ThemeToggle />
-          <UserMenu />
+          <SynapseUserMenu />
           <button
             onClick={() => navigate("/")}
             aria-label="Retour aux applications"

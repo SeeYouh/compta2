@@ -1,5 +1,6 @@
 import { Navigate } from "react-router-dom";
 
+import Loader from "./Loader";
 import { useAuth } from "./hooks/useAuth";
 
 function ProtectedRoute({ children }) {
@@ -9,7 +10,7 @@ function ProtectedRoute({ children }) {
     return (
       <div className="auth-container">
         <div className="auth-card">
-          <p style={{ textAlign: "center" }}>Chargement...</p>
+          <Loader />
         </div>
       </div>
     );

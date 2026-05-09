@@ -10,7 +10,7 @@ const apps = [
   {
     id: "compta",
     path: "/synapse",
-    label: "Synapse Compta",
+    label: "Synapse",
     description: "Gérez vos comptes, transactions et budgets",
     icon: (
       <svg
@@ -72,11 +72,6 @@ export default function Dashboard() {
       </header>
 
       <main className="dashboard-main">
-        <h1 className="dashboard-title">Vos applications</h1>
-        <p className="dashboard-subtitle">
-          Choisissez une application pour commencer
-        </p>
-
         <div className="dashboard-grid">
           {apps.map((app) => (
             <button

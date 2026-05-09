@@ -53,7 +53,7 @@ export const useSettings = () => {
   const updatePeriodFilter = useCallback(
     async (periodFilter) => {
       try {
-        const updatedSettings = { ...settings, periodFilter };
+        // const updatedSettings = { ...settings, periodFilter };
         const response = await authFetch(`/api/settings/${SETTINGS_ID}`, {
           method: "PATCH",
           body: JSON.stringify({ periodFilter }),

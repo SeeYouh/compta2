@@ -1,8 +1,12 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useLabels } from "../components/hooks/useLabels";
-import AppShell from "../components/AppShell";
 import "./LabelsSettings.scss";
+
+import { useEffect, useState } from "react";
+
+import { useNavigate } from "react-router-dom";
+
+import AppShell from "../components/AppShell";
+import Loader from "../components/Loader";
+import { useLabels } from "../components/hooks/useLabels";
 
 export default function LabelsSettings() {
   const navigate = useNavigate();
@@ -44,7 +48,7 @@ export default function LabelsSettings() {
   const handleReset = async () => {
     if (
       !window.confirm(
-        "Êtes-vous sûr de vouloir réinitialiser tous les labels aux valeurs par défaut ?"
+        "Êtes-vous sûr de vouloir réinitialiser tous les labels aux valeurs par défaut ?",
       )
     ) {
       return;
@@ -159,7 +163,10 @@ export default function LabelsSettings() {
         { key: "authRegisterName", label: "Nom" },
         { key: "authRegisterEmail", label: "Email" },
         { key: "authRegisterPassword", label: "Mot de passe" },
-        { key: "authRegisterPasswordConfirm", label: "Confirmer le mot de passe" },
+        {
+          key: "authRegisterPasswordConfirm",
+          label: "Confirmer le mot de passe",
+        },
         { key: "authRegisterSubmit", label: "Créer mon compte" },
         { key: "authRegisterHasAccount", label: "Déjà un compte" },
       ],
@@ -174,7 +181,7 @@ export default function LabelsSettings() {
           field.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
           (formData[field.key] || "")
             .toLowerCase()
-            .includes(searchTerm.toLowerCase())
+            .includes(searchTerm.toLowerCase()),
       ),
     }))
     .filter((group) => group.fields.length > 0);
@@ -183,7 +190,7 @@ export default function LabelsSettings() {
     return (
       <AppShell>
         <div className="labels-settings">
-          <div className="labels-settings__loading">Chargement...</div>
+          <Loader />
         </div>
       </AppShell>
     );
@@ -200,7 +207,9 @@ export default function LabelsSettings() {
           >
             ← Retour
           </button>
-          <h1 className="labels-settings__title">Personnalisation des labels</h1>
+          <h1 className="labels-settings__title">
+            Personnalisation des labels
+          </h1>
           <p className="labels-settings__subtitle">
             Modifiez tous les textes de l'application selon vos préférences
           </p>

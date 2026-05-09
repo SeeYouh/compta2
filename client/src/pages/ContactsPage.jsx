@@ -18,6 +18,7 @@ import {
 } from "../components/utils/contactsApi";
 import AppShell from "../components/AppShell";
 import ConfirmationModal from "../components/ConfirmationModal";
+import Loader from "../components/Loader";
 import { useAccounts } from "../contexts/useAccounts";
 import { useDocumentTitle } from "../components/hooks/useDocumentTitle";
 
@@ -304,7 +305,7 @@ export default function ContactsPage() {
               </h2>
 
               {loading ? (
-                <p className="contacts-page__empty">Chargement…</p>
+                <Loader />
               ) : contacts.length === 0 ? (
                 <p className="contacts-page__empty">
                   Aucun contact enregistré.
@@ -493,7 +494,7 @@ export default function ContactsPage() {
               Invitations en attente
             </h2>
             {invLoading ? (
-              <p className="contacts-page__empty">Chargement…</p>
+              <Loader />
             ) : invitations.length === 0 ? (
               <p className="contacts-page__empty">
                 Vous n'avez aucune invitation en attente.

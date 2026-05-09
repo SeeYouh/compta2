@@ -11,6 +11,7 @@ import {
   getProjections,
   updateProjection,
 } from "../components/utils/projectionsApi";
+import Loader from "../components/Loader";
 import { useAccounts } from "../contexts/useAccounts";
 
 const HORIZON_OPTIONS = [
@@ -229,7 +230,7 @@ export default function ProjectionsSettings() {
           </h2>
 
           {loading ? (
-            <div className="projections-settings__loading">Chargement…</div>
+            <Loader />
           ) : projections.length === 0 ? (
             <div className="projections-settings__empty">
               Aucune projection détectée. Lancez un calcul pour analyser
