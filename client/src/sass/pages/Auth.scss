@@ -12,7 +12,7 @@
   // Gradient de fond moderne avec deux blobs animés
   background: var(--color-bg);
 
-  // Premier blob (en haut à gauche)
+  // Premier blob
   &::before {
     content: "";
     position: absolute;
@@ -21,18 +21,9 @@
     top: 50%;
     left: 50%;
     background: radial-gradient(
-      circle,
-      var(--color-primary-100) 0%,
-      var(--color-primary-50) 15%,
-      var(--color-primary-20) 28%,
-      var(--color-primary-10) 40%,
-      color-mix(in srgb, var(--color-primary-5) 75%, transparent) 52%,
-      color-mix(in srgb, var(--color-primary-5) 50%, transparent) 64%,
-      color-mix(in srgb, var(--color-primary-4) 30%, transparent) 74%,
-      color-mix(in srgb, var(--color-primary-4) 12%, transparent) 84%,
-      color-mix(in srgb, var(--color-primary-4) 4%, transparent) 90%,
-      transparent 95%,
-      transparent 100%
+      in oklch circle,
+      var(--color-primary) 0%,
+      transparent 70%
     );
     opacity: $gradient-opacity;
     filter: blur($gradient-blur);
@@ -41,7 +32,7 @@
     animation: rotateGradients $gradient-animation-duration linear infinite;
   }
 
-  // Deuxième blob (en bas à droite, décalé de 180deg)
+  // Deuxième blob (décalé de 180deg)
   &::after {
     content: "";
     position: absolute;
@@ -50,18 +41,9 @@
     top: 50%;
     left: 50%;
     background: radial-gradient(
-      circle,
-      var(--color-primary-50) 0%,
-      var(--color-primary-20) 18%,
-      var(--color-primary-10) 32%,
-      color-mix(in srgb, var(--color-primary-5) 85%, transparent) 46%,
-      color-mix(in srgb, var(--color-primary-5) 60%, transparent) 58%,
-      color-mix(in srgb, var(--color-primary-4) 40%, transparent) 68%,
-      color-mix(in srgb, var(--color-primary-4) 20%, transparent) 78%,
-      color-mix(in srgb, var(--color-primary-4) 8%, transparent) 86%,
-      color-mix(in srgb, var(--color-primary-4) 2%, transparent) 92%,
-      transparent 96%,
-      transparent 100%
+      in oklch circle,
+      var(--color-primary) 0%,
+      transparent 70%
     );
     opacity: $gradient-opacity;
     filter: blur($gradient-blur);

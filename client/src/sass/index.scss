@@ -100,21 +100,14 @@ body {
   width: 100%;
   max-width: 1140px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.75rem;
   margin: 0 auto 1rem auto;
   flex-wrap: wrap;
 
   .txn-form {
     flex: 1;
-    min-width: 300px;
-  }
-
-  @media (max-width: 1200px) {
-    .txn-form {
-      flex: 1 1 100%;
-      order: 10;
-    }
+    min-width: 0;
   }
 }
 
@@ -222,7 +215,7 @@ body {
 
 .month-tabs {
   width: auto;
-  max-width: 200px;
+  max-width: 150px;
   position: relative;
 
   &__label {
@@ -473,8 +466,7 @@ body {
     grid-template-columns: 1fr auto; // label à gauche, action (Annuler) à droite
     align-items: center;
     gap: 0.5rem;
-    padding: 0.25rem;
-    margin: 0 0.25rem 0.25rem 0.25rem;
+    padding: 0;
     border: 2px solid var(--color-border);
     border-radius: 0.5rem;
     background: var(--color-surface);
@@ -493,7 +485,7 @@ body {
 
   &__label {
     font-weight: 500;
-    padding: 5px 15px 5px 15px;
+    padding: 0.5rem 1rem;
   }
 
   &__action {
@@ -1177,5 +1169,47 @@ body {
     transition: transform 0.3s ease;
     width: 1.5rem;
     height: 1.5rem;
+  }
+}
+
+// ============================================
+// ANIMATED BACKGROUND BLOBS
+// ============================================
+
+.animated-blob {
+  transform: translate(-50%, -50%);
+  filter: blur(120px);
+  opacity: 0.55;
+  will-change: border-radius;
+}
+
+.animated-blob--1 {
+  background: radial-gradient(
+    ellipse at center,
+    var(--color-primary) 0%,
+    transparent 70%
+  );
+}
+
+.animated-blob--2 {
+  background: radial-gradient(
+    ellipse at center,
+    color-mix(in srgb, var(--color-primary) 60%, var(--color-accent)) 0%,
+    transparent 70%
+  );
+}
+
+// Grain overlay — casse le color banding des gradients
+.animated-blob-container {
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 128px 128px;
   }
 }

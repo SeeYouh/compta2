@@ -60,6 +60,7 @@ function AnimatedBackground() {
 
   return (
     <div
+      className="animated-blob-container"
       style={{
         position: 'absolute',
         inset: 0,
