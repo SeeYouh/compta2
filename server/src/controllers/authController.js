@@ -266,7 +266,7 @@ export const forgotPassword = async (req, res) => {
 
     // Nettoyer les demandes de plus d'une heure
     user.passwordResetRequests = user.passwordResetRequests.filter(
-      (timestamp) => now - timestamp.getTime() < oneHour
+      (timestamp) => now - timestamp.getTime() < oneHour,
     );
 
     // Vérifier la limite de 5 minutes depuis la dernière demande
@@ -277,7 +277,7 @@ export const forgotPassword = async (req, res) => {
 
       if (timeSinceLastRequest < fiveMinutes) {
         const remainingMinutes = Math.ceil(
-          (fiveMinutes - timeSinceLastRequest) / 60000
+          (fiveMinutes - timeSinceLastRequest) / 60000,
         );
         return res.status(429).json({
           error: `Veuillez patienter ${remainingMinutes} minute${
@@ -324,6 +324,83 @@ export const forgotPassword = async (req, res) => {
     console.error("Erreur forgotPassword:", error);
     res.status(500).json({
       error: "Erreur serveur lors de la demande de réinitialisation",
+    });
+  }
+};
+
+/**
+ * PATCH /api/auth/profile
+ * Modifie le pseudo de l'utilisateur connecté
+ */
+export const updateProfile = async (req, res) => {
+  try {
+    const { name } = req.body;
+
+    if (!name || name.trim().length === 0) {
+      return res.status(400).json({ error: "Le pseudo est requis" });
+    }
+
+    if (name.trim().length > 50) {
+      return res.status(400).json({
+        error: "Le pseudo ne peut pas dépasser 50 caractères",
+      });
+    }
+
+    const user = await User.findOne({ id: req.userId });
+    if (!user) {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
+
+    user.name = name.trim();
+    await user.save();
+
+    res.json({ user: user.toJSON() });
+  } catch (error) {
+    console.error("Erreur updateProfile:", error);
+    res.status(500).json({
+      error: "Erreur serveur lors de la mise à jour du profil",
+    });
+  }
+};
+
+/**
+ * PATCH /api/auth/password
+ * Change le mot de passe de l'utilisateur connecté
+ */
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        error: "Mot de passe actuel et nouveau mot de passe requis",
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        error: "Le nouveau mot de passe doit contenir au moins 6 caractères",
+      });
+    }
+
+    const user = await User.findOne({ id: req.userId });
+    if (!user) {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
+
+    const isValid = await user.comparePassword(currentPassword);
+    if (!isValid) {
+      return res.status(401).json({ error: "Mot de passe actuel incorrect" });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ message: "Mot de passe modifié avec succès" });
+  } catch (error) {
+    console.error("Erreur changePassword:", error);
+    res.status(500).json({
+      error: "Erreur serveur lors du changement de mot de passe",
     });
   }
 };

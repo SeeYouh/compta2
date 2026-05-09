@@ -7,6 +7,7 @@ import {
   getAllAccounts,
   getTemplateAccount,
   updateAccount,
+  updateSharedPermission,
 } from "../controllers/accountsController.js";
 
 const router = express.Router();
@@ -25,5 +26,8 @@ router.put("/:id", authenticate, updateAccount);
 
 // DELETE /api/accounts/:id - Supprimer un compte
 router.delete("/:id", authenticate, deleteAccount);
+
+// PATCH /api/accounts/:id/shared-permissions - Modifier une permission d'un partagé
+router.patch("/:id/shared-permissions", authenticate, updateSharedPermission);
 
 export default router;

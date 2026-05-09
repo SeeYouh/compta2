@@ -2,12 +2,14 @@ import express from "express";
 
 import { authenticate } from "../middleware/auth.js";
 import {
+  changePassword,
   forgotPassword,
   getMe,
   login,
   register,
   resendVerification,
   resetPassword,
+  updateProfile,
   verifyEmail,
 } from "../controllers/authController.js";
 
@@ -33,5 +35,11 @@ router.post("/forgot-password", forgotPassword);
 
 // POST /api/auth/reset-password/:token - Réinitialiser le mot de passe
 router.post("/reset-password/:token", resetPassword);
+
+// PATCH /api/auth/profile - Modifier le pseudo
+router.patch("/profile", authenticate, updateProfile);
+
+// PATCH /api/auth/password - Changer le mot de passe
+router.patch("/password", authenticate, changePassword);
 
 export default router;

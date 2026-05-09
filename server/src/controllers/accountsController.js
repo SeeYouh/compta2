@@ -4,6 +4,7 @@ import { Account } from "../models/Account.js";
 import { getUserAccounts } from "../middleware/permissions.js";
 import { Theme } from "../models/Theme.js";
 import { Transaction } from "../models/Transaction.js";
+import { User } from "../models/User.js";
 
 const TRANSFER_THEME_ID = "theme-compte-transfer";
 
@@ -42,7 +43,7 @@ async function syncAccountTransferThemes() {
             linkedThemeId: null,
             linkedSubThemeId: null,
           },
-        ])
+        ]),
       );
 
       // Vérifier si le thème existe déjà
@@ -78,10 +79,37 @@ async function syncAccountTransferThemes() {
  */
 export const getAllAccounts = async (req, res) => {
   try {
-    // req.userId est défini par le middleware authenticate
     const accounts = await getUserAccounts(req.userId);
 
-    res.json(accounts);
+    // Collecter tous les userId référencés dans sharedWith
+    const sharedUserIds = [
+      ...new Set(
+        accounts.flatMap((a) => (a.sharedWith || []).map((s) => s.userId)),
+      ),
+    ];
+
+    // Résoudre les noms en une seule requête
+    const users = sharedUserIds.length
+      ? await User.find(
+          { id: { $in: sharedUserIds } },
+          { id: 1, name: 1, _id: 0 },
+        )
+      : [];
+    const nameById = Object.fromEntries(users.map((u) => [u.id, u.name]));
+
+    // Remplacer userId par name dans sharedWith avant d'envoyer
+    const sanitized = accounts.map((account) => {
+      const obj = account.toJSON();
+      obj.sharedWith = (obj.sharedWith || []).map(
+        ({ userId, permissions }) => ({
+          name: nameById[userId] ?? "Utilisateur inconnu",
+          permissions,
+        }),
+      );
+      return obj;
+    });
+
+    res.json(sanitized);
   } catch (error) {
     console.error("Erreur getAllAccounts:", error);
     res
@@ -263,7 +291,7 @@ export const deleteAccount = async (req, res) => {
     // Orpheliner les transactions liées (linkedAccountId = ce compte)
     await Transaction.updateMany(
       { linkedAccountId: id },
-      { $set: { linkedAccountId: null, transferId: null } }
+      { $set: { linkedAccountId: null, transferId: null } },
     );
 
     // Supprimer le compte
@@ -285,5 +313,72 @@ export const deleteAccount = async (req, res) => {
     res
       .status(500)
       .json({ error: "Erreur serveur lors de la suppression du compte" });
+  }
+};
+
+const VALID_PERMISSIONS = [
+  "canViewTransactions",
+  "canCreateTransactions",
+  "canEditTransactions",
+  "canDeleteTransactions",
+  "canManageThemes",
+  "canRenameAccount",
+  "canInviteUsers",
+];
+
+/**
+ * PATCH /api/accounts/:id/shared-permissions
+ * Modifie une permission d'un utilisateur partagé
+ * Body : { userName, permission, value }
+ * Seul le propriétaire du compte peut modifier les permissions
+ */
+export const updateSharedPermission = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userName, permission, value } = req.body;
+
+    if (!userName || !permission || typeof value !== "boolean") {
+      return res.status(400).json({ error: "Paramètres invalides" });
+    }
+
+    if (!VALID_PERMISSIONS.includes(permission)) {
+      return res.status(400).json({ error: "Permission inconnue" });
+    }
+
+    const account = await Account.findOne({ id, isTemplate: false });
+    if (!account) {
+      return res.status(404).json({ error: "Compte introuvable" });
+    }
+
+    // Seul le propriétaire peut modifier les permissions
+    if (account.userId !== req.userId) {
+      return res.status(403).json({ error: "Accès refusé" });
+    }
+
+    // Résoudre le nom en userId
+    const targetUser = await User.findOne({ name: userName });
+    if (!targetUser) {
+      return res.status(404).json({ error: "Utilisateur introuvable" });
+    }
+
+    const sharedEntry = account.sharedWith.find(
+      (s) => s.userId === targetUser.id,
+    );
+    if (!sharedEntry) {
+      return res
+        .status(404)
+        .json({ error: "Cet utilisateur ne partage pas ce compte" });
+    }
+
+    sharedEntry.permissions[permission] = value;
+    account.markModified("sharedWith");
+    await account.save();
+
+    res.json({ permission, value });
+  } catch (error) {
+    console.error("Erreur updateSharedPermission:", error);
+    res.status(500).json({
+      error: "Erreur serveur lors de la modification des permissions",
+    });
   }
 };
