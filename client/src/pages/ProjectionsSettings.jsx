@@ -168,7 +168,7 @@ export default function ProjectionsSettings() {
         <div className="projections-settings__header">
           <button
             className="projections-settings__back"
-            onClick={() => navigate("/")}
+            onClick={() => navigate(-1)}
           >
             ← Retour
           </button>

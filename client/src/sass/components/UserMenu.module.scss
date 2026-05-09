@@ -49,14 +49,7 @@
 .userName {
   font-weight: 600;
   font-size: 0.95rem;
-  margin-bottom: 0.25rem;
   color: var(--color-text);
-}
-
-.userEmail {
-  font-size: 0.85rem;
-  color: var(--color-text-secondary);
-  word-break: break-all;
 }
 
 .divider {
@@ -65,24 +58,68 @@
   border-top: 1px solid var(--color-border);
 }
 
-.logoutButton {
-  width: 100%;
-  padding: 0.75rem 1rem;
+.actionBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.actionBarLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  :global(.theme-toggle) {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 6px;
+    font-size: 1rem;
+    line-height: 1;
+
+    span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+  }
+}
+
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 6px;
   background: transparent;
   border: none;
-  text-align: left;
-  font-size: 0.9rem;
-  color: var(--color-error, #f44336);
+  color: var(--color-text-dim);
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition:
+    background 0.15s,
+    color 0.15s;
 
-  &:hover {
-    background: var(--color-hover);
+  svg {
+    width: 1.1rem;
+    height: 1.1rem;
   }
 
-  &:focus {
-    outline: 2px solid var(--primary-color);
-    outline-offset: -2px;
+  &:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-text);
+  }
+}
+
+.iconBtnDanger {
+  @extend .iconBtn;
+  color: var(--color-danger);
+
+  &:hover {
+    background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+    color: var(--color-danger);
   }
 }
 
@@ -99,10 +136,5 @@
 
   &:hover {
     background: var(--color-hover);
-  }
-
-  &:focus {
-    outline: 2px solid var(--primary-color);
-    outline-offset: -2px;
   }
 }

@@ -158,7 +158,7 @@ export default function AccountSharingSettings() {
         <div className="account-sharing__header">
           <button
             className="account-sharing__back"
-            onClick={() => navigate("/")}
+            onClick={() => navigate(-1)}
           >
             ← Retour
           </button>

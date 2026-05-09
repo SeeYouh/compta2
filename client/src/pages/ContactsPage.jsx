@@ -212,7 +212,7 @@ export default function ContactsPage() {
     <AppShell>
       <div className="contacts-page">
         <div className="contacts-page__header">
-          <button className="contacts-page__back" onClick={() => navigate("/")}>
+          <button className="contacts-page__back" onClick={() => navigate(-1)}>
             ← Retour
           </button>
           <h1 className="contacts-page__title">Contacts & invitations</h1>

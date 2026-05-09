@@ -203,7 +203,7 @@ export default function LabelsSettings() {
           <button
             type="button"
             className="labels-settings__back"
-            onClick={() => navigate("/")}
+            onClick={() => navigate(-1)}
           >
             ← Retour
           </button>

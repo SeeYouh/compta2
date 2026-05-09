@@ -28,7 +28,6 @@ import { saveThemes } from "../components/utils/themesApi";
 import ScrollButton from "../components/ScrollButton";
 import SynapseUserMenu from "../components/SynapseUserMenu";
 import ThemeFilterMenu from "../components/filters/ThemeFilterMenu";
-import ThemeToggle from "../components/ThemeToggle";
 import TransactionForm from "../components/TransactionForm";
 import TransactionsTable from "../components/TransactionsTable";
 import { useAccounts } from "../contexts/useAccounts";
@@ -254,7 +253,6 @@ const App = () => {
     <AppShell
       headerRight={
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <ThemeToggle />
           <SynapseUserMenu />
           <button
             onClick={() => navigate("/")}

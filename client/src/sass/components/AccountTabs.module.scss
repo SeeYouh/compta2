@@ -10,34 +10,45 @@
 
 .tab {
   padding: 0.5rem 1rem;
-  background: transparent;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: 0.5rem;
   cursor: pointer;
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--color-text);
   white-space: nowrap;
-  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 
   &:hover {
     background: var(--color-surface-hover);
     border-color: var(--color-accent);
+    color: var(--color-accent);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    transform: scale(0.97);
   }
 
   &.active {
     background: var(--color-accent);
     color: white;
     border-color: var(--color-accent);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
   &.addButton {
-    min-width: 2.5rem;
-    padding: 0.5rem;
-    font-size: 1.2rem;
+    width: 2rem;
+    height: 2rem;
+    min-width: unset;
+    padding: 4px 4px 6px 4px;
+    font-size: 1.1rem;
     font-weight: 400;
     color: var(--color-accent);
     border-style: dashed;
+    box-shadow: none;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -46,6 +57,7 @@
       background: var(--color-accent);
       color: white;
       border-style: solid;
+      box-shadow: none;
     }
   }
 }

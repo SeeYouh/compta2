@@ -84,7 +84,7 @@ export default function PendingInvitations() {
         <div className="pending-invitations__header">
           <button
             className="pending-invitations__back"
-            onClick={() => navigate("/")}
+            onClick={() => navigate(-1)}
           >
             ← Retour
           </button>
