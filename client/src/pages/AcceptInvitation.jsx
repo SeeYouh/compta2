@@ -1,10 +1,16 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from 'react';
 
-import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
 
-import { acceptInvitation } from "../components/utils/sharingApi";
-import ThemeToggle from "../components/ThemeToggle";
-import { useDocumentTitle } from "../components/hooks/useDocumentTitle";
+import { acceptInvitation } from '../components/utils/sharingApi';
+import ThemeToggle from '../components/ThemeToggle';
+import { useDocumentTitle } from '../components/hooks/useDocumentTitle';
 
 export default function AcceptInvitation() {
   const [searchParams] = useSearchParams();

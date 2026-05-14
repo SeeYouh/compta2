@@ -9,50 +9,6 @@
   position: relative;
   overflow: hidden;
 
-  // Gradient de fond moderne avec deux blobs animés
-  background: var(--color-bg);
-
-  // Premier blob
-  &::before {
-    content: "";
-    position: absolute;
-    width: $gradient-size;
-    height: $gradient-size;
-    top: 50%;
-    left: 50%;
-    background: radial-gradient(
-      in oklch circle,
-      var(--color-primary) 0%,
-      transparent 70%
-    );
-    opacity: $gradient-opacity;
-    filter: blur($gradient-blur);
-    pointer-events: none;
-    z-index: 0;
-    animation: rotateGradients $gradient-animation-duration linear infinite;
-  }
-
-  // Deuxième blob (décalé de 180deg)
-  &::after {
-    content: "";
-    position: absolute;
-    width: $gradient-size;
-    height: $gradient-size;
-    top: 50%;
-    left: 50%;
-    background: radial-gradient(
-      in oklch circle,
-      var(--color-primary) 0%,
-      transparent 70%
-    );
-    opacity: $gradient-opacity;
-    filter: blur($gradient-blur);
-    pointer-events: none;
-    z-index: 0;
-    animation: rotateGradients $gradient-animation-duration linear infinite;
-    animation-delay: calc($gradient-animation-duration / -2);
-  }
-
   &__theme-toggle {
     position: absolute;
     top: 2rem;
@@ -535,85 +491,143 @@
   }
 }
 
-// Animations de morphing pour créer des formes organiques avec beaucoup de variété
-@keyframes morphBlob1 {
+// Morphing géométrique via clip-path (8 points fixes pour interpolation fluide)
+// Blob → Losange → Carré → Triangle → Octogone → Blob asymétrique
+@keyframes morphShape1 {
   0% {
-    border-radius: 42% 58% 67% 33% / 38% 52% 48% 62%;
-  }
-  10% {
-    border-radius: 58% 42% 45% 55% / 63% 37% 67% 33%;
+    clip-path: polygon(
+      28% 2%,
+      72% 3%,
+      97% 28%,
+      96% 70%,
+      71% 97%,
+      30% 98%,
+      3% 72%,
+      2% 30%
+    );
   }
   20% {
-    border-radius: 35% 65% 72% 28% / 44% 66% 34% 56%;
-  }
-  30% {
-    border-radius: 68% 32% 39% 61% / 57% 43% 61% 39%;
+    clip-path: polygon(
+      50% 2%,
+      72% 28%,
+      98% 50%,
+      72% 72%,
+      50% 98%,
+      28% 72%,
+      2% 50%,
+      28% 28%
+    );
   }
   40% {
-    border-radius: 47% 53% 62% 38% / 71% 29% 45% 55%;
-  }
-  50% {
-    border-radius: 55% 45% 33% 67% / 48% 52% 58% 42%;
+    clip-path: polygon(
+      12% 2%,
+      88% 2%,
+      98% 12%,
+      98% 88%,
+      88% 98%,
+      12% 98%,
+      2% 88%,
+      2% 12%
+    );
   }
   60% {
-    border-radius: 31% 69% 54% 46% / 65% 35% 39% 61%;
-  }
-  70% {
-    border-radius: 64% 36% 48% 52% / 42% 58% 53% 47%;
+    clip-path: polygon(
+      50% 2%,
+      62% 38%,
+      98% 95%,
+      75% 98%,
+      50% 92%,
+      25% 98%,
+      2% 95%,
+      38% 38%
+    );
   }
   80% {
-    border-radius: 39% 61% 69% 31% / 56% 44% 68% 32%;
-  }
-  90% {
-    border-radius: 52% 48% 41% 59% / 37% 63% 51% 49%;
+    clip-path: polygon(
+      35% 2%,
+      78% 8%,
+      98% 42%,
+      90% 80%,
+      62% 98%,
+      22% 92%,
+      2% 60%,
+      8% 22%
+    );
   }
   100% {
-    border-radius: 42% 58% 67% 33% / 38% 52% 48% 62%;
+    clip-path: polygon(
+      28% 2%,
+      72% 3%,
+      97% 28%,
+      96% 70%,
+      71% 97%,
+      30% 98%,
+      3% 72%,
+      2% 30%
+    );
   }
 }
 
-@keyframes morphBlob2 {
+@keyframes morphShape2 {
   0% {
-    border-radius: 61% 39% 44% 56% / 52% 48% 59% 41%;
+    clip-path: polygon(
+      50% 5%,
+      80% 20%,
+      95% 50%,
+      80% 80%,
+      50% 95%,
+      20% 80%,
+      5% 50%,
+      20% 20%
+    );
   }
-  8% {
-    border-radius: 43% 57% 68% 32% / 71% 29% 42% 58%;
+  25% {
+    clip-path: polygon(
+      35% 2%,
+      78% 8%,
+      98% 42%,
+      90% 80%,
+      62% 98%,
+      22% 92%,
+      2% 60%,
+      8% 22%
+    );
   }
-  16% {
-    border-radius: 73% 27% 51% 49% / 39% 61% 55% 45%;
+  50% {
+    clip-path: polygon(
+      12% 2%,
+      88% 2%,
+      98% 12%,
+      98% 88%,
+      88% 98%,
+      12% 98%,
+      2% 88%,
+      2% 12%
+    );
   }
-  24% {
-    border-radius: 38% 62% 35% 65% / 66% 34% 48% 52%;
-  }
-  32% {
-    border-radius: 56% 44% 69% 31% / 44% 56% 37% 63%;
-  }
-  40% {
-    border-radius: 49% 51% 42% 58% / 58% 42% 64% 36%;
-  }
-  48% {
-    border-radius: 67% 33% 57% 43% / 35% 65% 51% 49%;
-  }
-  56% {
-    border-radius: 34% 66% 48% 52% / 62% 38% 46% 54%;
-  }
-  64% {
-    border-radius: 59% 41% 36% 64% / 53% 47% 69% 31%;
-  }
-  72% {
-    border-radius: 46% 54% 63% 37% / 41% 59% 33% 67%;
-  }
-  80% {
-    border-radius: 71% 29% 45% 55% / 57% 43% 62% 38%;
-  }
-  88% {
-    border-radius: 37% 63% 59% 41% / 49% 51% 44% 56%;
-  }
-  96% {
-    border-radius: 54% 46% 32% 68% / 68% 32% 56% 44%;
+  75% {
+    clip-path: polygon(
+      50% 2%,
+      72% 28%,
+      98% 50%,
+      72% 72%,
+      50% 98%,
+      28% 72%,
+      2% 50%,
+      28% 28%
+    );
   }
   100% {
-    border-radius: 61% 39% 44% 56% / 52% 48% 59% 41%;
+    clip-path: polygon(
+      50% 5%,
+      80% 20%,
+      95% 50%,
+      80% 80%,
+      50% 95%,
+      20% 80%,
+      5% 50%,
+      20% 20%
+    );
   }
 }
 

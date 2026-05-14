@@ -13,7 +13,11 @@
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
-  background: var(--color-bg);
+  background: color-mix(
+    in srgb,
+    var(--color-bg) #{$bg-opacity * 100%},
+    transparent
+  );
   color: var(--color-text);
   transition:
     background 0.3s,

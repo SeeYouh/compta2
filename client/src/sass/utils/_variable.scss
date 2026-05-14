@@ -2,6 +2,9 @@
 // VARIABLES SCSS - ANIMATIONS ET STYLES
 // ============================================
 
+// --- Opacité du fond de page (laisse transparaître les blobs) ---
+$bg-opacity: 0.8;
+
 // --- Variables d'animation des gradients ---
 $gradient-animation-duration: 40s;
 $gradient-size: 1400px;
@@ -170,7 +173,7 @@ $card-background-opacity: 0.3;
   // ============================================
   // COULEURS SYSTÈME (basées sur la couleur principale)
   // ============================================
-  --color-bg: var(--color-neutral-50);
+  --color-bg: var(--color-neutral-400);
   --color-subSurface: var(--color-neutral-150);
   --color-surface: var(--color-neutral-100);
   --color-surface-hover: var(--color-neutral-200);

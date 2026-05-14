@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
-import { config } from "../config/env";
-import ThemeToggle from "../components/ThemeToggle";
-import { useDocumentTitle } from "../components/hooks/useDocumentTitle";
+import { config } from '../config/env';
+import ThemeToggle from '../components/ThemeToggle';
+import { useDocumentTitle } from '../components/hooks/useDocumentTitle';
 
 const API_URL = config.apiUrl;
 
@@ -150,13 +150,12 @@ function Login() {
       <div className="auth-page__theme-toggle">
         <ThemeToggle />
       </div>
-
       <div className="auth-page__container">
         <div className="auth-page__card">
           <div className="auth-page__header">
             <h1 className="auth-page__title">Bienvenue</h1>
             <p className="auth-page__subtitle">
-              Connectez-vous pour accéder à votre compte
+              Connectez-vous pour accéder à vos applications
             </p>
           </div>
 

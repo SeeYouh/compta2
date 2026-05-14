@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
 
-import { config } from "../config/env";
-import ThemeToggle from "../components/ThemeToggle";
-import { useDocumentTitle } from "../components/hooks/useDocumentTitle";
+import { config } from '../config/env';
+import ThemeToggle from '../components/ThemeToggle';
+import { useDocumentTitle } from '../components/hooks/useDocumentTitle';
 
 const API_URL = config.apiUrl;
 
