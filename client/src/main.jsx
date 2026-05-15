@@ -1,36 +1,27 @@
-import './sass/index.scss';
+import "./sass/index.scss";
 
-import {
-  lazy,
-  StrictMode,
-  Suspense,
-} from 'react';
+import { lazy, StrictMode, Suspense } from "react";
 
-import {
-  BrowserRouter,
-  Route,
-  Routes,
-} from 'react-router-dom';
-import { createRoot } from 'react-dom/client';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { createRoot } from "react-dom/client";
 
-import AcceptInvitation from './pages/AcceptInvitation';
-import AccountSharingSettings from './pages/AccountSharingSettings';
-import { AccountsProvider } from './contexts/AccountsContext';
-import App from './pages/App';
-import BlobBackground from './components/BlobBackground';
-import ContactsPage from './pages/ContactsPage';
-import Dashboard from './pages/Dashboard';
-import ForgotPassword from './pages/ForgotPassword';
-import { LabelsProvider } from './contexts/LabelsContext';
-import LabelsSettings from './pages/LabelsSettings';
-import Login from './pages/Login';
-import ProjectionsSettings from './pages/ProjectionsSettings';
-import ProtectedRoute from './components/ProtectedRoute';
-import Register from './pages/Register';
-import ResetPassword from './pages/ResetPassword';
-import SettingsPage from './pages/SettingsPage';
-import { ThemesProvider } from './contexts/ThemesContext';
-import VerifyEmail from './pages/VerifyEmail';
+import AcceptInvitation from "./pages/AcceptInvitation";
+import AccountSharingSettings from "./pages/AccountSharingSettings";
+import { AccountsProvider } from "./contexts/AccountsContext";
+import App from "./pages/App";
+import ContactsPage from "./pages/ContactsPage";
+import Dashboard from "./pages/Dashboard";
+import ForgotPassword from "./pages/ForgotPassword";
+import { LabelsProvider } from "./contexts/LabelsContext";
+import LabelsSettings from "./pages/LabelsSettings";
+import Login from "./pages/Login";
+import ProjectionsSettings from "./pages/ProjectionsSettings";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Register from "./pages/Register";
+import ResetPassword from "./pages/ResetPassword";
+import SettingsPage from "./pages/SettingsPage";
+import { ThemesProvider } from "./contexts/ThemesContext";
+import VerifyEmail from "./pages/VerifyEmail";
 
 const TramePage = lazy(() => import("./pages/trame/TramePage.jsx"));
 
@@ -51,7 +42,6 @@ initTheme();
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
-      <BlobBackground />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route

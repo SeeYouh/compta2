@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
-import AnimatedBlob from './AnimatedBlob';
+import AnimatedBlob from "./AnimatedBlob";
 
 /**
  * Rendu adaptatif de blobs en arrière-plan selon la largeur de la fenêtre.
@@ -15,8 +15,8 @@ import AnimatedBlob from './AnimatedBlob';
 const BREAKPOINTS = [
   { maxWidth: 768, count: 2 },
   { maxWidth: 1280, count: 3 },
-  { maxWidth: 1920, count: 5 },
-  { maxWidth: Infinity, count: 8 },
+  { maxWidth: 1920, count: 4 },
+  { maxWidth: Infinity, count: 5 },
 ];
 
 // Variation des paramètres par index pour que les blobs ne soient pas identiques
