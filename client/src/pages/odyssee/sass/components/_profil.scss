@@ -1,0 +1,15 @@
+@use "../utils/_variable" as *;
+
+.left-menu {
+  color: $color-lightness;
+
+  & .container-profil_status-profil {
+    width: 25px;
+    height: 73px;
+
+    & p {
+      rotate: -90deg;
+      font-size: 0.7rem;
+    }
+  }
+}

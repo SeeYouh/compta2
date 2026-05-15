@@ -24,6 +24,9 @@ import { ThemesProvider } from "./contexts/ThemesContext";
 import VerifyEmail from "./pages/VerifyEmail";
 
 const TramePage = lazy(() => import("./pages/trame/TramePage.jsx"));
+const OdysseeDashboard = lazy(
+  () => import("./pages/odyssee/OdysseeDashboard.jsx"),
+);
 
 function initTheme() {
   const stored = localStorage.getItem("theme");
@@ -39,7 +42,9 @@ function initTheme() {
 }
 initTheme();
 
-createRoot(document.getElementById("root")).render(
+const container = document.getElementById("root");
+const root = window.__reactRoot ?? (window.__reactRoot = createRoot(container));
+root.render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
@@ -122,6 +127,16 @@ createRoot(document.getElementById("root")).render(
               <AccountsProvider>
                 <ContactsPage />
               </AccountsProvider>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/odyssee/*"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={null}>
+                <OdysseeDashboard />
+              </Suspense>
             </ProtectedRoute>
           }
         />

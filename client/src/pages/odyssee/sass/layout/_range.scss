@@ -1,0 +1,116 @@
+@use "../utils/_variable" as *;
+@use "../utils/colors" as *;
+
+.custom-range {
+  input[type="range"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 300px;
+    height: 3px;
+    background: transparent;
+    cursor: pointer;
+
+    // WebKit + Blink track
+    &::-webkit-slider-runnable-track {
+      background: $color-darker;
+      height: 6px;
+      border-radius: 3px;
+    }
+
+    // Firefox track
+    &::-moz-range-track {
+      background: $color-darker;
+      height: 6px;
+      border-radius: 3px;
+    }
+
+    // Firefox filled part (avant le thumb)
+    &::-moz-range-progress {
+      background-color: $color-darker;
+      height: 6px;
+      border-radius: 3px;
+    }
+
+    // WebKit + Blink thumb
+    &::-webkit-slider-thumb {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      background: $color-darker;
+      border: none;
+      border-radius: 50%;
+      margin-top: -6px; // pour centrer verticalement
+      cursor: pointer;
+    }
+
+    // Firefox thumb
+    &::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      background: $color-darker;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    // Pour éviter le style focus Firefox
+    &::-moz-focus-outer {
+      border: 0;
+    }
+  }
+}
+
+// $track-style: (
+//   background: $color-darker,
+//   height: 6px,
+//   border-radius: 3px,
+// );
+
+// $track-style: (
+//   background: transparent,
+//   // important pour Chrome qui reçoit le linear-gradient sur l'input
+//   height: 6px,
+//   border-radius: 3px,
+// );
+
+// $thumb-style: (
+//   width: 18px,
+//   height: 18px,
+//   background: $color-darker,
+//   border: none,
+//   border-radius: 50%,
+//   cursor: pointer,
+// );
+
+// .custom-range {
+//   input[type="range"] {
+//     appearance: none;
+//     -webkit-appearance: none;
+//     -moz-appearance: none;
+//     width: 300px;
+//     height: 3px;
+//     background: transparent;
+//     cursor: pointer;
+
+//     @each $selector, $type in $range-parts {
+//       &#{ $selector } {
+//         @if $type == track or $type == progress {
+//           @each $prop, $val in $track-style {
+//             #{$prop}: #{$val};
+//           }
+//         } @else if $type == thumb {
+//           @each $prop, $val in $thumb-style {
+//             #{$prop}: #{$val};
+//           }
+
+//           @if str-index($selector, "webkit") {
+//             margin-top: -6px;
+//           }
+//         } @else if $type == focus {
+//           border: 0;
+//         }
+//       }
+//     }
+//   }
+// }

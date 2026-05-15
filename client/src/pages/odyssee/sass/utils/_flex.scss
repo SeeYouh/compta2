@@ -1,0 +1,112 @@
+.container-product-name,
+.container-profil,
+.container-profil_status-profil p,
+.content-files li,
+.content-files ul,
+.custom-range,
+.flex,
+.form-container,
+.inTakeTime-container_moment,
+.inTakeTime-container_moment label,
+.inTakeTime-container_moment__label,
+.inTakeTime-moment,
+.inTakeTime-moment label,
+.left-menu,
+.library-list,
+.library-folder-list,
+.library-main-container,
+.library-navBar,
+.library-navBar li label,
+.library-wrapper,
+.main-content,
+.paper-product,
+.paper-product-bloc-img,
+.paper-product-container,
+.paper-product-container li,
+.paper-product-container-navBar,
+.paper-product-container-navBar_titleProduct,
+.paper-product-container ul,
+.range-value,
+.title-inTakeTime-container,
+.title-inTakeTime-container div,
+.title-inTakeTime-container label,
+.title-library,
+.user-list {
+  display: flex;
+}
+
+//---- FLEX-DIRECTION----//
+
+.content-files li,
+.custom-range,
+.flex-column,
+.form-container,
+.inTakeTime-container_moment__label,
+.inTakeTime-container_moment,
+.inTakeTime-container_moment ul,
+.left-menu,
+.library-list,
+.library-folder-list,
+.paper-product {
+  flex-direction: column;
+}
+
+.btn-advancedMode-toggle,
+.content-files ul,
+.container-profil,
+.library-main-container,
+.main-content,
+.paper-product-container,
+.paper-product-container-navBar,
+.paper-product-container-navBar_titleProduct,
+.range-value,
+.title-inTakeTime-container,
+.user-list {
+  flex-direction: row;
+}
+
+//---- JUSTIFY-CONTENT ----//
+
+.container-profil,
+.inTakeTime-moment label,
+.library-navBar li label,
+.range-value,
+.title-inTakeTime-container,
+.title-library {
+  align-items: center;
+}
+
+.inTakeTime-container_moment__label,
+.inTakeTime-moment label,
+.library-navBar li label,
+.title-library {
+  justify-content: center;
+}
+
+.container-profil_status-profil p,
+.user-list {
+  justify-content: end;
+}
+
+.container-profil,
+.inTakeTime-moment,
+.library-navBar,
+.title-inTakeTime-container {
+  justify-content: space-between;
+}
+
+//---- FLEX ----//
+
+.container-profil_status-profil p,
+.flex-1,
+.form-container {
+  flex: 1;
+}
+
+//---- FLEX WRAP ----//
+
+.content-files ul,
+.paper-product-bloc-img,
+.paper-product-container {
+  flex-wrap: wrap;
+}

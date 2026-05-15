@@ -1,0 +1,23 @@
+@use "./_variable" as *;
+
+$colors-variants: (
+  "lightness": lighten($color-1, $change-brightness * 88),
+  "light": lighten($color-1, $change-brightness * 69),
+  "base": $color-1,
+  "dark": darken($color-1, $change-brightness * 53),
+  "darker": darken($color-1, $change-brightness * 66),
+  "darkest": darken($color-1, $change-brightness * 73),
+);
+
+@each $colorName, $colorAtribut in $colors-variants {
+  .color-#{$colorName} {
+    color: get-contrast($colorAtribut);
+    background-color: $colorAtribut;
+    border: 1px solid lighten($colorAtribut, $change-brightness * 30);
+
+    // &:hover {
+    //   background-color: get-contrast-bg($colorAtribut);
+    //   border: 1px solid get-contrast-bg($colorAtribut);
+    // }
+  }
+}

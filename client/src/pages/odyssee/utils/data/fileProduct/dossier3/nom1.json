@@ -1,0 +1,53 @@
+{
+  "name": "nom 1",
+  "img": ["/assets/img/png/IconDrag&Drop.png"],
+  "tooltips": "Info nom 1",
+  "contentFilesData": {
+    "productName": "Nom Produit",
+    "aliasName": {
+      "activate": true,
+      "name": "Alias titre"
+    },
+    "img": [
+      {
+        "adress": "/assets/img/png/IconDrag&Drop.png",
+        "alt": "image1"
+      },
+      {
+        "adress": "/assets/img/png/IconDrag&Drop.png",
+        "alt": "image2"
+      },
+      {
+        "adress": "/assets/img/png/IconDrag&Drop.png",
+        "alt": "image3"
+      },
+      {
+        "adress": "/assets/img/png/IconDrag&Drop.png",
+        "alt": "image4"
+      }
+    ],
+    "treatmentDuration": 1,
+    "amountToAdminister": 1,
+    "intakeTime": {
+      "advancedMode": true,
+      "timeArray": [
+        {
+          "name": "Matin",
+          "activateTime": false
+        },
+        {
+          "name": "Midi",
+          "activateTime": false
+        },
+        {
+          "name": "Soir",
+          "activateTime": false
+        },
+        {
+          "name": "Nuit",
+          "activateTime": false
+        }
+      ]
+    }
+  }
+}

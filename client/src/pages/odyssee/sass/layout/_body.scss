@@ -1,0 +1,6 @@
+@use "../utils/_variable" as *;
+
+body {
+  background-color: $color-light;
+  user-select: none;
+}

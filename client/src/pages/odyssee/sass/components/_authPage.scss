@@ -1,0 +1,308 @@
+// Styles pour la page d'authentification
+@use "../utils/_variable" as *;
+
+.auth-container {
+  min-height: calc(100vh - 101px);
+  background: linear-gradient(135deg, $color-dark 0%, $color-darker 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: "Inter", Arial, sans-serif;
+}
+
+.auth-title {
+  color: get-contrast($color-darker);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  // text-align: center;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.forms-container {
+  display: flex;
+  max-width: 1000px;
+  width: 100%;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.form-section {
+  flex: 1;
+  background: $color-lightness;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+
+  h2 {
+    color: get-contrast($color-lightness);
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    border-bottom: 2px solid $color-darker;
+    padding-bottom: 0.5rem;
+  }
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+
+  label {
+    color: $color-dark;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  input {
+    padding: 0.75rem;
+    border: 2px solid $color-light;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: lighten($color-lightness, 30%);
+
+    &:focus {
+      outline: none;
+      border-color: $color-darker;
+      background: $color-lightness;
+      box-shadow: 0 0 0 3px lighten($color-darker, 80%);
+    }
+
+    &::placeholder {
+      color: $color-1;
+    }
+  }
+}
+
+.field-error {
+  color: darken($color-1, 30%);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
+  padding-left: 0.25rem;
+}
+
+.navigation-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(5px);
+}
+
+.loader-content {
+  text-align: center;
+  color: get-contrast($color-darker);
+
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid lighten($color-darker, 50%);
+    border-top: 4px solid $color-lightness;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+  }
+
+  p {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.submit-btn {
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.signup-btn {
+  background: linear-gradient(135deg, $color-dark 0%, $color-darker 100%);
+  color: get-contrast($color-darker);
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(
+      135deg,
+      darken($color-dark, 10%) 0%,
+      darken($color-darker, 10%) 100%
+    );
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.login-btn {
+  background: linear-gradient(135deg, $color-darker 0%, $color-darkest 100%);
+  color: get-contrast($color-darkest);
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(
+      135deg,
+      darken($color-darker, 5%) 0%,
+      darken($color-darkest, 5%) 100%
+    );
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.separator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.separator-line {
+  width: 2px;
+  height: 100px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    get-contrast($color-darker),
+    transparent
+  );
+}
+
+.separator-text {
+  color: get-contrast($color-darker);
+  font-weight: 600;
+  font-size: 1.2rem;
+  background: lighten($color-darker, 20%);
+  backdrop-filter: blur(10px);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  margin: 1rem 0;
+  border: 1px solid lighten($color-darker, 30%);
+}
+
+.message {
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  &.success {
+    background: lighten($color-lightness, 40%);
+    color: $color-darkest;
+    border: 1px solid $color-light;
+  }
+
+  &.error {
+    background: lighten($color-light, 50%);
+    color: $color-darkest;
+    border: 1px solid $color-1;
+  }
+}
+
+.debug-info {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: lighten($color-darker, 20%);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  color: get-contrast($color-darker);
+  font-size: 0.9rem;
+  border: 1px solid lighten($color-darker, 30%);
+
+  p {
+    margin: 0.5rem 0;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .forms-container {
+    flex-direction: column;
+    max-width: 500px;
+  }
+
+  .separator {
+    flex-direction: row;
+    padding: 1rem 0;
+  }
+
+  .separator-line {
+    width: 100px;
+    height: 2px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      get-contrast($color-darker),
+      transparent
+    );
+  }
+
+  .auth-title {
+    font-size: 2rem;
+  }
+
+  .form-section {
+    padding: 1.5rem;
+
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 10px;
+  }
+
+  .forms-container {
+    max-width: 100%;
+  }
+
+  .form-section {
+    padding: 1rem;
+  }
+
+  .auth-title {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+}
