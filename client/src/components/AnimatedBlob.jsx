@@ -1,21 +1,17 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useRef, useState } from "react";
 
-import { motion as Motion } from 'framer-motion';
+import { motion as Motion } from "framer-motion";
 
 // ─── Configuration morphing ───────────────────────────────────────────────────
 
 /** Taille du blob en px */
 const DEFAULT_SIZE = 1400;
 /** Rayon de blur CSS en px */
-const DEFAULT_BLUR = 80;
+const DEFAULT_BLUR = 50;
 /** Opacité du blob (0–1) */
 const DEFAULT_OPACITY = 0.5;
 /** Couleur CSS du blob */
-const DEFAULT_COLOR = "var(--color-primary)";
+const DEFAULT_COLOR = "var(--color-neutral-200)";
 /** Durée minimale d'une transition de morphing en secondes */
 const MORPH_DURATION_MIN = 2;
 /** Durée maximale d'une transition de morphing en secondes */
@@ -30,9 +26,9 @@ const POINT_JITTER = 50;
 /** Dépassement autorisé au-delà du bord de la viewport (px) */
 const DEFAULT_FLOAT_OVERFLOW = 200;
 /** Durée minimale d'un déplacement en secondes */
-const DEFAULT_FLOAT_DURATION_MIN = 8;
+const DEFAULT_FLOAT_DURATION_MIN = 50;
 /** Durée maximale d'un déplacement en secondes */
-const DEFAULT_FLOAT_DURATION_MAX = 120;
+const DEFAULT_FLOAT_DURATION_MAX = 240;
 
 // ─── Points de base ───────────────────────────────────────────────────────────
 // 12 points répartis autour du centre (50,50).
