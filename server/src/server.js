@@ -68,6 +68,10 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api", routes);
 
+// Servir les images Odyssée (toujours actif)
+const odysseeImagesPath = path.join(__dirname, "../odyssee-images");
+app.use("/odyssee-images", express.static(odysseeImagesPath));
+
 // Health check
 app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });

@@ -4,6 +4,8 @@ import accountsRoutes from "./accounts.js";
 import authRoutes from "./auth.js";
 import contactsRoutes from "./contacts.js";
 import labelsRoutes from "./labels.js";
+import odysseeCategoriesRoutes from "./odysseeCategories.js";
+import odysseeProductsRoutes from "./odysseeProducts.js";
 import organigrammeRoutes from "./organigramme.js";
 import projectionsRoutes from "./projections.js";
 import settingsRoutes from "./settings.js";
@@ -24,5 +26,7 @@ router.use("/settings", settingsRoutes);
 router.use("/sharing", sharingRoutes);
 router.use("/themes", themesRoutes);
 router.use("/transactions", transactionsRoutes);
+router.use("/odyssee/products", odysseeProductsRoutes);
+router.use("/odyssee/categories", odysseeCategoriesRoutes);
 
 export default router;

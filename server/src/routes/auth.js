@@ -1,10 +1,12 @@
 import express from "express";
 
+import { adminAuth } from "../middleware/adminAuth.js";
 import { authenticate } from "../middleware/auth.js";
 import {
   changePassword,
   forgotPassword,
   getMe,
+  getUsers,
   login,
   register,
   resendVerification,
@@ -41,5 +43,8 @@ router.patch("/profile", authenticate, updateProfile);
 
 // PATCH /api/auth/password - Changer le mot de passe
 router.patch("/password", authenticate, changePassword);
+
+// GET /api/auth/users - Liste des utilisateurs (admin)
+router.get("/users", authenticate, adminAuth, getUsers);
 
 export default router;

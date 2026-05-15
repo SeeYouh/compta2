@@ -111,9 +111,13 @@ export const login = async (req, res) => {
     }
 
     // Générer le token JWT
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-    });
+    const token = jwt.sign(
+      { userId: user.id, role: user.role || "user" },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: process.env.JWT_EXPIRES_IN,
+      },
+    );
 
     res.json({
       user: user.toJSON(),
@@ -178,9 +182,13 @@ export const verifyEmail = async (req, res) => {
     await user.save();
 
     // Générer le token JWT pour connexion automatique
-    const jwtToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-    });
+    const jwtToken = jwt.sign(
+      { userId: user.id, role: user.role || "user" },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: process.env.JWT_EXPIRES_IN,
+      },
+    );
 
     res.json({
       message: "Email vérifié avec succès ! Vous êtes maintenant connecté.",
@@ -446,5 +454,48 @@ export const resetPassword = async (req, res) => {
     res.status(500).json({
       error: "Erreur serveur lors de la réinitialisation du mot de passe",
     });
+  }
+};
+
+/**
+ * GET /api/auth/users
+ * Récupère la liste des utilisateurs (admin uniquement)
+ */
+export const getUsers = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
+
+    const query = search
+      ? {
+          $or: [
+            { email: { $regex: search, $options: "i" } },
+            { name: { $regex: search, $options: "i" } },
+          ],
+        }
+      : {};
+
+    const total = await User.countDocuments(query);
+    const users = await User.find(query)
+      .select(
+        "-password -verificationToken -verificationTokenExpires -resetPasswordToken -passwordResetToken -passwordResetTokenExpires",
+      )
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.json({
+      users: users.map((u) => u.toJSON()),
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    console.error("Erreur getUsers:", error);
+    res.status(500).json({ error: "Erreur serveur" });
   }
 };
