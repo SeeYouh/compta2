@@ -14,8 +14,8 @@ const apps = [
     description: "Gérez vos comptes, transactions et budgets",
     icon: (
       <svg
-        width="32"
-        height="32"
+        width="48"
+        height="48"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -36,8 +36,8 @@ const apps = [
     description: "Créez et visualisez vos organigrammes",
     icon: (
       <svg
-        width="32"
-        height="32"
+        width="48"
+        height="48"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -84,19 +84,6 @@ export default function Dashboard() {
                 <h2 className="dashboard-card__label">{app.label}</h2>
                 <p className="dashboard-card__description">{app.description}</p>
               </div>
-              <svg
-                className="dashboard-card__arrow"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
             </button>
           ))}
         </div>
