@@ -1,26 +1,22 @@
 import mongoose from "mongoose";
 
 const categorySchema = new mongoose.Schema({
+  userId: {
+    type: String,
+    required: true,
+  },
   name: {
     type: String,
     required: true,
-    unique: true,
     trim: true,
   },
   description: {
     type: String,
     trim: true,
   },
-  color: {
+  image: {
     type: String,
-    default: "#3498db",
-    validate: {
-      validator: (v) => /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(v),
-      message: "La couleur doit être un code hexadécimal valide",
-    },
-  },
-  icon: {
-    type: String,
+    default: null,
   },
   isActive: {
     type: Boolean,
@@ -35,6 +31,9 @@ const categorySchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+// Unicité du nom par utilisateur
+categorySchema.index({ userId: 1, name: 1 }, { unique: true });
 
 categorySchema.pre("save", function (next) {
   this.updatedAt = Date.now();

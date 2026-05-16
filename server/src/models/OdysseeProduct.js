@@ -62,17 +62,10 @@ const productSchema = new mongoose.Schema({
       ],
     },
   },
-  folder: {
-    type: String,
+  categoryId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "OdysseeCategory",
     required: true,
-    enum: [
-      "dossier1",
-      "dossier2",
-      "dossier3",
-      "dossier4",
-      "dossier5",
-      "dossier6",
-    ],
   },
   // userId stocké en String (format site-1 : "user-UUID")
   userId: {
@@ -99,8 +92,8 @@ productSchema.index({
   name: "text",
 });
 productSchema.index({ userId: 1 });
-productSchema.index({ folder: 1 });
-productSchema.index({ userId: 1, folder: 1 });
+productSchema.index({ categoryId: 1 });
+productSchema.index({ userId: 1, categoryId: 1 });
 
 productSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
@@ -111,8 +104,8 @@ productSchema.statics.findByUser = function (userId) {
   return this.find({ userId, isActive: true });
 };
 
-productSchema.statics.findByUserAndFolder = function (userId, folder) {
-  return this.find({ userId, folder, isActive: true });
+productSchema.statics.findByUserAndCategory = function (userId, categoryId) {
+  return this.find({ userId, categoryId, isActive: true });
 };
 
 productSchema.statics.searchProducts = function (searchTerm, userId) {

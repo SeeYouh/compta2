@@ -1,6 +1,7 @@
 import express from "express";
 
 import { authenticate } from "../middleware/auth.js";
+import { categoryUpload } from "../middleware/odysseeMulter.js";
 import {
   createCategory,
   deleteCategory,
@@ -10,28 +11,29 @@ import {
   searchCategories,
   updateCategory,
 } from "../controllers/odysseeCategoryController.js";
+import { validateCategoryImage } from "../middleware/imageValidation.js";
 
 const router = express.Router();
 
-// Récupérer toutes les catégories (public)
-router.get("/", getAllCategories);
-
-// Rechercher des catégories (public)
-router.get("/search", searchCategories);
-
-// Récupérer une catégorie par ID (public)
-router.get("/:id", getOneCategory);
-
-// Créer une catégorie (authentification requise)
-router.post("/", authenticate, createCategory);
-
-// Mettre à jour une catégorie
-router.put("/:id", authenticate, updateCategory);
-
-// Supprimer une catégorie (soft delete)
+// Toutes les routes sont protégées : les catégories appartiennent à un utilisateur
+router.get("/", authenticate, getAllCategories);
+router.get("/search", authenticate, searchCategories);
+router.get("/:id", authenticate, getOneCategory);
+router.post(
+  "/",
+  authenticate,
+  categoryUpload,
+  validateCategoryImage,
+  createCategory,
+);
+router.put(
+  "/:id",
+  authenticate,
+  categoryUpload,
+  validateCategoryImage,
+  updateCategory,
+);
 router.delete("/:id", authenticate, deleteCategory);
-
-// Supprimer définitivement une catégorie
 router.delete("/:id/hard", authenticate, hardDeleteCategory);
 
 export default router;

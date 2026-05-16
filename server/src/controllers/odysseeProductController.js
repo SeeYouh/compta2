@@ -15,8 +15,14 @@ export const createProduct = async (req, res) => {
       treatmentDuration,
       amountToAdminister,
       intakeTime,
-      folder = "dossier1",
+      categoryId,
     } = req.body;
+
+    if (!categoryId) {
+      return res
+        .status(400)
+        .json({ success: false, error: "categoryId est requis" });
+    }
 
     const productData = {
       name: productName || "Nouveau produit",
@@ -46,7 +52,7 @@ export const createProduct = async (req, res) => {
             })) || [],
         },
       },
-      folder,
+      categoryId,
       userId: req.userId,
     };
 
@@ -75,12 +81,12 @@ export const createProduct = async (req, res) => {
   }
 };
 
-export const getProductsByFolder = async (req, res) => {
+export const getProductsByCategory = async (req, res) => {
   try {
-    const { folder } = req.params;
-    const products = await OdysseeProduct.findByUserAndFolder(
+    const { categoryId } = req.params;
+    const products = await OdysseeProduct.findByUserAndCategory(
       req.userId,
-      folder,
+      categoryId,
     );
 
     res.status(200).json({
@@ -89,7 +95,7 @@ export const getProductsByFolder = async (req, res) => {
       count: products.length,
     });
   } catch (error) {
-    console.error("Erreur récupération produits par dossier:", error);
+    console.error("Erreur récupération produits par catégorie:", error);
     res.status(500).json({
       success: false,
       error: error.message || "Erreur lors de la récupération des produits",
@@ -101,24 +107,17 @@ export const getAllUserProducts = async (req, res) => {
   try {
     const products = await OdysseeProduct.findByUser(req.userId);
 
-    const productsByFolder = {
-      dossier1: [],
-      dossier2: [],
-      dossier3: [],
-      dossier4: [],
-      dossier5: [],
-      dossier6: [],
-    };
-
+    // Grouper par categoryId
+    const productsByCategory = {};
     products.forEach((product) => {
-      if (productsByFolder[product.folder]) {
-        productsByFolder[product.folder].push(product);
-      }
+      const key = product.categoryId.toString();
+      if (!productsByCategory[key]) productsByCategory[key] = [];
+      productsByCategory[key].push(product);
     });
 
     res.status(200).json({
       success: true,
-      productsByFolder,
+      productsByCategory,
       totalCount: products.length,
     });
   } catch (error) {
@@ -176,13 +175,11 @@ export const updateProduct = async (req, res) => {
       runValidators: true,
     });
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Produit mis à jour !",
-        product: updated,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Produit mis à jour !",
+      product: updated,
+    });
   } catch (error) {
     console.error("Erreur mise à jour produit:", error);
     res.status(400).json({ error: error.message });

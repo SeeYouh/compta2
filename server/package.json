@@ -1,6 +1,6 @@
 {
   "name": "compta-server",
-  "version": "2.0.4-0006",
+  "version": "2.0.4-0007",
   "type": "module",
   "description": "Backend API pour l'application de comptabilité",
   "main": "src/server.js",
@@ -28,6 +28,7 @@
     "mongoose": "^8.0.0",
     "multer": "^2.1.1",
     "nodemailer": "^7.0.11",
+    "sharp": "^0.34.5",
     "uuid": "^13.0.0"
   },
   "devDependencies": {

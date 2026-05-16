@@ -6,7 +6,7 @@ import {
   deleteProduct,
   getAllUserProducts,
   getOneProduct,
-  getProductsByFolder,
+  getProductsByCategory,
   hardDeleteProduct,
   searchProducts,
   updateProduct,
@@ -15,11 +15,11 @@ import { odysseeUpload } from "../middleware/odysseeMulter.js";
 
 const router = express.Router();
 
-// Récupérer tous les produits de l'utilisateur (organisés par dossier)
+// Récupérer tous les produits de l'utilisateur (groupés par catégorie)
 router.get("/user", authenticate, getAllUserProducts);
 
-// Récupérer les produits par dossier
-router.get("/folder/:folder", authenticate, getProductsByFolder);
+// Récupérer les produits par catégorie
+router.get("/category/:categoryId", authenticate, getProductsByCategory);
 
 // Rechercher des produits
 router.get("/search", authenticate, searchProducts);

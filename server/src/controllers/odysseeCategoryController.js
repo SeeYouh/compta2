@@ -2,9 +2,14 @@ import { OdysseeCategory } from "../models/OdysseeCategory.js";
 
 export const createCategory = async (req, res) => {
   try {
-    const { name, description, color, icon } = req.body;
+    const { name, description } = req.body;
 
-    const category = new OdysseeCategory({ name, description, color, icon });
+    const category = new OdysseeCategory({
+      userId: req.userId,
+      name,
+      description,
+      image: req.savedImagePath || null,
+    });
     const saved = await category.save();
 
     res
@@ -12,50 +17,57 @@ export const createCategory = async (req, res) => {
       .json({ message: "Catégorie créée avec succès !", category: saved });
   } catch (error) {
     if (error.code === 11000) {
-      return res.status(409).json({ error: "Cette catégorie existe déjà" });
+      return res
+        .status(409)
+        .json({ error: "Vous avez déjà une catégorie avec ce nom" });
     }
-    res
-      .status(400)
-      .json({
-        error: error.message || "Erreur lors de la création de la catégorie",
-      });
+    res.status(400).json({
+      error: error.message || "Erreur lors de la création de la catégorie",
+    });
   }
 };
 
 export const updateCategory = async (req, res) => {
   try {
-    const updates = { ...req.body };
-    delete updates._id;
+    const { name, description } = req.body;
+    const updates = { name, description };
+    if (req.savedImagePath) updates.image = req.savedImagePath;
 
-    const category = await OdysseeCategory.findByIdAndUpdate(
-      req.params.id,
+    const category = await OdysseeCategory.findOneAndUpdate(
+      { _id: req.params.id, userId: req.userId },
       updates,
-      {
-        new: true,
-        runValidators: true,
-      },
+      { new: true, runValidators: true },
     );
 
     if (!category) {
-      return res.status(404).json({ error: "Catégorie non trouvée" });
+      return res
+        .status(404)
+        .json({ error: "Catégorie non trouvée ou non autorisée" });
     }
 
     res.status(200).json({ message: "Catégorie mise à jour !", category });
   } catch (error) {
+    if (error.code === 11000) {
+      return res
+        .status(409)
+        .json({ error: "Vous avez déjà une catégorie avec ce nom" });
+    }
     res.status(400).json({ error: error.message });
   }
 };
 
 export const deleteCategory = async (req, res) => {
   try {
-    const category = await OdysseeCategory.findByIdAndUpdate(
-      req.params.id,
+    const category = await OdysseeCategory.findOneAndUpdate(
+      { _id: req.params.id, userId: req.userId },
       { isActive: false },
       { new: true },
     );
 
     if (!category) {
-      return res.status(404).json({ error: "Catégorie non trouvée" });
+      return res
+        .status(404)
+        .json({ error: "Catégorie non trouvée ou non autorisée" });
     }
 
     res.status(200).json({ message: "Catégorie supprimée !", category });
@@ -66,10 +78,15 @@ export const deleteCategory = async (req, res) => {
 
 export const hardDeleteCategory = async (req, res) => {
   try {
-    const category = await OdysseeCategory.findByIdAndDelete(req.params.id);
+    const category = await OdysseeCategory.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.userId,
+    });
 
     if (!category) {
-      return res.status(404).json({ error: "Catégorie non trouvée" });
+      return res
+        .status(404)
+        .json({ error: "Catégorie non trouvée ou non autorisée" });
     }
 
     res
@@ -84,11 +101,14 @@ export const getOneCategory = async (req, res) => {
   try {
     const category = await OdysseeCategory.findOne({
       _id: req.params.id,
+      userId: req.userId,
       isActive: true,
     });
 
     if (!category) {
-      return res.status(404).json({ error: "Catégorie non trouvée" });
+      return res
+        .status(404)
+        .json({ error: "Catégorie non trouvée ou non autorisée" });
     }
 
     res.status(200).json({ category });
@@ -99,9 +119,10 @@ export const getOneCategory = async (req, res) => {
 
 export const getAllCategories = async (req, res) => {
   try {
-    const categories = await OdysseeCategory.find({ isActive: true }).sort({
-      name: 1,
-    });
+    const categories = await OdysseeCategory.find({
+      userId: req.userId,
+      isActive: true,
+    }).sort({ createdAt: 1 });
     res.status(200).json({ categories });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -116,6 +137,7 @@ export const searchCategories = async (req, res) => {
     }
 
     const categories = await OdysseeCategory.find({
+      userId: req.userId,
       isActive: true,
       name: { $regex: q, $options: "i" },
     });
