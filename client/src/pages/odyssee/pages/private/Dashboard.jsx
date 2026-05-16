@@ -79,7 +79,6 @@ const Dashboard = () => {
 
   // Drag & drop
   const dragRef = useRef(null);
-  const dndZoneRef = useRef({ targetId: null }); // hysteresis : élément cible courant
   const [ghostIndex, setGhostIndex] = useState(null);
   const [nestedGhost, setNestedGhost] = useState(null); // { folderId, index }
   const [dropTarget, setDropTarget] = useState(null);
@@ -247,7 +246,6 @@ const Dashboard = () => {
     setNestedGhost(null);
     setDropTarget(null);
     dragRef.current = null;
-    dndZoneRef.current = { targetId: null };
   };
 
   // Réordonnancement au sein d'un même dossier
@@ -258,7 +256,6 @@ const Dashboard = () => {
     setGhostIndex(null);
     setDropTarget(null);
     dragRef.current = null;
-    dndZoneRef.current = { targetId: null };
     if (!drag || ghost?.folderId !== folderId) return;
     const folder = folders.find((f) => f._id === folderId);
     if (!folder) return;
@@ -448,6 +445,16 @@ const Dashboard = () => {
 
   // ── Ghost ────────────────────────────────────────────────────────────────────
 
+  // Ghost redondant = position identique à celle de l'item en cours de drag
+  // (juste avant lui ou juste après lui → aucun déplacement réel)
+  const isGhostRedundant = (index) => {
+    const drag = dragRef.current;
+    if (!drag || drag.fromFolderId) return false;
+    const currentIndex = sidebarItems.findIndex((i) => i.id === drag.id);
+    if (currentIndex === -1) return false;
+    return index === currentIndex || index === currentIndex + 1;
+  };
+
   const renderGhost = () => {
     const drag = dragRef.current;
     if (!drag) return null;
@@ -632,7 +639,9 @@ const Dashboard = () => {
 
                     return (
                       <Fragment key={item.id}>
-                        {ghostIndex === index && renderGhost()}
+                        {ghostIndex === index &&
+                          !isGhostRedundant(index) &&
+                          renderGhost()}
                         <div
                           className="catalog-sidebar__folder"
                           style={{
@@ -648,14 +657,28 @@ const Dashboard = () => {
                               dragRef.current?.type === "category" &&
                               dragRef.current?.fromFolderId !== item.id
                             ) {
-                              // Catégorie externe → dépôt sur le dossier
-                              setGhostIndex(null);
-                              setNestedGhost(null);
-                              setDropTarget({
-                                action: "on",
-                                id: item.id,
-                                type: "folder",
-                              });
+                              // Catégorie externe → ratio haut / milieu / bas
+                              const rect =
+                                e.currentTarget.getBoundingClientRect();
+                              const ratio =
+                                (e.clientY - rect.top) / rect.height;
+                              if (ratio < 0.25) {
+                                setNestedGhost(null);
+                                setDropTarget(null);
+                                setGhostIndex(index);
+                              } else if (ratio > 0.75) {
+                                setNestedGhost(null);
+                                setDropTarget(null);
+                                setGhostIndex(index + 1);
+                              } else {
+                                setGhostIndex(null);
+                                setNestedGhost(null);
+                                setDropTarget({
+                                  action: "on",
+                                  id: item.id,
+                                  type: "folder",
+                                });
+                              }
                             } else if (
                               dragRef.current?.fromFolderId === item.id
                             ) {
@@ -666,13 +689,8 @@ const Dashboard = () => {
                               // Dossier → réordonnancement sidebar
                               const rect =
                                 e.currentTarget.getBoundingClientRect();
-                              const isNew =
-                                dndZoneRef.current.targetId !== item.id;
-                              if (isNew) dndZoneRef.current.targetId = item.id;
                               const ratio =
                                 (e.clientY - rect.top) / rect.height;
-                              if (!isNew && ratio >= 0.4 && ratio <= 0.6)
-                                return;
                               setNestedGhost(null);
                               setGhostIndex(ratio < 0.5 ? index : index + 1);
                               setDropTarget(null);
@@ -753,7 +771,6 @@ const Dashboard = () => {
                                       }
                                       onDragOver={(e) => {
                                         e.preventDefault();
-                                        e.stopPropagation();
                                         const drag = dragRef.current;
                                         if (
                                           drag?.type !== "category" ||
@@ -761,21 +778,12 @@ const Dashboard = () => {
                                           drag.id === catId
                                         )
                                           return;
+                                        // Interne uniquement → on bloque et on positionne
+                                        e.stopPropagation();
                                         const rect =
                                           e.currentTarget.getBoundingClientRect();
-                                        const key = `${item.id}-${catId}`;
-                                        const isNew =
-                                          dndZoneRef.current.targetId !== key;
-                                        if (isNew)
-                                          dndZoneRef.current.targetId = key;
                                         const ratio =
                                           (e.clientY - rect.top) / rect.height;
-                                        if (
-                                          !isNew &&
-                                          ratio >= 0.4 &&
-                                          ratio <= 0.6
-                                        )
-                                          return;
                                         setNestedGhost({
                                           folderId: item.id,
                                           index:
@@ -786,6 +794,9 @@ const Dashboard = () => {
                                       }}
                                       onDrop={(e) => {
                                         e.preventDefault();
+                                        const drag = dragRef.current;
+                                        if (drag?.fromFolderId !== item.id)
+                                          return; // Externe → remonte au dossier
                                         e.stopPropagation();
                                         handleReorderInFolder(item.id);
                                       }}
@@ -827,7 +838,9 @@ const Dashboard = () => {
 
                   return (
                     <Fragment key={item.id}>
-                      {ghostIndex === index && renderGhost()}
+                      {ghostIndex === index &&
+                        !isGhostRedundant(index) &&
+                        renderGhost()}
                       <div
                         className={`catalog-sidebar__icon${cat.active ? " active" : ""}${isDropOnCat ? " drop-target" : ""}`}
                         draggable
@@ -844,17 +857,8 @@ const Dashboard = () => {
                           const drag = dragRef.current;
                           if (!drag || drag.id === item.id) return;
                           const rect = e.currentTarget.getBoundingClientRect();
-                          const isNew = dndZoneRef.current.targetId !== item.id;
-                          if (isNew) dndZoneRef.current.targetId = item.id;
                           const ratio = (e.clientY - rect.top) / rect.height;
                           if (drag.type === "category") {
-                            // Zones mortes ±6% autour des seuils 0.4 et 0.6
-                            if (
-                              !isNew &&
-                              ((ratio >= 0.37 && ratio <= 0.43) ||
-                                (ratio >= 0.57 && ratio <= 0.63))
-                            )
-                              return;
                             if (ratio < 0.4) {
                               setGhostIndex(index);
                               setDropTarget(null);
@@ -870,8 +874,6 @@ const Dashboard = () => {
                               });
                             }
                           } else {
-                            // Zone morte 40-60% pour dossier sur catégorie
-                            if (!isNew && ratio >= 0.4 && ratio <= 0.6) return;
                             setGhostIndex(ratio < 0.5 ? index : index + 1);
                             setDropTarget(null);
                           }
@@ -908,7 +910,9 @@ const Dashboard = () => {
                   );
                 })}
 
-                {ghostIndex === sidebarItems.length && renderGhost()}
+                {ghostIndex === sidebarItems.length &&
+                  !isGhostRedundant(sidebarItems.length) &&
+                  renderGhost()}
 
                 <div
                   className="catalog-sidebar__add"

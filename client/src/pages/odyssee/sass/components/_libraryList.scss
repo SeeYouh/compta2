@@ -112,67 +112,24 @@
 }
 
 // Ghost — icône fantome pendant le drag
-@keyframes ghost-slide-in {
-  from {
-    max-height: 0;
-    margin-top: 0;
-    margin-bottom: 0;
-    opacity: 0;
-  }
-
-  to {
-    max-height: 56px; // 40px + 8px*2 margin
-    margin-top: 8px;
-    margin-bottom: 8px;
-    opacity: 0.35;
-  }
-}
-
-@keyframes ghost-folder-slide-in {
-  from {
-    max-height: 0;
-    opacity: 0;
-  }
-
-  to {
-    max-height: 80px;
-    opacity: 0.65;
-  }
-}
-
 .catalog-sidebar__icon--ghost {
   border: 2px dashed $color-1;
   background: transparent !important;
   cursor: default;
-  overflow: hidden;
-  animation: ghost-slide-in 0.15s ease forwards;
-}
-
-// Variante nested (32px + margin 4px)
-@keyframes ghost-nested-slide-in {
-  from {
-    max-height: 0;
-    margin-top: 0;
-    margin-bottom: 0;
-    opacity: 0;
-  }
-
-  to {
-    max-height: 40px; // 32px + 4px*2 margin
-    margin-top: 4px;
-    margin-bottom: 4px;
-    opacity: 0.35;
-  }
+  opacity: 0.35;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 .catalog-sidebar__icon--nested.catalog-sidebar__icon--ghost {
-  animation: ghost-nested-slide-in 0.15s ease forwards;
+  opacity: 0.35;
+  margin-top: 4px;
+  margin-bottom: 4px;
 }
 
 .catalog-sidebar__folder--ghost {
   cursor: default;
-  overflow: hidden;
-  animation: ghost-folder-slide-in 0.15s ease forwards;
+  opacity: 0.65;
 }
 
 // ── Tooltip sidebar ──────────────────────────────────────────────────────────
@@ -187,7 +144,7 @@
   pointer-events: none;
   z-index: 500;
   width: max-content;
-  max-width: 180px;
+  max-width: 260px;
   transform: translateY(-50%);
 
   // Flèche gauche — bord (couleur bordure)
