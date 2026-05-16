@@ -255,7 +255,11 @@ const Dashboard = () => {
                     className={`catalog-sidebar__icon${category.active ? " active" : ""}`}
                     onClick={() => handleCategorySelect(category._id)}
                   >
-                    {getInitials(category.name)}
+                    {category.image ? (
+                      <img src={category.image} alt={category.name} />
+                    ) : (
+                      getInitials(category.name)
+                    )}
                   </div>
                 ))}
                 <div

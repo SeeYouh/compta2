@@ -40,21 +40,18 @@ const PaperProduct = ({
     if (!file) return;
     setImageError("");
 
-    const img = new Image();
+    const MAX_SIZE = 2 * 1024 * 1024; // 2 Mo
+    if (file.size > MAX_SIZE) {
+      setImageError(
+        `Image trop lourde (${(file.size / 1024 / 1024).toFixed(1)} Mo). Max 2 Mo.`,
+      );
+      e.target.value = "";
+      return;
+    }
+
     const url = URL.createObjectURL(file);
-    img.onload = () => {
-      if (img.width > 256 || img.height > 256) {
-        setImageError(
-          `Image trop grande (${img.width}×${img.height}px). Max 256×256 px.`,
-        );
-        URL.revokeObjectURL(url);
-        e.target.value = "";
-        return;
-      }
-      setImagePreview(url);
-      setImageFile(file);
-    };
-    img.src = url;
+    setImagePreview(url);
+    setImageFile(file);
   };
 
   const handleTimeChange = (time) => {
