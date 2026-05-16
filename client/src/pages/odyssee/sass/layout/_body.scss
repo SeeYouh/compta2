@@ -1,6 +1,6 @@
 @use "../utils/_variable" as *;
 
-body {
+.odyssee-root {
   background-color: $color-light;
   user-select: none;
 }

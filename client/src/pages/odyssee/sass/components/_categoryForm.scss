@@ -1,0 +1,184 @@
+@use "../utils/_variable" as *;
+
+// Overlay
+.cat-form-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+// Carte du formulaire
+.cat-form {
+  background: $color-darkest;
+  border-radius: 12px;
+  padding: 28px;
+  width: 380px;
+  max-width: 92vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  &__title {
+    margin: 0 0 24px 0;
+    color: $color-lightness;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  &__field {
+    margin-bottom: 20px;
+  }
+
+  &__label {
+    display: block;
+    margin-bottom: 8px;
+    color: $color-light;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  &__hint {
+    font-weight: 400;
+    color: $color-dark;
+    font-size: 12px;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 10px 12px;
+    background: $color-darker;
+    border: 1px solid $color-dark;
+    border-radius: 6px;
+    color: $color-lightness;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+
+    &::placeholder {
+      color: $color-dark;
+    }
+
+    &:focus {
+      border-color: $color-light;
+    }
+  }
+
+  &__counter {
+    display: block;
+    text-align: right;
+    font-size: 11px;
+    color: $color-dark;
+    margin-top: 4px;
+  }
+
+  // Zone upload image
+  &__upload-btn {
+    width: 100%;
+    padding: 10px;
+    background: $color-darker;
+    border: 1px dashed $color-dark;
+    border-radius: 6px;
+    color: $color-light;
+    font-size: 13px;
+    cursor: pointer;
+    transition:
+      background 0.2s,
+      border-color 0.2s;
+
+    &:hover {
+      background: $color-dark;
+      border-color: $color-light;
+    }
+  }
+
+  // Aperçu de l'image uploadée
+  &__preview {
+    position: relative;
+    display: inline-flex;
+    width: 64px;
+    height: 64px;
+
+    img {
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid $color-dark;
+    }
+  }
+
+  &__remove-img {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 18px;
+    height: 18px;
+    background: $color-darker;
+    border: 1px solid $color-dark;
+    border-radius: 50%;
+    color: $color-lightness;
+    font-size: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+
+    &:hover {
+      background: $color-dark;
+    }
+  }
+
+  // Message d'erreur image
+  &__error {
+    margin: 6px 0 0 0;
+    color: #e74c3c;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  // Boutons d'action
+  &__actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+
+  &__btn {
+    padding: 9px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+
+    &--cancel {
+      background: $color-darker;
+      color: $color-light;
+
+      &:hover {
+        background: $color-dark;
+      }
+    }
+
+    &--submit {
+      background: $color-dark;
+      color: $color-lightness;
+
+      &:hover:not(:disabled) {
+        background: $color-darker;
+      }
+
+      &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+    }
+  }
+}

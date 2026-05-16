@@ -110,10 +110,9 @@ class ProductService {
       const response = await fetch(`${config.apiUrl}/api/odyssee/products`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(productData),
+        body: productData,
       });
 
       const data = await response.json();
@@ -135,10 +134,53 @@ class ProductService {
     }
   }
 
-  /**
-   * Vérifier si l'utilisateur est authentifié
-   * @returns {boolean} True si authentifié
-   */
+  static async updateProduct(id, formData) {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Token d'authentification manquant");
+
+      const response = await fetch(
+        `${config.apiUrl}/api/odyssee/products/${id}`,
+        {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        },
+      );
+
+      const data = await response.json();
+      if (!response.ok)
+        throw new Error(data.error || "Erreur lors de la mise à jour");
+
+      return { success: true, product: data.product, message: data.message };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  static async deleteProduct(id) {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Token d'authentification manquant");
+
+      const response = await fetch(
+        `${config.apiUrl}/api/odyssee/products/${id}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      const data = await response.json();
+      if (!response.ok)
+        throw new Error(data.error || "Erreur lors de la suppression");
+
+      return { success: true, message: data.message };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  }
+
   static isAuthenticated() {
     return !!localStorage.getItem("token");
   }

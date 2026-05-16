@@ -33,9 +33,9 @@ const OdysseeProductService = {
     }
   },
 
-  async getProductsByFolder(folder) {
+  async getProductsByCategory(categoryId) {
     try {
-      const res = await fetch(`${BASE}/folder/${folder}`, {
+      const res = await fetch(`${BASE}/category/${categoryId}`, {
         headers: authHeaders(),
       });
       const data = await res.json();

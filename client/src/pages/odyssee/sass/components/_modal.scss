@@ -1,0 +1,37 @@
+@use "../utils/_variable" as *;
+
+.modal-content {
+  background: $color-darkest;
+  border: 1px solid $color-darker;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+  .modal-header .modal-title {
+    color: $color-lightness;
+  }
+
+  .modal-body .modal-message {
+    color: $color-light;
+  }
+
+  .modal-footer .btn {
+    &.btn-secondary {
+      background: $color-dark;
+      color: $color-lightness;
+      border-color: $color-darker;
+
+      &:hover {
+        background: $color-darker;
+      }
+    }
+
+    &.btn-danger {
+      background: $color-darker;
+      color: $color-lightness;
+      border: 1px solid $color-dark;
+
+      &:hover:not(:disabled) {
+        background: $color-dark;
+      }
+    }
+  }
+}

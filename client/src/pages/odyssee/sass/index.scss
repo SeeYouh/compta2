@@ -17,7 +17,6 @@
 
 @use "./layout/body";
 @use "./layout/editableNavBar";
-@use "./layout/header";
 @use "./layout/leftMenu";
 @use "./layout/library";
 @use "./layout/productName";
@@ -31,3 +30,7 @@
 @use "./components/authPage";
 @use "./components/usersList";
 @use "./components/homepage";
+@use "./components/libraryList";
+@use "./components/productGrid";
+@use "./components/categoryForm";
+@use "./components/modal";

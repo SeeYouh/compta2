@@ -1,0 +1,189 @@
+@use "../utils/_variable" as *;
+
+// Zone principale des produits
+.catalog-main {
+  flex: 1;
+  padding: 20px;
+  overflow: auto;
+  background: $color-lightness;
+}
+
+// En-tête (titre + compteur + bouton +)
+.catalog-main__header {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h4 {
+    margin: 0;
+    color: $color-darkest;
+    font-size: 15px;
+    font-weight: 600;
+  }
+}
+
+.catalog-main__meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.catalog-main__count {
+  color: $color-dark;
+  font-size: 14px;
+}
+
+// Bouton + pour nouveau produit
+.catalog-main__add {
+  width: 36px;
+  height: 36px;
+  background: $color-dark;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 22px;
+  color: $color-lightness;
+  transition:
+    background 0.15s,
+    transform 0.15s;
+  user-select: none;
+
+  &:hover {
+    background: $color-darker;
+    transform: scale(1.12);
+  }
+}
+
+// État vide
+.catalog-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: $color-dark;
+  text-align: center;
+
+  &__icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  &__title {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  &__hint {
+    font-size: 14px;
+  }
+}
+
+// Grille de produits
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+// Carte produit
+.catalog-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  position: relative;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+
+    .catalog-card__toolbar {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  &__toolbar {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+  }
+
+  &__toolbar-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    transition: background 0.15s ease;
+
+    &--edit:hover {
+      background: $color-light;
+    }
+
+    &--delete:hover {
+      background: #fdd;
+    }
+  }
+
+  &__image {
+    width: 100%;
+    height: 110px;
+    background: $color-light;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    color: $color-dark;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__info {
+    padding: 10px 12px;
+  }
+
+  &__name {
+    margin: 0 0 3px 0;
+    color: $color-darkest;
+    font-size: 13px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__tooltip {
+    margin: 0;
+    color: $color-dark;
+    font-size: 11px;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

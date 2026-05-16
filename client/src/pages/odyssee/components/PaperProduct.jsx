@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { ArrayGraduation } from "./utils/ArrayGraduation";
 import InTakeTimeAdvancedMode from "./InTakeTimeAdvancedMode";
@@ -7,7 +7,24 @@ import ProductService from "../services/productService";
 import Range14 from "./Range14";
 import RangeDays from "./RangeDays";
 
-const PaperProduct = ({ contentFilesData, folder = "dossier1" }) => {
+const PaperProduct = ({
+  contentFilesData,
+  categoryId,
+  onProductCreated,
+  editMode = false,
+}) => {
+  const productId = contentFilesData._id || null;
+  const [productName, setProductName] = useState(
+    contentFilesData.productName || "",
+  );
+  const [aliasName, setAliasName] = useState(
+    contentFilesData.aliasName?.name || "",
+  );
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageError, setImageError] = useState("");
+  const fileInputRef = useRef(null);
+
   const [duration, setDuration] = useState(contentFilesData.treatmentDuration);
   const [quantity, setQuantity] = useState(contentFilesData.amountToAdminister);
   const [advancedMode, setAdvancedMode] = useState(false);
@@ -17,6 +34,28 @@ const PaperProduct = ({ contentFilesData, folder = "dossier1" }) => {
   const [durationAfter, setDurationAfter] = useState("");
   const [nightDuration, setNightDuration] = useState(10);
   const [saveStatus, setSaveStatus] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImageError("");
+
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      if (img.width > 256 || img.height > 256) {
+        setImageError(
+          `Image trop grande (${img.width}×${img.height}px). Max 256×256 px.`,
+        );
+        URL.revokeObjectURL(url);
+        e.target.value = "";
+        return;
+      }
+      setImagePreview(url);
+      setImageFile(file);
+    };
+    img.src = url;
+  };
 
   const handleTimeChange = (time) => {
     setSelectedTime(time);
@@ -39,67 +78,88 @@ const PaperProduct = ({ contentFilesData, folder = "dossier1" }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = {
-      productName: contentFilesData.productName,
-      aliasName: contentFilesData.aliasName.name,
-      treatmentDuration: duration,
-      amountToAdminister: quantity,
-      intakeTime: {
+    const formData = new FormData();
+    formData.append("productName", productName);
+    formData.append("aliasName", aliasName);
+    formData.append("treatmentDuration", duration);
+    formData.append("amountToAdminister", quantity);
+    formData.append(
+      "intakeTime",
+      JSON.stringify({
         mode: advancedMode ? "advanced" : "normal",
         checkedMoments,
         selectedTime,
         durationBefore,
         durationAfter,
         nightDuration,
-      },
-      folder,
-      // Le dossier est passé en prop depuis le composant parent
-    };
-
-    console.log("FormData envoyé :", JSON.stringify(formData, null, 2));
+      }),
+    );
+    formData.append("categoryId", categoryId);
+    if (imageFile) formData.append("image", imageFile);
 
     try {
-      const result = await ProductService.createProduct(formData);
+      const result =
+        productId && editMode
+          ? await ProductService.updateProduct(productId, formData)
+          : await ProductService.createProduct(formData);
 
       if (result.success) {
         setSaveStatus({
           type: "success",
-          message: "Produit sauvegardé avec succès !",
+          message:
+            productId && editMode
+              ? "Produit mis à jour !"
+              : "Produit sauvegardé avec succès !",
         });
         setTimeout(() => setSaveStatus(null), 3000);
+        if (onProductCreated) onProductCreated();
       } else {
-        setSaveStatus({ type: "error", message: "Erreur : " + result.error });
-        console.error("Erreur:", result.error);
+        setSaveStatus({ type: "error", message: "Erreur : " + result.error });
       }
-    } catch (error) {
+    } catch {
       setSaveStatus({
         type: "error",
         message: "Erreur de connexion au serveur",
       });
-      console.error("Erreur de connexion:", error);
     }
   };
+
+  const readOnly = !!productId && !editMode;
 
   return (
     <form className="paper-product" onSubmit={handleSubmit} method="POST">
       <div className="paper-product-container-navBar">
         <div className="paper-product-container-navBar_titleProduct">
-          <p>{contentFilesData.productName}</p>
-          <p> {contentFilesData.aliasName.name} </p>
+          <input
+            type="text"
+            className="paper-product__name-input"
+            value={productName}
+            onChange={(e) => setProductName(e.target.value)}
+            placeholder="Nom du produit"
+            maxLength={60}
+            readOnly={readOnly}
+          />
+          <input
+            type="text"
+            className="paper-product__alias-input"
+            value={aliasName}
+            onChange={(e) => setAliasName(e.target.value)}
+            placeholder="Alias"
+            maxLength={40}
+            readOnly={readOnly}
+          />
         </div>
-        <input type="submit" value="Enregistrer" />
+        {!readOnly && (
+          <input
+            type="submit"
+            value={editMode ? "Mettre à jour" : "Enregistrer"}
+          />
+        )}
       </div>
+
       {saveStatus && (
         <div
-          style={{
-            padding: "8px 16px",
-            margin: "8px",
-            borderRadius: "4px",
-            backgroundColor:
-              saveStatus.type === "success" ? "#d4edda" : "#f8d7da",
-            color: saveStatus.type === "success" ? "#155724" : "#721c24",
-            fontSize: "14px",
-          }}
+          className={`paper-product__status paper-product__status--${saveStatus.type}`}
         >
           {saveStatus.message}
         </div>
@@ -107,6 +167,42 @@ const PaperProduct = ({ contentFilesData, folder = "dossier1" }) => {
 
       <div className="paper-product-container">
         <div className="bloc">
+          <div className="paper-product__upload-zone">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="paper-product__file-input"
+              onChange={handleImageChange}
+            />
+            {imagePreview ? (
+              <div className="paper-product__image-preview">
+                <img src={imagePreview} alt="Aperçu" />
+                <button
+                  type="button"
+                  className="paper-product__image-remove"
+                  onClick={() => {
+                    setImagePreview(null);
+                    setImageFile(null);
+                    if (fileInputRef.current) fileInputRef.current.value = "";
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            ) : (
+              <div
+                className="paper-product__upload-label"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                + Ajouter une image
+              </div>
+            )}
+            {imageError && (
+              <p className="paper-product__image-error">{imageError}</p>
+            )}
+          </div>
+
           <ul className="paper-product-bloc-img">
             {contentFilesData.img.map((item, index) => (
               <li
