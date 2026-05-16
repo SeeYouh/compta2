@@ -7,7 +7,6 @@ import {
   getAllUserProducts,
   getOneProduct,
   getProductsByCategory,
-  hardDeleteProduct,
   searchProducts,
   updateProduct,
 } from "../controllers/odysseeProductController.js";
@@ -33,10 +32,7 @@ router.post("/", authenticate, odysseeUpload, createProduct);
 // Mettre à jour un produit
 router.put("/:id", authenticate, odysseeUpload, updateProduct);
 
-// Supprimer un produit (soft delete)
+// Supprimer un produit
 router.delete("/:id", authenticate, deleteProduct);
-
-// Supprimer définitivement un produit
-router.delete("/:id/hard", authenticate, hardDeleteProduct);
 
 export default router;
