@@ -292,12 +292,6 @@ const Dashboard = () => {
                         </h4>
                         <div className="catalog-main__meta">
                           {selectedCat && (
-                            <span className="catalog-main__count">
-                              {currentProducts.length} produit
-                              {currentProducts.length !== 1 ? "s" : ""}
-                            </span>
-                          )}
-                          {selectedCat && (
                             <div
                               className="catalog-main__add"
                               title="Nouveau produit"

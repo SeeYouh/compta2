@@ -1,3 +1,5 @@
+@use "../utils/_variable" as *;
+
 .editable-navbar-wrapper {
   .hover-zone {
     display: inline-block;
@@ -5,7 +7,7 @@
     .nav-bar-minitools {
       top: 5px;
       left: 0;
-      background: #aaa;
+      background: $color-1;
       border-radius: 4px;
       padding: 4px;
       gap: 4px;

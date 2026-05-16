@@ -58,7 +58,7 @@
         position: relative;
 
         &:hover {
-          color: lighten(get-contrast($color-darker), 20%);
+          color: get-contrast($color-darker);
         }
 
         &:after {
@@ -82,7 +82,7 @@
 
 .navbar-auth {
   .auth-button {
-    background: lighten($color-darker, 20%);
+    background: $color-dark;
     color: get-contrast($color-darker);
     text-decoration: none;
     padding: 0.75rem 1.5rem;
@@ -197,12 +197,14 @@
 }
 
 .feature-card {
-  background: lighten($color-lightness, 30%);
+  background: $color-lightness;
   padding: 2.5rem;
   border-radius: 12px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 
   &:hover {
     transform: translateY(-5px);
@@ -223,7 +225,7 @@
 
 .about-section {
   padding: 6rem 0;
-  background: lighten($color-lightness, 30%);
+  background: $color-lightness;
 
   h2 {
     text-align: center;
@@ -277,7 +279,7 @@
   }
 
   p {
-    color: lighten($color-darkest, 30%);
+    color: $color-1;
     line-height: 1.6;
   }
 
@@ -289,7 +291,7 @@
       margin-bottom: 0.8rem;
 
       a {
-        color: lighten($color-darkest, 30%);
+        color: $color-1;
         text-decoration: none;
         transition: color 0.3s ease;
 
@@ -302,12 +304,12 @@
 }
 
 .footer-bottom {
-  border-top: 1px solid lighten($color-darkest, 10%);
+  border-top: 1px solid $color-darker;
   padding-top: 2rem;
   text-align: center;
 
   p {
-    color: lighten($color-darkest, 30%);
+    color: $color-1;
     margin-bottom: 1rem;
 
     &:last-child {

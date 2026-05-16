@@ -43,7 +43,7 @@
 
     label {
       cursor: pointer;
-      color: #fff;
+      color: $color-lightness;
     }
   }
 }
@@ -90,18 +90,18 @@
 }
 
 .loading-message {
-  background-color: lighten($color-1, 40%);
+  background-color: $color-light;
   color: $color-dark;
 }
 
 .error-message {
-  background-color: lighten($color-darker, 20%);
-  color: white;
+  background-color: $color-dark;
+  color: $color-lightness;
 
   button {
     margin-top: 1rem;
     padding: 0.5rem 1rem;
-    background-color: white;
+    background-color: $color-lightness;
     color: $color-darker;
     border: none;
     border-radius: 4px;
@@ -109,13 +109,13 @@
     font-size: 1rem;
 
     &:hover {
-      background-color: lighten($color-1, 30%);
+      background-color: $color-light;
     }
   }
 }
 
 .no-products-message {
-  background-color: lighten($color-light, 10%);
+  background-color: $color-lightness;
   color: $color-dark;
   border: 2px dashed $color-1;
 }
@@ -126,7 +126,7 @@
   flex-direction: column;
   align-items: center;
   padding: 1rem;
-  background-color: lighten($color-light, 5%);
+  background-color: $color-lightness;
   border: 2px solid $color-1;
   border-radius: 8px;
   min-height: 80px;

@@ -32,6 +32,8 @@ $color-light: lighten($color-1, $change-brightness * 69);
 $color-dark: darken($color-1, $change-brightness * 53);
 $color-darker: darken($color-1, $change-brightness * 66);
 $color-darkest: darken($color-1, $change-brightness * 73);
+$color-danger: #c0392b;
+$color-danger-light: #e57373;
 
 .input-dysplay-none {
   display: none;

@@ -9,7 +9,7 @@
 // }
 .paper-product-container-navBar {
   background-color: $color-dark;
-  color: #fff;
+  color: $color-lightness;
   padding: 14px 20px;
   .paper-product-container-navBar_titleProduct {
     display: flex;
@@ -20,33 +20,33 @@
     .paper-product__alias-input {
       background: transparent;
       border: none;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-      color: #fff;
+      border-bottom: 1px solid rgba($color-lightness, 0.4);
+      color: $color-lightness;
       font-size: 1rem;
       padding: 6px 8px;
       outline: none;
       min-width: 120px;
 
       &::placeholder {
-        color: rgba(255, 255, 255, 0.45);
+        color: rgba($color-lightness, 0.45);
         font-style: italic;
       }
 
       &:focus {
-        border-bottom-color: #fff;
+        border-bottom-color: $color-lightness;
       }
     }
 
     .paper-product__alias-input {
       font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.75);
+      color: rgba($color-lightness, 0.75);
     }
   }
 
   input[type="submit"] {
     background-color: $color-darker;
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.35);
+    color: $color-lightness;
+    border: 1px solid rgba($color-lightness, 0.35);
     border-radius: 6px;
     padding: 8px 20px;
     cursor: pointer;
@@ -72,8 +72,8 @@
 
   &--error {
     background-color: $color-darkest;
-    color: #f88;
-    border-left: 3px solid #f44;
+    color: $color-danger-light;
+    border-left: 3px solid $color-danger;
   }
 }
 
@@ -140,13 +140,13 @@
       padding: 0;
 
       &:hover {
-        background-color: #f44;
+        background-color: $color-danger;
       }
     }
   }
 
   .paper-product__image-error {
-    color: #f88;
+    color: $color-danger-light;
     font-size: 0.8rem;
     margin: 0;
   }

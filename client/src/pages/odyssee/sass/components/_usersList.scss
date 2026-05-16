@@ -1,3 +1,5 @@
+@use "../utils/_variable" as *;
+
 // Styles pour la liste des utilisateurs
 
 .users-list-container {
@@ -13,10 +15,10 @@
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 2px solid $color-light;
 
   h2 {
-    color: #333;
+    color: $color-darkest;
     margin: 0;
     font-size: 1.8rem;
     font-weight: 700;
@@ -25,8 +27,8 @@
 
 .refresh-btn {
   padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
-  color: white;
+  background: linear-gradient(135deg, $color-dark 0%, $color-darker 100%);
+  color: $color-lightness;
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -35,7 +37,7 @@
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(23, 162, 184, 0.3);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
   }
 }
 
@@ -52,22 +54,22 @@
 .search-input {
   flex: 1;
   padding: 0.75rem;
-  border: 2px solid #e9ecef;
+  border: 2px solid $color-light;
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.3s ease;
 
   &:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: $color-1;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
   }
 }
 
 .search-btn {
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, $color-dark 0%, $color-darker 100%);
+  color: $color-lightness;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -76,26 +78,26 @@
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
   }
 }
 
 .error-message {
-  background: #f8d7da;
-  color: #721c24;
+  background: $color-lightness;
+  color: $color-danger;
   padding: 1rem;
   border-radius: 8px;
-  border: 1px solid #f5c6cb;
+  border: 1px solid $color-light;
   margin-bottom: 2rem;
   font-weight: 500;
 }
 
 .stats {
-  background: #e7f3ff;
-  color: #0c5460;
+  background: $color-lightness;
+  color: $color-darkest;
   padding: 1rem;
   border-radius: 8px;
-  border: 1px solid #bee5eb;
+  border: 1px solid $color-light;
   margin-bottom: 2rem;
   font-weight: 500;
 }
@@ -104,17 +106,17 @@
   text-align: center;
   padding: 3rem;
   font-size: 1.2rem;
-  color: #666;
+  color: $color-dark;
 }
 
 .no-users {
   text-align: center;
   padding: 3rem;
   font-size: 1.2rem;
-  color: #666;
-  background: #f8f9fa;
+  color: $color-dark;
+  background: $color-lightness;
   border-radius: 12px;
-  border: 2px dashed #dee2e6;
+  border: 2px dashed $color-light;
 }
 
 .users-grid {
@@ -125,8 +127,8 @@
 }
 
 .user-card {
-  background: white;
-  border: 1px solid #e9ecef;
+  background: $color-lightness;
+  border: 1px solid $color-light;
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -143,18 +145,18 @@
   align-items: flex-start;
   margin-bottom: 1rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #f1f3f4;
+  border-bottom: 1px solid $color-lightness;
 }
 
 .user-avatar {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, $color-dark 0%, $color-darker 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: $color-lightness;
   font-weight: bold;
   font-size: 1.2rem;
   margin-right: 1rem;
@@ -170,13 +172,13 @@
   margin: 0 0 0.25rem 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: $color-darkest;
   word-break: break-word;
 }
 
 .user-email {
   margin: 0;
-  color: #666;
+  color: $color-dark;
   font-size: 0.9rem;
   word-break: break-all;
 }
@@ -192,15 +194,15 @@
   font-weight: 600;
 
   &.active {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+    background: $color-lightness;
+    color: $color-darkest;
+    border: 1px solid $color-light;
   }
 
   &.inactive {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    background: $color-lightness;
+    color: $color-danger;
+    border: 1px solid $color-light;
   }
 }
 
@@ -215,7 +217,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 0;
-  border-bottom: 1px solid #f8f9fa;
+  border-bottom: 1px solid $color-lightness;
 
   &:last-child {
     border-bottom: none;
@@ -224,12 +226,12 @@
 
 .detail-label {
   font-weight: 500;
-  color: #495057;
+  color: $color-dark;
   font-size: 0.9rem;
 }
 
 .detail-value {
-  color: #333;
+  color: $color-darkest;
   font-size: 0.9rem;
   text-align: right;
   max-width: 60%;
@@ -239,7 +241,7 @@
 .user-id {
   font-family: "Courier New", monospace;
   font-size: 0.8rem;
-  color: #6c757d;
+  color: $color-1;
 }
 
 .pagination {
@@ -253,8 +255,8 @@
 
 .page-btn {
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, $color-dark 0%, $color-darker 100%);
+  color: $color-lightness;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -263,11 +265,11 @@
 
   &:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
   }
 
   &:disabled {
-    background: #6c757d;
+    background: $color-1;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
@@ -276,7 +278,7 @@
 
 .page-info {
   font-weight: 600;
-  color: #495057;
+  color: $color-dark;
   padding: 0 1rem;
 }
 
