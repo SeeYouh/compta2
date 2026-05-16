@@ -1,6 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
-import { APP_LABELS } from "./utils";
+import { APP_LABELS } from './utils';
 
 function ConfirmationModal({
   isOpen,
@@ -13,6 +17,10 @@ function ConfirmationModal({
   requireTextConfirmation = false,
   confirmationText = "",
   confirmationPlaceholder = "Tapez pour confirmer",
+  toggleLabel = null,
+  toggleChecked = false,
+  onToggleChange = null,
+  softDanger = false,
 }) {
   const modalRef = useRef(null);
   const confirmButtonRef = useRef(null);
@@ -108,6 +116,27 @@ function ConfirmationModal({
               />
             </div>
           )}
+          {toggleLabel && (
+            <div className="modal-toggle">
+              <span className="modal-toggle__label">{toggleLabel}</span>
+              <div className="modal-toggle__options">
+                <button
+                  type="button"
+                  className={`modal-toggle__opt${!toggleChecked ? " modal-toggle__opt--active" : ""}`}
+                  onClick={() => onToggleChange?.(false)}
+                >
+                  NON
+                </button>
+                <button
+                  type="button"
+                  className={`modal-toggle__opt${toggleChecked ? " modal-toggle__opt--danger" : ""}`}
+                  onClick={() => onToggleChange?.(true)}
+                >
+                  OUI
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="modal-footer">
@@ -120,7 +149,7 @@ function ConfirmationModal({
           </button>
           <button
             type="button"
-            className="btn btn-danger"
+            className={`btn ${softDanger ? "btn-danger-soft" : "btn-danger"}`}
             onClick={onConfirm}
             ref={confirmButtonRef}
             disabled={isConfirmDisabled}

@@ -7,6 +7,7 @@ const SidebarCategoryItem = ({
   onTooltipEnter,
   onTooltipLeave,
   onSelect,
+  onContextMenu,
   getInitials,
 }) => {
   const {
@@ -33,6 +34,10 @@ const SidebarCategoryItem = ({
       onMouseEnter={(e) => onTooltipEnter(e, "category", item.id)}
       onMouseLeave={onTooltipLeave}
       onClick={() => onSelect(item.id)}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        onContextMenu(e, item.id);
+      }}
     >
       {cat.image ? (
         <img src={cat.image} alt={cat.name} />

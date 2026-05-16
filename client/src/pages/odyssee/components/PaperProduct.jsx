@@ -1,11 +1,14 @@
-import { useRef, useState } from "react";
+import {
+  useRef,
+  useState,
+} from 'react';
 
-import { ArrayGraduation } from "./utils/ArrayGraduation";
-import InTakeTimeAdvancedMode from "./InTakeTimeAdvancedMode";
-import InTakeTimeNormalMode from "./InTakeTimeNormalMode";
-import ProductService from "../services/productService";
-import Range14 from "./Range14";
-import RangeDays from "./RangeDays";
+import { ArrayGraduation } from './utils/ArrayGraduation';
+import InTakeTimeAdvancedMode from './InTakeTimeAdvancedMode';
+import InTakeTimeNormalMode from './InTakeTimeNormalMode';
+import ProductService from '../services/productService';
+import Range14 from './Range14';
+import RangeDays from './RangeDays';
 
 const PaperProduct = ({
   contentFilesData,
@@ -109,7 +112,7 @@ const PaperProduct = ({
               : "Produit sauvegardé avec succès !",
         });
         setTimeout(() => setSaveStatus(null), 3000);
-        if (onProductCreated) onProductCreated();
+        if (onProductCreated) onProductCreated(result.product);
       } else {
         setSaveStatus({ type: "error", message: "Erreur : " + result.error });
       }

@@ -1,11 +1,15 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-import { darken } from "../utils/colorUtils";
-import { DARKEN_BORDER, FOLDER_PALETTE } from "../config/folderColors";
+import { darken } from '../utils/colorUtils';
+import {
+  DARKEN_BORDER,
+  DEFAULT_FOLDER_COLOR,
+  FOLDER_PALETTE,
+} from '../config/folderColors';
 
 const FolderSettingsModal = ({ folder, onSave, onCancel }) => {
   const [name, setName] = useState(folder.name || "");
-  const [color, setColor] = useState(folder.color || "#969696");
+  const [color, setColor] = useState(folder.color || DEFAULT_FOLDER_COLOR);
 
   const handleSave = () => {
     onSave({ name: name.trim(), color });

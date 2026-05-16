@@ -1,4 +1,4 @@
-import { config } from "../config/env.js";
+import { config } from '../config/env.js';
 
 const BASE = `${config.apiUrl}/api/odyssee/categories`;
 

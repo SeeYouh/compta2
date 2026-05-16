@@ -1,8 +1,11 @@
-import { Fragment } from "react";
+import { Fragment } from 'react';
 
-import { darken } from "../utils/colorUtils";
-import { DARKEN_BG, DARKEN_BORDER } from "../config/folderColors";
-import IconDossierFull from "../assets/IconDossierFull";
+import { darken } from '../utils/colorUtils';
+import {
+  DARKEN_BG,
+  DARKEN_BORDER,
+} from '../config/folderColors';
+import IconDossierFull from '../assets/IconDossierFull';
 
 const SidebarFolderItem = ({
   folder,
@@ -15,6 +18,7 @@ const SidebarFolderItem = ({
   onTooltipLeave,
   onToggle,
   onContextMenu,
+  onCategoryContextMenu,
   onSelect,
   getInitials,
 }) => {
@@ -27,7 +31,7 @@ const SidebarFolderItem = ({
     handleNestedDrop,
   } = dnd;
 
-  const folderColor = folder.color || "#969696";
+  const folderColor = folder.color || DEFAULT_FOLDER_COLOR;
   const folderBorderColor = darken(folderColor, DARKEN_BORDER);
   const folderBgColor = darken(folderColor, DARKEN_BG);
 
@@ -94,6 +98,10 @@ const SidebarFolderItem = ({
                   onMouseEnter={(e) => onTooltipEnter(e, "category", catId)}
                   onMouseLeave={onTooltipLeave}
                   onClick={() => onSelect(catId)}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    onCategoryContextMenu(e, catId);
+                  }}
                 >
                   {cat.image ? (
                     <img src={cat.image} alt={cat.name} />

@@ -1,10 +1,14 @@
-import { Fragment } from "react";
+import { Fragment } from 'react';
 
-import { darken } from "../utils/colorUtils";
-import { DARKEN_BG, DARKEN_BORDER } from "../config/folderColors";
-import IconDossierFull from "../assets/IconDossierFull";
-import SidebarCategoryItem from "./SidebarCategoryItem";
-import SidebarFolderItem from "./SidebarFolderItem";
+import { darken } from '../utils/colorUtils';
+import {
+  DARKEN_BG,
+  DARKEN_BORDER,
+  DEFAULT_FOLDER_COLOR,
+} from '../config/folderColors';
+import IconDossierFull from '../assets/IconDossierFull';
+import SidebarCategoryItem from './SidebarCategoryItem';
+import SidebarFolderItem from './SidebarFolderItem';
 
 const getInitials = (name) =>
   name
@@ -20,6 +24,7 @@ const CatalogSidebar = ({
   categories,
   dnd,
   onCategorySelect,
+  onCategoryContextMenu,
   onToggleFolder,
   onFolderContextMenu,
   onAddCategory,
@@ -64,7 +69,7 @@ const CatalogSidebar = ({
     if (drag.type === "folder") {
       const folder = folders.find((f) => f._id === drag.id);
       if (!folder) return null;
-      const color = folder.color || "#969696";
+      const color = folder.color || DEFAULT_FOLDER_COLOR;
       return (
         <div
           key="ghost"
@@ -117,6 +122,7 @@ const CatalogSidebar = ({
                 onTooltipLeave={onTooltipLeave}
                 onToggle={onToggleFolder}
                 onContextMenu={onFolderContextMenu}
+                onCategoryContextMenu={onCategoryContextMenu}
                 onSelect={onCategorySelect}
                 getInitials={getInitials}
               />
@@ -141,6 +147,7 @@ const CatalogSidebar = ({
               onTooltipEnter={onTooltipEnter}
               onTooltipLeave={onTooltipLeave}
               onSelect={onCategorySelect}
+              onContextMenu={onCategoryContextMenu}
               getInitials={getInitials}
             />
           </Fragment>

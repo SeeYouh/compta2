@@ -144,7 +144,6 @@
   pointer-events: none;
   z-index: 500;
   width: max-content;
-  max-width: 260px;
   transform: translateY(-50%);
 
   // Flèche gauche — bord (couleur bordure)
@@ -174,8 +173,6 @@
     font-size: 13px;
     font-weight: 600;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   &__list {
@@ -188,8 +185,6 @@
       font-size: 13px;
       line-height: 1.6;
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
   }
 }
@@ -207,19 +202,96 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 
   &__item {
-    display: block;
-    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: calc(100% - 12px);
+    margin: 0 6px;
     background: none;
     border: none;
+    border-radius: 5px;
     color: $color-lightness;
     font-size: 13px;
     text-align: left;
-    padding: 10px 16px;
+    padding: 10px 10px;
     cursor: pointer;
     transition: background 0.15s;
 
     &:hover {
       background: $color-dark;
+    }
+  }
+}
+
+// ── Menu contextuel catégorie ────────────────────────────────────────────────
+
+.category-ctx-menu {
+  position: fixed;
+  background: $color-darker;
+  border: 1px solid $color-dark;
+  border-radius: 8px;
+  padding: 4px 0;
+  z-index: 600;
+  min-width: 160px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: calc(100% - 12px);
+    margin: 0 6px;
+    background: none;
+    border: none;
+    border-radius: 5px;
+    color: $color-lightness;
+    font-size: 13px;
+    text-align: left;
+    padding: 10px 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover {
+      background: $color-dark;
+    }
+  }
+
+  &__separator {
+    height: 1px;
+    background: $color-dark;
+    margin: 4px 0;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 4px 8px;
+    gap: 4px;
+  }
+
+  &__action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition:
+      background 0.15s,
+      color 0.15s;
+
+    &--danger {
+      color: $color-lightness;
+
+      &:hover {
+        color: $color-danger;
+      }
+
+      svg {
+        pointer-events: none;
+      }
     }
   }
 }

@@ -1,23 +1,32 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from 'react';
 
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+} from 'react-router-dom';
 
-import CatalogMain from "../../components/CatalogMain";
-import CatalogSidebar from "../../components/CatalogSidebar";
-import CategoryForm from "../../components/CategoryForm";
-import { categoryLibrary } from "../../utils/variable";
-import ConfirmationModal from "../../../../components/ConfirmationModal";
-import FolderContextMenu from "../../components/FolderContextMenu";
-import FolderService from "../../services/folderService";
-import FolderSettingsModal from "../../components/FolderSettingsModal";
-import Gear from "../../assets/gear";
-import OdysseeCategoryService from "../../../../services/odysseeCategoryService";
-import OdysseeProductService from "../../../../services/odysseeProductService";
-import PaperProduct from "../../components/PaperProduct";
-import ProductService from "../../services/productService";
-import SidebarTooltip from "../../components/SidebarTooltip";
-import SynapseUserMenu from "../../../../components/SynapseUserMenu";
-import { useSidebarDnd } from "../../hooks/useSidebarDnd";
+import CatalogMain from '../../components/CatalogMain';
+import CatalogSidebar from '../../components/CatalogSidebar';
+import CategoryContextMenu from '../../components/CategoryContextMenu';
+import CategoryForm from '../../components/CategoryForm';
+import { categoryLibrary } from '../../utils/variable';
+import CategorySettings from '../../components/CategorySettings';
+import ConfirmationModal from '../../../../components/ConfirmationModal';
+import FolderContextMenu from '../../components/FolderContextMenu';
+import FolderService from '../../services/folderService';
+import FolderSettingsModal from '../../components/FolderSettingsModal';
+import Gear from '../../assets/gear';
+import OdysseeCategoryService
+  from '../../../../services/odysseeCategoryService';
+import OdysseeProductService from '../../../../services/odysseeProductService';
+import PaperProduct from '../../components/PaperProduct';
+import ProductService from '../../services/productService';
+import SidebarTooltip from '../../components/SidebarTooltip';
+import SynapseUserMenu from '../../../../components/SynapseUserMenu';
+import { useSidebarDnd } from '../../hooks/useSidebarDnd';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -90,6 +99,12 @@ const Dashboard = () => {
   const [tooltip, setTooltip] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
   const [folderSettingsModal, setFolderSettingsModal] = useState(null);
+  const [categoryContextMenu, setCategoryContextMenu] = useState(null);
+  const [categorySettingsId, setCategorySettingsId] = useState(null);
+  const [deleteCategoryFlow, setDeleteCategoryFlow] = useState(null);
+  // deleteCategoryFlow phases :
+  // { phase: 'confirm', categoryId, categoryName, products: [], confirmAll: false }
+  // { phase: 'products', categoryId, categoryName, products: [], pendingIndex: 0 }
 
   const enrichCategory = (cat) => ({ ...cat, active: false, products: [] });
 
@@ -109,9 +124,60 @@ const Dashboard = () => {
       }
 
       if (sidebarResult.success) {
-        setFolders(sidebarResult.folders);
-        if (sidebarResult.layout.length > 0) {
-          setSidebarItems(sidebarResult.layout);
+        const existingCatIds = new Set(
+          (catResult.success ? catResult.categories : []).map((c) => c._id),
+        );
+
+        // Dossiers vides ou dont tous les categoryIds sont des catégories supprimées
+        const ghostFolders = sidebarResult.folders.filter((f) =>
+          f.categoryIds.every((id) => !existingCatIds.has(id)),
+        );
+
+        if (ghostFolders.length > 0) {
+          await Promise.all(
+            ghostFolders.map((f) => FolderService.deleteFolder(f._id)),
+          );
+        }
+
+        const ghostIds = new Set(ghostFolders.map((f) => f._id));
+
+        // Dossiers partiellement orphelins : purger les catIds supprimées
+        const partialFolders = sidebarResult.folders.filter(
+          (f) =>
+            !ghostIds.has(f._id) &&
+            f.categoryIds.some((id) => !existingCatIds.has(id)),
+        );
+        await Promise.all(
+          partialFolders.map((f) =>
+            FolderService.updateFolder(f._id, {
+              categoryIds: f.categoryIds.filter((id) => existingCatIds.has(id)),
+            }),
+          ),
+        );
+
+        const cleanFolders = sidebarResult.folders
+          .filter((f) => !ghostIds.has(f._id))
+          .map((f) =>
+            partialFolders.find((p) => p._id === f._id)
+              ? {
+                  ...f,
+                  categoryIds: f.categoryIds.filter((id) =>
+                    existingCatIds.has(id),
+                  ),
+                }
+              : f,
+          );
+
+        const cleanLayout = sidebarResult.layout.filter(
+          (i) => !(i.type === "folder" && ghostIds.has(i.id)),
+        );
+
+        setFolders(cleanFolders);
+        if (cleanLayout.length > 0) {
+          setSidebarItems(cleanLayout);
+          if (ghostFolders.length > 0) FolderService.updateLayout(cleanLayout);
+        } else if (sidebarResult.layout.length === 0) {
+          setSidebarItems([]);
         }
       }
     };
@@ -138,6 +204,7 @@ const Dashboard = () => {
 
   const handleProductCreated = () => {
     if (selectedCategory) loadProducts(selectedCategory);
+    setSelectedFileData(null);
   };
 
   const handleEditProduct = (product) => {
@@ -161,10 +228,9 @@ const Dashboard = () => {
     setDeleteModal({ open: false, productId: null, productName: "" });
   };
 
-  // Création d'une catégorie via API (nom limité à 15 caractères)
+  // Création d'une catégorie via API
   const handleCreateCategory = async (categoryData) => {
-    const truncated = { ...categoryData, name: categoryData.name.slice(0, 15) };
-    const result = await OdysseeCategoryService.createCategory(truncated);
+    const result = await OdysseeCategoryService.createCategory(categoryData);
     if (result.success) {
       const newCat = enrichCategory(result.category);
       setCategories((prev) => [...prev, newCat]);
@@ -197,6 +263,102 @@ const Dashboard = () => {
   };
 
   const handleTooltipLeave = () => setTooltip(null);
+
+  // ── Menu contextuel + paramètres catégorie ───────────────────────────────────
+
+  const handleCategoryContextMenu = (e, categoryId) => {
+    setCategoryContextMenu({ categoryId, x: e.clientX, y: e.clientY });
+  };
+
+  const handleOpenDeleteCategory = async (categoryId) => {
+    const cat = categories.find((c) => c._id === categoryId);
+    const result =
+      await OdysseeProductService.getProductsByCategory(categoryId);
+    const products = result.success ? result.products : [];
+    setDeleteCategoryFlow({
+      phase: "confirm",
+      categoryId,
+      categoryName: cat?.name || "cette librairie",
+      products,
+      confirmAll: false,
+    });
+  };
+
+  const executeDeleteCategory = async (categoryId) => {
+    const result = await OdysseeCategoryService.deleteCategory(categoryId);
+    if (result.success) {
+      setCategories((prev) => prev.filter((c) => c._id !== categoryId));
+
+      const parentFolder = folders.find((f) =>
+        f.categoryIds.includes(categoryId),
+      );
+
+      if (parentFolder) {
+        const newCategoryIds = parentFolder.categoryIds.filter(
+          (id) => id !== categoryId,
+        );
+        if (newCategoryIds.length === 0) {
+          // Dernier élément du dossier : supprimer le dossier aussi
+          FolderService.deleteFolder(parentFolder._id);
+          setFolders((prev) => prev.filter((f) => f._id !== parentFolder._id));
+          setSidebarItems((prev) => {
+            const newItems = prev.filter((i) => i.id !== parentFolder._id);
+            FolderService.updateLayout(newItems);
+            return newItems;
+          });
+        } else {
+          FolderService.updateFolder(parentFolder._id, {
+            categoryIds: newCategoryIds,
+          });
+          setFolders((prev) =>
+            prev.map((f) =>
+              f._id === parentFolder._id
+                ? { ...f, categoryIds: newCategoryIds }
+                : f,
+            ),
+          );
+        }
+      } else {
+        setSidebarItems((prev) => {
+          const newItems = prev.filter((i) => i.id !== categoryId);
+          FolderService.updateLayout(newItems);
+          return newItems;
+        });
+      }
+
+      if (selectedCategory === categoryId) {
+        setSelectedCategory(null);
+        setSelectedFileData(null);
+      }
+      if (categorySettingsId === categoryId) setCategorySettingsId(null);
+    }
+    setDeleteCategoryFlow(null);
+  };
+
+  const handleConfirmDeleteCategory = () => {
+    const { categoryId, products, confirmAll } = deleteCategoryFlow;
+    if (products.length === 0 || confirmAll) {
+      executeDeleteCategory(categoryId);
+    } else {
+      setDeleteCategoryFlow((prev) => ({
+        ...prev,
+        phase: "products",
+        pendingIndex: 0,
+      }));
+    }
+  };
+
+  const handleConfirmProduct = () => {
+    const { categoryId, products, pendingIndex } = deleteCategoryFlow;
+    if (pendingIndex < products.length - 1) {
+      setDeleteCategoryFlow((prev) => ({
+        ...prev,
+        pendingIndex: prev.pendingIndex + 1,
+      }));
+    } else {
+      executeDeleteCategory(categoryId);
+    }
+  };
 
   // ── Menu contextuel + paramètres dossier ─────────────────────────────────────
 
@@ -330,35 +492,53 @@ const Dashboard = () => {
                 categories={categories}
                 dnd={dnd}
                 onCategorySelect={handleCategorySelect}
+                onCategoryContextMenu={handleCategoryContextMenu}
                 onToggleFolder={toggleFolder}
                 onFolderContextMenu={handleFolderContextMenu}
                 onAddCategory={() => setShowCategoryModal(true)}
                 onTooltipEnter={handleTooltipEnter}
                 onTooltipLeave={handleTooltipLeave}
               />
-              <CatalogMain
-                selectedCat={categories.find((c) => c._id === selectedCategory)}
-                onAdd={() => {
-                  setSelectedFileData({
-                    productName: "",
-                    aliasName: { activate: false, name: "" },
-                    img: [],
-                    treatmentDuration: 1,
-                    amountToAdminister: 1,
-                    intakeTime: { advancedMode: false, daysTime: [] },
-                  });
-                  setEditMode(false);
-                }}
-                onSelect={handleSelectProduct}
-                onEdit={handleEditProduct}
-                onDelete={(product) =>
-                  setDeleteModal({
-                    open: true,
-                    productId: product._id,
-                    productName: product.name || "ce produit",
-                  })
-                }
-              />
+              {categorySettingsId ? (
+                (() => {
+                  const cat = categories.find(
+                    (c) => c._id === categorySettingsId,
+                  );
+                  if (!cat) return null;
+                  return (
+                    <CategorySettings
+                      category={cat}
+                      onClose={() => setCategorySettingsId(null)}
+                    />
+                  );
+                })()
+              ) : (
+                <CatalogMain
+                  selectedCat={categories.find(
+                    (c) => c._id === selectedCategory,
+                  )}
+                  onAdd={() => {
+                    setSelectedFileData({
+                      productName: "",
+                      aliasName: { activate: false, name: "" },
+                      img: [],
+                      treatmentDuration: 1,
+                      amountToAdminister: 1,
+                      intakeTime: { advancedMode: false, daysTime: [] },
+                    });
+                    setEditMode(false);
+                  }}
+                  onSelect={handleSelectProduct}
+                  onEdit={handleEditProduct}
+                  onDelete={(product) =>
+                    setDeleteModal({
+                      open: true,
+                      productId: product._id,
+                      productName: product.name || "ce produit",
+                    })
+                  }
+                />
+              )}
             </div>
           )}
         </section>
@@ -424,6 +604,55 @@ const Dashboard = () => {
             />
           );
         })()}
+
+      {/* Menu contextuel catégorie */}
+      {categoryContextMenu && (
+        <CategoryContextMenu
+          x={categoryContextMenu.x}
+          y={categoryContextMenu.y}
+          onSettings={() =>
+            setCategorySettingsId(categoryContextMenu.categoryId)
+          }
+          onDelete={() => {
+            handleOpenDeleteCategory(categoryContextMenu.categoryId);
+          }}
+          onClose={() => setCategoryContextMenu(null)}
+        />
+      )}
+
+      {/* Phase 1 : confirmation suppression catégorie */}
+      {deleteCategoryFlow?.phase === "confirm" && (
+        <ConfirmationModal
+          isOpen
+          title="Supprimer la librairie"
+          message={`Supprimer "${deleteCategoryFlow.categoryName}" ? Cette action est irréversible.`}
+          confirmText="Supprimer"
+          cancelText="Annuler"
+          onConfirm={handleConfirmDeleteCategory}
+          onCancel={() => setDeleteCategoryFlow(null)}
+          softDanger
+          toggleLabel={
+            deleteCategoryFlow.products.length > 0 ? "Tout supprimer" : null
+          }
+          toggleChecked={deleteCategoryFlow.confirmAll}
+          onToggleChange={(checked) =>
+            setDeleteCategoryFlow((prev) => ({ ...prev, confirmAll: checked }))
+          }
+        />
+      )}
+
+      {/* Phase 2 : confirmation produit par produit */}
+      {deleteCategoryFlow?.phase === "products" && (
+        <ConfirmationModal
+          isOpen
+          title={`Produit ${deleteCategoryFlow.pendingIndex + 1} / ${deleteCategoryFlow.products.length}`}
+          message={`Supprimer "${deleteCategoryFlow.products[deleteCategoryFlow.pendingIndex]?.name || "ce produit"}" ?`}
+          confirmText="Supprimer"
+          cancelText="Tout annuler"
+          onConfirm={handleConfirmProduct}
+          onCancel={() => setDeleteCategoryFlow(null)}
+        />
+      )}
     </div>
   );
 };
