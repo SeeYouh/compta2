@@ -1,11 +1,17 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 
 import { Link, useNavigate } from "react-router-dom";
 
 import CategoryForm from "../../components/CategoryForm";
 import { categoryLibrary } from "../../utils/variable";
 import ConfirmationModal from "../../../../components/ConfirmationModal";
+import { darken } from "../../utils/colorUtils";
+import { DARKEN_BG, DARKEN_BORDER } from "../../config/folderColors";
+import FolderContextMenu from "../../components/FolderContextMenu";
+import FolderService from "../../services/folderService";
+import FolderSettingsModal from "../../components/FolderSettingsModal";
 import Gear from "../../assets/gear";
+import IconDossierFull from "../../assets/IconDossierFull";
 import OdysseeCategoryService from "../../../../services/odysseeCategoryService";
 import OdysseeProductService from "../../../../services/odysseeProductService";
 import PaperProduct from "../../components/PaperProduct";
@@ -67,6 +73,22 @@ const Dashboard = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
+  // Sidebar : ordre + dossiers
+  const [sidebarItems, setSidebarItems] = useState([]);
+  const [folders, setFolders] = useState([]);
+
+  // Drag & drop
+  const dragRef = useRef(null);
+  const dndZoneRef = useRef({ targetId: null }); // hysteresis : élément cible courant
+  const [ghostIndex, setGhostIndex] = useState(null);
+  const [nestedGhost, setNestedGhost] = useState(null); // { folderId, index }
+  const [dropTarget, setDropTarget] = useState(null);
+
+  // UI flottante
+  const [tooltip, setTooltip] = useState(null);
+  const [contextMenu, setContextMenu] = useState(null);
+  const [folderSettingsModal, setFolderSettingsModal] = useState(null);
+
   // Initiales du nom de catégorie (ex: "la catégorie" → "lc")
   const getInitials = (name) =>
     name
@@ -78,18 +100,38 @@ const Dashboard = () => {
 
   const enrichCategory = (cat) => ({ ...cat, active: false, products: [] });
 
-  // Chargement des catégories au montage
+  // Chargement initial : catégories + layout sidebar
   useEffect(() => {
-    const loadCategories = async () => {
-      const result = await OdysseeCategoryService.getUserCategories();
-      if (result.success && result.categories.length > 0) {
-        const enriched = result.categories.map(enrichCategory);
+    const init = async () => {
+      const [catResult, sidebarResult] = await Promise.all([
+        OdysseeCategoryService.getUserCategories(),
+        FolderService.getSidebar(),
+      ]);
+
+      let enriched = [];
+      if (catResult.success && catResult.categories.length > 0) {
+        enriched = catResult.categories.map(enrichCategory);
         enriched[0].active = true;
         setCategories(enriched);
         setSelectedCategory(enriched[0]._id);
       }
+
+      if (sidebarResult.success) {
+        setFolders(sidebarResult.folders);
+        if (sidebarResult.layout.length > 0) {
+          setSidebarItems(sidebarResult.layout);
+        } else if (enriched.length > 0) {
+          // Première connexion : génération automatique depuis les catégories
+          const items = enriched.map((cat) => ({
+            type: "category",
+            id: cat._id,
+          }));
+          setSidebarItems(items);
+          FolderService.updateLayout(items);
+        }
+      }
     };
-    loadCategories();
+    init();
   }, []);
 
   // Chargement des produits quand la catégorie sélectionnée change
@@ -140,9 +182,322 @@ const Dashboard = () => {
     const truncated = { ...categoryData, name: categoryData.name.slice(0, 15) };
     const result = await OdysseeCategoryService.createCategory(truncated);
     if (result.success) {
-      setCategories((prev) => [...prev, enrichCategory(result.category)]);
+      const newCat = enrichCategory(result.category);
+      setCategories((prev) => [...prev, newCat]);
+      setSidebarItems((prev) => {
+        const newItems = [...prev, { type: "category", id: newCat._id }];
+        FolderService.updateLayout(newItems);
+        return newItems;
+      });
     }
     setShowCategoryModal(false);
+  };
+
+  // ── Dossiers ────────────────────────────────────────────────────────────────
+
+  const toggleFolder = async (folderId) => {
+    const folder = folders.find((f) => f._id === folderId);
+    if (!folder) return;
+    const newIsOpen = !folder.isOpen;
+    setFolders((prev) =>
+      prev.map((f) => (f._id === folderId ? { ...f, isOpen: newIsOpen } : f)),
+    );
+    FolderService.updateFolder(folderId, { isOpen: newIsOpen });
+  };
+
+  // Retire une catégorie d'un dossier. Supprime le dossier s'il devient vide.
+  // Retourne { newFolders, newItems } à partir des valeurs courantes passées en paramètre.
+  const computeRemoveFromFolder = async (
+    categoryId,
+    folderId,
+    currentItems,
+    currentFolders,
+  ) => {
+    const folder = currentFolders.find((f) => f._id === folderId);
+    if (!folder) return { newFolders: currentFolders, newItems: currentItems };
+
+    const newCategoryIds = folder.categoryIds.filter((id) => id !== categoryId);
+
+    if (newCategoryIds.length === 0) {
+      await FolderService.deleteFolder(folderId);
+      return {
+        newFolders: currentFolders.filter((f) => f._id !== folderId),
+        newItems: currentItems.filter((item) => item.id !== folderId),
+      };
+    }
+
+    await FolderService.updateFolder(folderId, { categoryIds: newCategoryIds });
+    return {
+      newFolders: currentFolders.map((f) =>
+        f._id === folderId ? { ...f, categoryIds: newCategoryIds } : f,
+      ),
+      newItems: currentItems,
+    };
+  };
+
+  // ── Drag & Drop ──────────────────────────────────────────────────────────────
+
+  const handleDragStart = (e, item) => {
+    dragRef.current = item;
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragEnd = () => {
+    setGhostIndex(null);
+    setNestedGhost(null);
+    setDropTarget(null);
+    dragRef.current = null;
+    dndZoneRef.current = { targetId: null };
+  };
+
+  // Réordonnancement au sein d'un même dossier
+  const handleReorderInFolder = async (folderId) => {
+    const drag = dragRef.current;
+    const ghost = nestedGhost;
+    setNestedGhost(null);
+    setGhostIndex(null);
+    setDropTarget(null);
+    dragRef.current = null;
+    dndZoneRef.current = { targetId: null };
+    if (!drag || ghost?.folderId !== folderId) return;
+    const folder = folders.find((f) => f._id === folderId);
+    if (!folder) return;
+    const fromIndex = folder.categoryIds.indexOf(drag.id);
+    if (fromIndex === -1) return;
+    const newIds = [...folder.categoryIds];
+    newIds.splice(fromIndex, 1);
+    const adjusted = ghost.index > fromIndex ? ghost.index - 1 : ghost.index;
+    newIds.splice(adjusted, 0, drag.id);
+    if (newIds.join(",") === folder.categoryIds.join(",")) return;
+    setFolders((prev) =>
+      prev.map((f) => (f._id === folderId ? { ...f, categoryIds: newIds } : f)),
+    );
+    await FolderService.updateFolder(folderId, { categoryIds: newIds });
+  };
+
+  // Dépose entre deux éléments de la sidebar (réordonnancement / retrait de dossier)
+  const handleDropBetween = async (insertIndex) => {
+    const drag = dragRef.current;
+    setGhostIndex(null);
+    setNestedGhost(null);
+    setDropTarget(null);
+    dragRef.current = null;
+    if (!drag) return;
+
+    let newItems = [...sidebarItems];
+    let newFolders = [...folders];
+
+    if (drag.fromFolderId) {
+      // Retrait du dossier source
+      const result = await computeRemoveFromFolder(
+        drag.id,
+        drag.fromFolderId,
+        newItems,
+        newFolders,
+      );
+      newItems = result.newItems;
+      newFolders = result.newFolders;
+      const safeIndex = Math.min(insertIndex, newItems.length);
+      newItems.splice(safeIndex, 0, { type: "category", id: drag.id });
+    } else {
+      // Réordonnancement dans la sidebar
+      const currentIndex = newItems.findIndex((item) => item.id === drag.id);
+      if (currentIndex === -1) return;
+      newItems.splice(currentIndex, 1);
+      const adjustedIndex =
+        currentIndex < insertIndex ? insertIndex - 1 : insertIndex;
+      newItems.splice(Math.min(adjustedIndex, newItems.length), 0, {
+        type: drag.type,
+        id: drag.id,
+      });
+    }
+
+    setFolders(newFolders);
+    setSidebarItems(newItems);
+    FolderService.updateLayout(newItems);
+  };
+
+  // Dépose sur un élément existant (catégorie ou dossier)
+  const handleDropOnItem = async (e, target) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const drag = dragRef.current;
+    setGhostIndex(null);
+    setNestedGhost(null);
+    setDropTarget(null);
+    dragRef.current = null;
+    if (!drag || drag.id === target.id) return;
+
+    // Catégorie sur catégorie → créer un dossier
+    if (drag.type === "category" && target.type === "category") {
+      let newItems = [...sidebarItems];
+      let newFolders = [...folders];
+
+      if (drag.fromFolderId) {
+        const result = await computeRemoveFromFolder(
+          drag.id,
+          drag.fromFolderId,
+          newItems,
+          newFolders,
+        );
+        newItems = result.newItems;
+        newFolders = result.newFolders;
+      } else {
+        newItems = newItems.filter((item) => item.id !== drag.id);
+      }
+
+      const targetIndex = newItems.findIndex((item) => item.id === target.id);
+      const folderResult = await FolderService.createFolder([
+        drag.id,
+        target.id,
+      ]);
+      if (!folderResult.success) return;
+
+      const newFolder = folderResult.folder;
+      newFolders = [...newFolders, newFolder];
+
+      if (targetIndex >= 0) {
+        newItems.splice(targetIndex, 1, { type: "folder", id: newFolder._id });
+      } else {
+        newItems.push({ type: "folder", id: newFolder._id });
+      }
+
+      setFolders(newFolders);
+      setSidebarItems(newItems);
+      FolderService.updateLayout(newItems);
+      return;
+    }
+
+    // Catégorie sur dossier → ajouter au dossier
+    if (drag.type === "category" && target.type === "folder") {
+      if (drag.fromFolderId === target.id) return;
+
+      let newItems = [...sidebarItems];
+      let newFolders = [...folders];
+
+      if (drag.fromFolderId) {
+        const result = await computeRemoveFromFolder(
+          drag.id,
+          drag.fromFolderId,
+          newItems,
+          newFolders,
+        );
+        newItems = result.newItems;
+        newFolders = result.newFolders;
+      } else {
+        newItems = newItems.filter((item) => item.id !== drag.id);
+      }
+
+      const targetFolder = newFolders.find((f) => f._id === target.id);
+      if (!targetFolder) return;
+
+      const newCategoryIds = [...targetFolder.categoryIds, drag.id];
+      const folderResult = await FolderService.updateFolder(target.id, {
+        categoryIds: newCategoryIds,
+      });
+      if (!folderResult.success) return;
+
+      newFolders = newFolders.map((f) =>
+        f._id === target.id ? { ...f, categoryIds: newCategoryIds } : f,
+      );
+
+      setFolders(newFolders);
+      setSidebarItems(newItems);
+      FolderService.updateLayout(newItems);
+    }
+  };
+
+  // ── Tooltip ──────────────────────────────────────────────────────────────────
+
+  const handleTooltipEnter = (e, type, id) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setTooltip({ type, id, top: rect.top + rect.height / 2 });
+  };
+
+  const handleTooltipLeave = () => setTooltip(null);
+
+  // ── Menu contextuel + paramètres dossier ─────────────────────────────────────
+
+  const handleFolderContextMenu = (e, folderId) => {
+    e.preventDefault();
+    setContextMenu({ folderId, x: e.clientX, y: e.clientY });
+  };
+
+  const handleToggleAllFolders = async () => {
+    const allClosed = folders.every((f) => !f.isOpen);
+    const newIsOpen = allClosed;
+    setFolders((prev) => prev.map((f) => ({ ...f, isOpen: newIsOpen })));
+    await Promise.all(
+      folders.map((f) =>
+        FolderService.updateFolder(f._id, { isOpen: newIsOpen }),
+      ),
+    );
+  };
+
+  const handleSaveFolderSettings = async ({ name, color }) => {
+    const folderId = folderSettingsModal;
+    const result = await FolderService.updateFolder(folderId, { name, color });
+    if (result.success) {
+      setFolders((prev) =>
+        prev.map((f) => (f._id === folderId ? { ...f, name, color } : f)),
+      );
+    }
+    setFolderSettingsModal(null);
+  };
+
+  // ── Ghost ────────────────────────────────────────────────────────────────────
+
+  const renderGhost = () => {
+    const drag = dragRef.current;
+    if (!drag) return null;
+
+    if (drag.type === "category") {
+      const cat = categories.find((c) => c._id === drag.id);
+      if (!cat) return null;
+      return (
+        <div
+          key="ghost"
+          className="catalog-sidebar__icon catalog-sidebar__icon--ghost"
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+        >
+          {cat.image ? (
+            <img src={cat.image} alt={cat.name} />
+          ) : (
+            getInitials(cat.name)
+          )}
+        </div>
+      );
+    }
+
+    if (drag.type === "folder") {
+      const folder = folders.find((f) => f._id === drag.id);
+      if (!folder) return null;
+      const color = folder.color || "#969696";
+      return (
+        <div
+          key="ghost"
+          className="catalog-sidebar__folder catalog-sidebar__folder--ghost"
+          style={{
+            borderColor: darken(color, DARKEN_BORDER),
+            background: darken(color, DARKEN_BG),
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+        >
+          <div className="catalog-sidebar__icon catalog-sidebar__icon--folder">
+            <IconDossierFull size={22} color={color} />
+          </div>
+        </div>
+      );
+    }
+
+    return null;
   };
 
   // Fonctions pour les catégories
@@ -248,20 +603,313 @@ const Dashboard = () => {
           }) || (
             <div className="catalog-container">
               {/* Sidebar catégories */}
-              <div className="catalog-sidebar">
-                {categories.map((category) => (
-                  <div
-                    key={category._id}
-                    className={`catalog-sidebar__icon${category.active ? " active" : ""}`}
-                    onClick={() => handleCategorySelect(category._id)}
-                  >
-                    {category.image ? (
-                      <img src={category.image} alt={category.name} />
-                    ) : (
-                      getInitials(category.name)
-                    )}
-                  </div>
-                ))}
+              <div
+                className="catalog-sidebar"
+                onDragOver={(e) => {
+                  if (!dragRef.current) return;
+                  e.preventDefault();
+                  setGhostIndex(sidebarItems.length);
+                  setDropTarget(null);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  if (ghostIndex !== null) handleDropBetween(ghostIndex);
+                }}
+              >
+                {sidebarItems.map((item, index) => {
+                  if (item.type === "folder") {
+                    const folder = folders.find((f) => f._id === item.id);
+                    if (!folder) return null;
+                    const isDropOnFolder =
+                      dropTarget?.action === "on" && dropTarget?.id === item.id;
+
+                    const folderColor = folder.color || "#969696";
+                    const folderBorderColor = darken(
+                      folderColor,
+                      DARKEN_BORDER,
+                    );
+                    const folderBgColor = darken(folderColor, DARKEN_BG);
+
+                    return (
+                      <Fragment key={item.id}>
+                        {ghostIndex === index && renderGhost()}
+                        <div
+                          className="catalog-sidebar__folder"
+                          style={{
+                            borderColor: isDropOnFolder
+                              ? folderColor
+                              : folderBorderColor,
+                            background: folderBgColor,
+                          }}
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (
+                              dragRef.current?.type === "category" &&
+                              dragRef.current?.fromFolderId !== item.id
+                            ) {
+                              // Catégorie externe → dépôt sur le dossier
+                              setGhostIndex(null);
+                              setNestedGhost(null);
+                              setDropTarget({
+                                action: "on",
+                                id: item.id,
+                                type: "folder",
+                              });
+                            } else if (
+                              dragRef.current?.fromFolderId === item.id
+                            ) {
+                              // Catégorie interne → les icônes nested gèrent la position
+                              setGhostIndex(null);
+                              setDropTarget(null);
+                            } else {
+                              // Dossier → réordonnancement sidebar
+                              const rect =
+                                e.currentTarget.getBoundingClientRect();
+                              const isNew =
+                                dndZoneRef.current.targetId !== item.id;
+                              if (isNew) dndZoneRef.current.targetId = item.id;
+                              const ratio =
+                                (e.clientY - rect.top) / rect.height;
+                              if (!isNew && ratio >= 0.4 && ratio <= 0.6)
+                                return;
+                              setNestedGhost(null);
+                              setGhostIndex(ratio < 0.5 ? index : index + 1);
+                              setDropTarget(null);
+                            }
+                          }}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (
+                              dropTarget?.action === "on" &&
+                              dropTarget?.id === item.id
+                            ) {
+                              handleDropOnItem(e, {
+                                type: "folder",
+                                id: item.id,
+                              });
+                            } else if (nestedGhost?.folderId === item.id) {
+                              handleReorderInFolder(item.id);
+                            } else if (ghostIndex !== null) {
+                              handleDropBetween(ghostIndex);
+                            }
+                          }}
+                        >
+                          <div
+                            className="catalog-sidebar__icon catalog-sidebar__icon--folder"
+                            draggable
+                            onDragStart={(e) =>
+                              handleDragStart(e, {
+                                type: "folder",
+                                id: item.id,
+                                fromFolderId: null,
+                              })
+                            }
+                            onDragEnd={handleDragEnd}
+                            onContextMenu={(e) =>
+                              handleFolderContextMenu(e, item.id)
+                            }
+                            onMouseEnter={(e) =>
+                              handleTooltipEnter(e, "folder", item.id)
+                            }
+                            onMouseLeave={handleTooltipLeave}
+                            onClick={() => toggleFolder(item.id)}
+                          >
+                            <IconDossierFull size={22} color={folderColor} />
+                          </div>
+                          {folder.isOpen && (
+                            <div className="catalog-sidebar__folder-children">
+                              {folder.categoryIds.map((catId, nestedIdx) => {
+                                const cat = categories.find(
+                                  (c) => c._id === catId,
+                                );
+                                if (!cat) return null;
+                                return (
+                                  <Fragment key={catId}>
+                                    {nestedGhost?.folderId === item.id &&
+                                      nestedGhost.index === nestedIdx && (
+                                        <div className="catalog-sidebar__icon catalog-sidebar__icon--nested catalog-sidebar__icon--ghost" />
+                                      )}
+                                    <div
+                                      className={`catalog-sidebar__icon catalog-sidebar__icon--nested${cat.active ? " active" : ""}`}
+                                      style={
+                                        cat.image
+                                          ? { background: "transparent" }
+                                          : {
+                                              background: darken(
+                                                folderColor,
+                                                DARKEN_BORDER,
+                                              ),
+                                            }
+                                      }
+                                      draggable
+                                      onDragStart={(e) =>
+                                        handleDragStart(e, {
+                                          type: "category",
+                                          id: catId,
+                                          fromFolderId: item.id,
+                                        })
+                                      }
+                                      onDragOver={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        const drag = dragRef.current;
+                                        if (
+                                          drag?.type !== "category" ||
+                                          drag?.fromFolderId !== item.id ||
+                                          drag.id === catId
+                                        )
+                                          return;
+                                        const rect =
+                                          e.currentTarget.getBoundingClientRect();
+                                        const key = `${item.id}-${catId}`;
+                                        const isNew =
+                                          dndZoneRef.current.targetId !== key;
+                                        if (isNew)
+                                          dndZoneRef.current.targetId = key;
+                                        const ratio =
+                                          (e.clientY - rect.top) / rect.height;
+                                        if (
+                                          !isNew &&
+                                          ratio >= 0.4 &&
+                                          ratio <= 0.6
+                                        )
+                                          return;
+                                        setNestedGhost({
+                                          folderId: item.id,
+                                          index:
+                                            ratio < 0.5
+                                              ? nestedIdx
+                                              : nestedIdx + 1,
+                                        });
+                                      }}
+                                      onDrop={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleReorderInFolder(item.id);
+                                      }}
+                                      onDragEnd={handleDragEnd}
+                                      onMouseEnter={(e) =>
+                                        handleTooltipEnter(e, "category", catId)
+                                      }
+                                      onMouseLeave={handleTooltipLeave}
+                                      onClick={() =>
+                                        handleCategorySelect(catId)
+                                      }
+                                    >
+                                      {cat.image ? (
+                                        <img src={cat.image} alt={cat.name} />
+                                      ) : (
+                                        getInitials(cat.name)
+                                      )}
+                                    </div>
+                                  </Fragment>
+                                );
+                              })}
+                              {nestedGhost?.folderId === item.id &&
+                                nestedGhost.index ===
+                                  folder.categoryIds.length && (
+                                  <div className="catalog-sidebar__icon catalog-sidebar__icon--nested catalog-sidebar__icon--ghost" />
+                                )}
+                            </div>
+                          )}
+                        </div>
+                      </Fragment>
+                    );
+                  }
+
+                  // item.type === "category"
+                  const cat = categories.find((c) => c._id === item.id);
+                  if (!cat) return null;
+                  const isDropOnCat =
+                    dropTarget?.action === "on" && dropTarget?.id === item.id;
+
+                  return (
+                    <Fragment key={item.id}>
+                      {ghostIndex === index && renderGhost()}
+                      <div
+                        className={`catalog-sidebar__icon${cat.active ? " active" : ""}${isDropOnCat ? " drop-target" : ""}`}
+                        draggable
+                        onDragStart={(e) =>
+                          handleDragStart(e, {
+                            type: "category",
+                            id: item.id,
+                            fromFolderId: null,
+                          })
+                        }
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const drag = dragRef.current;
+                          if (!drag || drag.id === item.id) return;
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          const isNew = dndZoneRef.current.targetId !== item.id;
+                          if (isNew) dndZoneRef.current.targetId = item.id;
+                          const ratio = (e.clientY - rect.top) / rect.height;
+                          if (drag.type === "category") {
+                            // Zones mortes ±6% autour des seuils 0.4 et 0.6
+                            if (
+                              !isNew &&
+                              ((ratio >= 0.37 && ratio <= 0.43) ||
+                                (ratio >= 0.57 && ratio <= 0.63))
+                            )
+                              return;
+                            if (ratio < 0.4) {
+                              setGhostIndex(index);
+                              setDropTarget(null);
+                            } else if (ratio > 0.6) {
+                              setGhostIndex(index + 1);
+                              setDropTarget(null);
+                            } else {
+                              setGhostIndex(null);
+                              setDropTarget({
+                                action: "on",
+                                id: item.id,
+                                type: "category",
+                              });
+                            }
+                          } else {
+                            // Zone morte 40-60% pour dossier sur catégorie
+                            if (!isNew && ratio >= 0.4 && ratio <= 0.6) return;
+                            setGhostIndex(ratio < 0.5 ? index : index + 1);
+                            setDropTarget(null);
+                          }
+                        }}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (
+                            dropTarget?.action === "on" &&
+                            dropTarget?.id === item.id
+                          ) {
+                            handleDropOnItem(e, {
+                              type: "category",
+                              id: item.id,
+                            });
+                          } else if (ghostIndex !== null) {
+                            handleDropBetween(ghostIndex);
+                          }
+                        }}
+                        onDragEnd={handleDragEnd}
+                        onMouseEnter={(e) =>
+                          handleTooltipEnter(e, "category", item.id)
+                        }
+                        onMouseLeave={handleTooltipLeave}
+                        onClick={() => handleCategorySelect(item.id)}
+                      >
+                        {cat.image ? (
+                          <img src={cat.image} alt={cat.name} />
+                        ) : (
+                          getInitials(cat.name)
+                        )}
+                      </div>
+                    </Fragment>
+                  );
+                })}
+
+                {ghostIndex === sidebarItems.length && renderGhost()}
+
                 <div
                   className="catalog-sidebar__add"
                   onClick={() => setShowCategoryModal(true)}
@@ -424,6 +1072,71 @@ const Dashboard = () => {
           setDeleteModal({ open: false, productId: null, productName: "" })
         }
       />
+
+      {/* Tooltip sidebar */}
+      {tooltip &&
+        (() => {
+          if (tooltip.type === "category") {
+            const cat = categories.find((c) => c._id === tooltip.id);
+            if (!cat) return null;
+            return (
+              <div className="sidebar-tooltip" style={{ top: tooltip.top }}>
+                <span className="sidebar-tooltip__name">{cat.name}</span>
+              </div>
+            );
+          }
+          if (tooltip.type === "folder") {
+            const folder = folders.find((f) => f._id === tooltip.id);
+            if (!folder) return null;
+            if (folder.name) {
+              return (
+                <div className="sidebar-tooltip" style={{ top: tooltip.top }}>
+                  <span className="sidebar-tooltip__name">{folder.name}</span>
+                </div>
+              );
+            }
+            const catNames = folder.categoryIds
+              .map((id) => categories.find((c) => c._id === id)?.name)
+              .filter(Boolean);
+            return (
+              <div className="sidebar-tooltip" style={{ top: tooltip.top }}>
+                <ul className="sidebar-tooltip__list">
+                  {catNames.slice(0, 5).map((n, i) => (
+                    <li key={i}>{n}</li>
+                  ))}
+                  {catNames.length > 5 && <li>…</li>}
+                </ul>
+              </div>
+            );
+          }
+          return null;
+        })()}
+
+      {/* Menu contextuel dossier */}
+      {contextMenu && (
+        <FolderContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          allClosed={folders.every((f) => !f.isOpen)}
+          onSettings={() => setFolderSettingsModal(contextMenu.folderId)}
+          onToggleAll={handleToggleAllFolders}
+          onClose={() => setContextMenu(null)}
+        />
+      )}
+
+      {/* Modal paramètres dossier */}
+      {folderSettingsModal &&
+        (() => {
+          const folder = folders.find((f) => f._id === folderSettingsModal);
+          if (!folder) return null;
+          return (
+            <FolderSettingsModal
+              folder={folder}
+              onSave={handleSaveFolderSettings}
+              onCancel={() => setFolderSettingsModal(null)}
+            />
+          );
+        })()}
     </div>
   );
 };

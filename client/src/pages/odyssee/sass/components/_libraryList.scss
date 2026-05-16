@@ -50,6 +50,362 @@
   &.active {
     background: $color-dark;
   }
+
+  img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+
+  // Variante dossier : fond et contour injectés via inline styles (couleur dynamique)
+  &--folder {
+    background: transparent;
+    transition: opacity 0.2s;
+
+    &:hover {
+      background: transparent;
+      opacity: 0.8;
+    }
+  }
+
+  // Variante imbriquée (dans un dossier ouvert)
+  &--nested {
+    width: 32px;
+    height: 32px;
+    font-size: 10px;
+    border-radius: 6px;
+    margin: 4px 0;
+
+    img {
+      width: 26px;
+      height: 26px;
+    }
+  }
+
+  &.drop-target {
+    outline: 2px dashed $color-1;
+  }
+}
+
+// Dossier (conteneur icône + enfants)
+.catalog-sidebar__folder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 52px;
+  border-radius: 10px;
+  border: 2px solid transparent; // remplacé par inline style dynamique
+  padding: 2px;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.catalog-sidebar__folder-children {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 0;
+  width: 100%;
+}
+
+// Ghost — icône fantome pendant le drag
+@keyframes ghost-slide-in {
+  from {
+    max-height: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    opacity: 0;
+  }
+
+  to {
+    max-height: 56px; // 40px + 8px*2 margin
+    margin-top: 8px;
+    margin-bottom: 8px;
+    opacity: 0.35;
+  }
+}
+
+@keyframes ghost-folder-slide-in {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+
+  to {
+    max-height: 80px;
+    opacity: 0.65;
+  }
+}
+
+.catalog-sidebar__icon--ghost {
+  border: 2px dashed $color-1;
+  background: transparent !important;
+  cursor: default;
+  overflow: hidden;
+  animation: ghost-slide-in 0.15s ease forwards;
+}
+
+// Variante nested (32px + margin 4px)
+@keyframes ghost-nested-slide-in {
+  from {
+    max-height: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    opacity: 0;
+  }
+
+  to {
+    max-height: 40px; // 32px + 4px*2 margin
+    margin-top: 4px;
+    margin-bottom: 4px;
+    opacity: 0.35;
+  }
+}
+
+.catalog-sidebar__icon--nested.catalog-sidebar__icon--ghost {
+  animation: ghost-nested-slide-in 0.15s ease forwards;
+}
+
+.catalog-sidebar__folder--ghost {
+  cursor: default;
+  overflow: hidden;
+  animation: ghost-folder-slide-in 0.15s ease forwards;
+}
+
+// ── Tooltip sidebar ──────────────────────────────────────────────────────────
+
+.sidebar-tooltip {
+  position: fixed;
+  left: 65px; // 60px sidebar + 5px espace (inclut la flèche)
+  background: $color-darker;
+  border: 1px solid $color-dark;
+  border-radius: 6px;
+  padding: 4px 8px 5px;
+  pointer-events: none;
+  z-index: 500;
+  width: max-content;
+  max-width: 180px;
+  transform: translateY(-50%);
+
+  // Flèche gauche — bord (couleur bordure)
+  &::before {
+    content: "";
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 7px solid transparent;
+    border-right-color: $color-dark;
+  }
+
+  // Flèche gauche — remplissage (couleur fond)
+  &::after {
+    content: "";
+    position: absolute;
+    right: calc(100% - 1px);
+    top: 50%;
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-right-color: $color-darker;
+  }
+
+  &__name {
+    color: $color-lightness;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__list {
+    margin: 4px 0 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      color: $color-1;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+// ── Menu contextuel clic droit ───────────────────────────────────────────────
+
+.folder-ctx-menu {
+  position: fixed;
+  background: $color-darker;
+  border: 1px solid $color-dark;
+  border-radius: 8px;
+  padding: 4px 0;
+  z-index: 600;
+  min-width: 200px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+
+  &__item {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    color: $color-lightness;
+    font-size: 13px;
+    text-align: left;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover {
+      background: $color-dark;
+    }
+  }
+}
+
+// ── Modal paramètres dossier ─────────────────────────────────────────────────
+
+.folder-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 700;
+}
+
+.folder-modal {
+  position: relative;
+  background: $color-darker;
+  border: 1px solid $color-dark;
+  border-radius: 12px;
+  padding: 28px 24px 24px;
+  width: 340px;
+  max-width: 90vw;
+
+  &__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: $color-1;
+    font-size: 16px;
+    cursor: pointer;
+    line-height: 1;
+
+    &:hover {
+      color: $color-lightness;
+    }
+  }
+
+  &__title {
+    margin: 0 0 20px;
+    color: $color-lightness;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  &__label {
+    display: block;
+    color: $color-1;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  &__input {
+    width: 100%;
+    background: $color-darkest;
+    border: 1px solid $color-dark;
+    border-radius: 6px;
+    color: $color-lightness;
+    font-size: 13px;
+    padding: 8px 10px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: $color-dark;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $color-1;
+    }
+  }
+
+  &__palette {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  &__swatch {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+
+    &.selected {
+      transform: scale(1.1);
+    }
+  }
+
+  &__swatch-check {
+    color: $color-lightness;
+    font-size: 14px;
+    font-weight: 700;
+    pointer-events: none;
+  }
+
+  &__confirm {
+    width: 100%;
+    background: $color-dark;
+    border: none;
+    border-radius: 8px;
+    color: $color-lightness;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: $color-1;
+    }
+  }
+}
+
+// Zone de dépôt entre les éléments
+.catalog-sidebar__drop-stripe {
+  width: 36px;
+  height: 6px;
+  border-radius: 3px;
+  transition:
+    height 0.15s,
+    background 0.15s;
+
+  &.active {
+    height: 12px;
+    background: $color-1;
+  }
 }
 
 // Bouton + en bas de la sidebar

@@ -78,12 +78,12 @@ const CategoryForm = ({ onSubmit, onCancel }) => {
               className="cat-form__input"
               type="text"
               value={categoryName}
-              onChange={(e) => setCategoryName(e.target.value.slice(0, 15))}
+              onChange={(e) => setCategoryName(e.target.value.slice(0, 30))}
               placeholder="Nom de la catégorie"
-              maxLength={15}
+              maxLength={30}
               autoFocus
             />
-            <span className="cat-form__counter">{categoryName.length}/15</span>
+            <span className="cat-form__counter">{categoryName.length}/30</span>
           </div>
 
           {/* Image */}
