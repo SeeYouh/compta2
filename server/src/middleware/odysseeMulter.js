@@ -30,7 +30,11 @@ const fileFilter = (req, file, callback) => {
   }
 };
 
-export const odysseeUpload = multer({ storage, fileFilter }).single("image");
+export const odysseeUpload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2 Mo max
+}).single("image");
 
 // Upload en mémoire pour les catégories (validation des dimensions via Sharp)
 export const categoryUpload = multer({

@@ -28,7 +28,7 @@ export const validateCategoryImage = async (req, res, next) => {
     await fs.mkdir(categoryDir, { recursive: true });
     await fs.writeFile(path.join(categoryDir, filename), req.file.buffer);
 
-    req.savedImagePath = `/odyssee-images/categories/${filename}`;
+    req.savedImagePath = `${req.protocol}://${req.get("host")}/odyssee-images/categories/${filename}`;
     next();
   } catch {
     return res
