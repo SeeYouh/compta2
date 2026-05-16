@@ -1,4 +1,6 @@
-import { OdysseeCategory } from "../models/OdysseeCategory.js";
+import { OdysseeCategory } from '../models/OdysseeCategory.js';
+import { OdysseeFolder } from '../models/OdysseeFolder.js';
+import { OdysseeProduct } from '../models/OdysseeProduct.js';
 
 export const createCategory = async (req, res) => {
   try {
@@ -58,26 +60,6 @@ export const updateCategory = async (req, res) => {
 
 export const deleteCategory = async (req, res) => {
   try {
-    const category = await OdysseeCategory.findOneAndUpdate(
-      { _id: req.params.id, userId: req.userId },
-      { isActive: false },
-      { new: true },
-    );
-
-    if (!category) {
-      return res
-        .status(404)
-        .json({ error: "Catégorie non trouvée ou non autorisée" });
-    }
-
-    res.status(200).json({ message: "Catégorie supprimée !", category });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-export const hardDeleteCategory = async (req, res) => {
-  try {
     const category = await OdysseeCategory.findOneAndDelete({
       _id: req.params.id,
       userId: req.userId,
@@ -89,9 +71,23 @@ export const hardDeleteCategory = async (req, res) => {
         .json({ error: "Catégorie non trouvée ou non autorisée" });
     }
 
-    res
-      .status(200)
-      .json({ message: "Catégorie supprimée définitivement !", category });
+    await OdysseeProduct.deleteMany({
+      categoryId: req.params.id,
+      userId: req.userId,
+    });
+
+    // Cascade : retirer la catégorie des dossiers qui la référencent
+    await OdysseeFolder.updateMany(
+      { userId: req.userId, categoryIds: req.params.id },
+      { $pull: { categoryIds: req.params.id } },
+    );
+    // Supprimer les dossiers devenus vides
+    await OdysseeFolder.deleteMany({
+      userId: req.userId,
+      categoryIds: { $size: 0 },
+    });
+
+    res.status(200).json({ message: "Catégorie supprimée !", category });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

@@ -1,17 +1,16 @@
-import express from "express";
+import express from 'express';
 
-import { authenticate } from "../middleware/auth.js";
-import { categoryUpload } from "../middleware/odysseeMulter.js";
+import { authenticate } from '../middleware/auth.js';
+import { categoryUpload } from '../middleware/odysseeMulter.js';
 import {
   createCategory,
   deleteCategory,
   getAllCategories,
   getOneCategory,
-  hardDeleteCategory,
   searchCategories,
   updateCategory,
-} from "../controllers/odysseeCategoryController.js";
-import { validateCategoryImage } from "../middleware/imageValidation.js";
+} from '../controllers/odysseeCategoryController.js';
+import { validateCategoryImage } from '../middleware/imageValidation.js';
 
 const router = express.Router();
 
@@ -34,6 +33,5 @@ router.put(
   updateCategory,
 );
 router.delete("/:id", authenticate, deleteCategory);
-router.delete("/:id/hard", authenticate, hardDeleteCategory);
 
 export default router;
