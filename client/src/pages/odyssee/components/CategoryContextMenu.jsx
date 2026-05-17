@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import ContextMenu from './ContextMenu';
-import Gear from '../assets/gear';
-import IconTrash from '../assets/IconTrash';
+import ContextMenu from "./ContextMenu";
+import Gear from "../assets/gear";
+import IconTrash from "../assets/IconTrash";
 
 const CategoryContextMenu = ({
   x,
@@ -11,6 +11,8 @@ const CategoryContextMenu = ({
   onDelete,
   onCreateFolder,
   onCreateProduct,
+  allFoldersClosed,
+  onToggleAllFolders,
   onClose,
 }) => {
   const [dataTimeRotateGear, setDataTimeRotateGear] = useState({
@@ -39,6 +41,17 @@ const CategoryContextMenu = ({
         }}
       >
         Créer un produit
+      </button>
+      <button
+        className="ctx-menu__item"
+        onClick={() => {
+          onToggleAllFolders?.();
+          onClose();
+        }}
+      >
+        {allFoldersClosed
+          ? "Ouvrir tous les dossiers"
+          : "Fermer tous les dossiers"}
       </button>
       <div className="ctx-menu__separator" />
       <div className="ctx-menu__actions">

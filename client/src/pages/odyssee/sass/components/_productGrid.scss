@@ -149,8 +149,13 @@
     opacity: 0.5;
   }
 
-  &:hover .catalog-card:hover {
+  &:hover .catalog-card:hover,
+  &:hover .catalog-card--selected {
     opacity: 1;
+  }
+
+  &:has(.catalog-card--selected) .catalog-card:not(.catalog-card--selected) {
+    opacity: 0.5;
   }
 }
 
@@ -164,6 +169,12 @@
   &--selected {
     outline: 2px solid $color-light;
     outline-offset: -2px;
+  }
+
+  &--drag-over {
+    outline: 2px dashed $color-lightness;
+    outline-offset: -2px;
+    opacity: 0.8;
   }
 
   &__image {

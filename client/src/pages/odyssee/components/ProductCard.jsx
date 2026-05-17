@@ -1,11 +1,7 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useRef, useState } from "react";
 
-import IconPicture from '../assets/IconPicture';
-import IconTrash from '../assets/IconTrash';
+import IconPicture from "../assets/IconPicture";
+import IconTrash from "../assets/IconTrash";
 
 const ProductCard = ({
   product,
@@ -17,9 +13,30 @@ const ProductCard = ({
   onHoverLeave,
   draggable,
   onDragStart,
+  onDragOver,
+  onDrop,
 }) => {
   const [imgError, setImgError] = useState(false);
   const [contextMenu, setContextMenu] = useState(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+
+  const handleDragOver = onDragOver
+    ? (e) => {
+        if (Array.from(e.dataTransfer.types).includes("productid")) {
+          setIsDragOver(true);
+        }
+        onDragOver(e);
+      }
+    : undefined;
+
+  const handleDragLeave = onDrop ? () => setIsDragOver(false) : undefined;
+
+  const handleDrop = onDrop
+    ? (e) => {
+        setIsDragOver(false);
+        onDrop(e);
+      }
+    : undefined;
   const menuRef = useRef(null);
 
   const hasImage = product.img?.[0] && !imgError;
@@ -56,13 +73,16 @@ const ProductCard = ({
   return (
     <>
       <div
-        className={`catalog-card${isSelected ? " catalog-card--selected" : ""}`}
+        className={`catalog-card${isSelected ? " catalog-card--selected" : ""}${isDragOver ? " catalog-card--drag-over" : ""}`}
         onClick={onClick}
         onContextMenu={handleContextMenu}
         onMouseEnter={(e) => onHover?.(e, displayName)}
         onMouseLeave={() => onHoverLeave?.()}
         draggable={!!draggable}
         onDragStart={onDragStart}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
       >
         <div className="catalog-card__image">
           {hasImage ? (

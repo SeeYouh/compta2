@@ -1,22 +1,17 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import ContextMenu from './ContextMenu';
-import Gear from '../assets/gear';
-import IconTrash from '../assets/IconTrash';
+import ContextMenu from "./ContextMenu";
+import Gear from "../assets/gear";
+import IconTrash from "../assets/IconTrash";
 
-/**
- * Menu contextuel d'un dossier de produits.
- * depth 0 = dossier (peut créer sous-dossier + produit)
- * depth 1 = sous-dossier (peut créer produit uniquement)
- */
 const ProductFolderContextMenu = ({
   x,
   y,
-  depth,
-  onCreateSubFolder,
   onCreateProduct,
   onSettings,
   onDelete,
+  allFoldersClosed,
+  onToggleAllFolders,
   onClose,
 }) => {
   const [dataTimeRotateGear, setDataTimeRotateGear] = useState({
@@ -28,17 +23,6 @@ const ProductFolderContextMenu = ({
 
   return (
     <ContextMenu x={x} y={y} onClose={onClose}>
-      {depth === 0 && (
-        <button
-          className="ctx-menu__item"
-          onClick={() => {
-            onCreateSubFolder();
-            onClose();
-          }}
-        >
-          Créer un sous-dossier
-        </button>
-      )}
       <button
         className="ctx-menu__item"
         onClick={() => {
@@ -47,6 +31,17 @@ const ProductFolderContextMenu = ({
         }}
       >
         Créer un produit
+      </button>
+      <button
+        className="ctx-menu__item"
+        onClick={() => {
+          onToggleAllFolders?.();
+          onClose();
+        }}
+      >
+        {allFoldersClosed
+          ? "Ouvrir tous les dossiers"
+          : "Fermer tous les dossiers"}
       </button>
       <div className="ctx-menu__separator" />
       <div className="ctx-menu__actions">

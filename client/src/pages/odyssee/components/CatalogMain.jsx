@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import ProductCard from './ProductCard';
-import ProductFolder from './ProductFolder';
+import ProductCard from "./ProductCard";
+import ProductFolder from "./ProductFolder";
 
 const CatalogMain = ({
   selectedCat,
@@ -13,12 +13,16 @@ const CatalogMain = ({
   onDelete,
   onCreateFolder,
   onCreateProductInFolder,
-  onCreateSubFolder,
+  onGroupProducts,
   onRenameFolder,
   onDeleteFolder,
   onMoveProductToFolder,
   onReorderFolders,
   onCategoryContextMenu,
+  folderOpenStates,
+  onToggleFolder,
+  allFoldersClosed,
+  onToggleAllFolders,
 }) => {
   const allProducts = selectedCat?.products || [];
   const [productTooltip, setProductTooltip] = useState(null);
@@ -33,16 +37,6 @@ const CatalogMain = ({
       (f) => f.depth === 0 && String(f.categoryId) === String(selectedCat?._id),
     )
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-
-  // Sous-dossiers par parentFolderId
-  const subFoldersByParent = (productFolders || [])
-    .filter((f) => f.depth === 1)
-    .reduce((acc, sf) => {
-      const parentId = String(sf.parentFolderId);
-      if (!acc[parentId]) acc[parentId] = [];
-      acc[parentId].push(sf);
-      return acc;
-    }, {});
 
   // Produits par folderId
   const productsByFolder = allProducts
@@ -67,6 +61,15 @@ const CatalogMain = ({
 
   const handleProductDragStart = (e, productId) => {
     e.dataTransfer.setData("productId", productId);
+  };
+
+  // Drop d'un produit sur un autre produit → crée un dossier groupé
+  const handleProductDropOnProduct = (e, targetProductId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const draggedId = e.dataTransfer.getData("productId");
+    if (!draggedId || draggedId === targetProductId) return;
+    if (onGroupProducts) onGroupProducts(draggedId, targetProductId);
   };
 
   // Dépôt sur la zone racine (retire le produit d'un dossier)
@@ -120,17 +123,16 @@ const CatalogMain = ({
   const isEmpty = rootProducts.length === 0 && rootFolders.length === 0;
 
   return (
-    <div className="catalog-main">
+    <div
+      className="catalog-main"
+      onContextMenu={(e) => {
+        if (!selectedCat || !onCategoryContextMenu) return;
+        e.preventDefault();
+        onCategoryContextMenu(e, selectedCat._id);
+      }}
+    >
       <div className="catalog-main__header">
-        <h4
-          onContextMenu={(e) => {
-            if (!selectedCat || !onCategoryContextMenu) return;
-            e.preventDefault();
-            onCategoryContextMenu(e, selectedCat._id);
-          }}
-        >
-          {selectedCat ? selectedCat.name : "Sélectionnez une librairie"}
-        </h4>
+        <h4>{selectedCat ? selectedCat.name : "Sélectionnez une librairie"}</h4>
         <div className="catalog-main__meta">
           {selectedCat && (
             <div
@@ -168,18 +170,11 @@ const CatalogMain = ({
             <ProductFolder
               key={folder._id}
               folder={folder}
-              subFolders={(subFoldersByParent[String(folder._id)] || []).map(
-                (sf) => ({
-                  ...sf,
-                  products: productsByFolder[String(sf._id)] || [],
-                }),
-              )}
               products={productsByFolder[String(folder._id)] || []}
               selectedProductId={selectedProductId}
               onSelectProduct={onSelect}
               onEditProduct={onEdit}
               onDeleteProduct={onDelete}
-              onCreateSubFolder={onCreateSubFolder}
               onCreateProduct={onCreateProductInFolder}
               onRenameFolder={onRenameFolder}
               onDeleteFolder={onDeleteFolder}
@@ -192,6 +187,12 @@ const CatalogMain = ({
                   ? folderDropInfo.position
                   : null
               }
+              onHover={handleProductHover}
+              onHoverLeave={handleProductHoverLeave}
+              isOpen={folderOpenStates?.[String(folder._id)] !== false}
+              onToggle={() => onToggleFolder?.(folder._id)}
+              allFoldersClosed={allFoldersClosed}
+              onToggleAllFolders={onToggleAllFolders}
             />
           ))}
           {rootProducts.length > 0 && (
@@ -208,6 +209,15 @@ const CatalogMain = ({
                   onHoverLeave={handleProductHoverLeave}
                   draggable
                   onDragStart={(e) => handleProductDragStart(e, product._id)}
+                  onDragOver={(e) => {
+                    if (
+                      Array.from(e.dataTransfer.types).includes("productid")
+                    ) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }
+                  }}
+                  onDrop={(e) => handleProductDropOnProduct(e, product._id)}
                 />
               ))}
             </div>

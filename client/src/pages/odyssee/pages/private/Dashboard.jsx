@@ -1,33 +1,26 @@
-import {
-  useEffect,
-  useState,
-} from 'react';
+import { useEffect, useState } from "react";
 
-import {
-  Link,
-  useNavigate,
-} from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
 
-import CatalogMain from '../../components/CatalogMain';
-import CatalogSidebar from '../../components/CatalogSidebar';
-import CategoryContextMenu from '../../components/CategoryContextMenu';
-import CategoryForm from '../../components/CategoryForm';
-import { categoryLibrary } from '../../utils/variable';
-import CategorySettings from '../../components/CategorySettings';
-import ConfirmationModal from '../../../../components/ConfirmationModal';
-import FolderContextMenu from '../../components/FolderContextMenu';
-import FolderService from '../../services/folderService';
-import FolderSettingsModal from '../../components/FolderSettingsModal';
-import Gear from '../../assets/gear';
-import OdysseeCategoryService
-  from '../../../../services/odysseeCategoryService';
-import OdysseeProductService from '../../../../services/odysseeProductService';
-import PaperProduct from '../../components/PaperProduct';
-import ProductFolderService from '../../../../services/productFolderService';
-import ProductService from '../../services/productService';
-import SidebarTooltip from '../../components/SidebarTooltip';
-import SynapseUserMenu from '../../../../components/SynapseUserMenu';
-import { useSidebarDnd } from '../../hooks/useSidebarDnd';
+import CatalogMain from "../../components/CatalogMain";
+import CatalogSidebar from "../../components/CatalogSidebar";
+import CategoryContextMenu from "../../components/CategoryContextMenu";
+import CategoryForm from "../../components/CategoryForm";
+import { categoryLibrary } from "../../utils/variable";
+import CategorySettings from "../../components/CategorySettings";
+import ConfirmationModal from "../../../../components/ConfirmationModal";
+import FolderContextMenu from "../../components/FolderContextMenu";
+import FolderService from "../../services/folderService";
+import FolderSettingsModal from "../../components/FolderSettingsModal";
+import Gear from "../../assets/gear";
+import OdysseeCategoryService from "../../../../services/odysseeCategoryService";
+import OdysseeProductService from "../../../../services/odysseeProductService";
+import PaperProduct from "../../components/PaperProduct";
+import ProductFolderService from "../../../../services/productFolderService";
+import ProductService from "../../services/productService";
+import SidebarTooltip from "../../components/SidebarTooltip";
+import SynapseUserMenu from "../../../../components/SynapseUserMenu";
+import { useSidebarDnd } from "../../hooks/useSidebarDnd";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -107,6 +100,7 @@ const Dashboard = () => {
   const [contextMenu, setContextMenu] = useState(null);
   const [folderSettingsModal, setFolderSettingsModal] = useState(null);
   const [categoryContextMenu, setCategoryContextMenu] = useState(null);
+  const [folderOpenStates, setFolderOpenStates] = useState({});
   const [categorySettingsId, setCategorySettingsId] = useState(null);
   const [deleteCategoryFlow, setDeleteCategoryFlow] = useState(null);
   // deleteCategoryFlow phases :
@@ -282,7 +276,34 @@ const Dashboard = () => {
   const handleCategoryContextMenu = (e, categoryId) => {
     setCategoryContextMenu({ categoryId, x: e.clientX, y: e.clientY });
   };
+  const relevantFolders = productFolders.filter(
+    (f) => String(f.categoryId) === String(selectedCategory),
+  );
+  const allProductFoldersClosed =
+    relevantFolders.length > 0 &&
+    relevantFolders.every((f) => folderOpenStates[String(f._id)] === false);
 
+  const toggleAllProductFolders = () => {
+    setFolderOpenStates((prev) => {
+      const updated = { ...prev };
+      if (allProductFoldersClosed) {
+        relevantFolders.forEach((f) => {
+          delete updated[String(f._id)];
+        });
+      } else {
+        relevantFolders.forEach((f) => {
+          updated[String(f._id)] = false;
+        });
+      }
+      return updated;
+    });
+  };
+
+  const toggleProductFolder = (folderId) =>
+    setFolderOpenStates((prev) => ({
+      ...prev,
+      [String(folderId)]: prev[String(folderId)] !== false ? false : true,
+    }));
   // ── Dossiers de produits ─────────────────────────────────────────────────────
 
   const handleCreateProductFolder = async (
@@ -297,18 +318,6 @@ const Dashboard = () => {
       setProductFolders((prev) => [...prev, result.folder]);
     }
     setCategoryContextMenu(null);
-  };
-
-  const handleCreateSubFolder = async (parentFolderId) => {
-    const parent = productFolders.find((f) => f._id === parentFolderId);
-    if (!parent) return;
-    const result = await ProductFolderService.createFolder({
-      categoryId: parent.categoryId,
-      parentFolderId,
-    });
-    if (result.success) {
-      setProductFolders((prev) => [...prev, result.folder]);
-    }
   };
 
   const handleSaveProductFolderEdit = async ({ name, color }) => {
@@ -335,12 +344,7 @@ const Dashboard = () => {
     if (!folderId) return;
     const result = await ProductFolderService.deleteFolder(folderId);
     if (result.success) {
-      setProductFolders((prev) =>
-        prev.filter(
-          (f) =>
-            f._id !== folderId && String(f.parentFolderId) !== String(folderId),
-        ),
-      );
+      setProductFolders((prev) => prev.filter((f) => f._id !== folderId));
       if (selectedCategory) loadProducts(selectedCategory);
     }
     setDeleteFolderProductModal(null);
@@ -351,6 +355,20 @@ const Dashboard = () => {
       folderId: folderId || null,
     });
     if (result.success && selectedCategory) loadProducts(selectedCategory);
+  };
+
+  const handleGroupProducts = async (draggedId, targetId) => {
+    const folderResult = await ProductFolderService.createFolder({
+      categoryId: selectedCategory,
+    });
+    if (!folderResult.success) return;
+    const folderId = folderResult.folder._id;
+    await Promise.all([
+      OdysseeProductService.updateProduct(draggedId, { folderId }),
+      OdysseeProductService.updateProduct(targetId, { folderId }),
+    ]);
+    setProductFolders((prev) => [...prev, folderResult.folder]);
+    if (selectedCategory) loadProducts(selectedCategory);
   };
 
   const handleReorderFolders = async (folderIds) => {
@@ -633,7 +651,6 @@ const Dashboard = () => {
                     });
                     setEditMode(false);
                   }}
-                  onCreateSubFolder={handleCreateSubFolder}
                   onRenameFolder={(folderId) =>
                     setEditFolderModal({ folderId })
                   }
@@ -647,8 +664,13 @@ const Dashboard = () => {
                     });
                   }}
                   onMoveProductToFolder={handleMoveProductToFolder}
+                  onGroupProducts={handleGroupProducts}
                   onReorderFolders={handleReorderFolders}
                   onCategoryContextMenu={handleCategoryContextMenu}
+                  folderOpenStates={folderOpenStates}
+                  onToggleFolder={toggleProductFolder}
+                  allFoldersClosed={allProductFoldersClosed}
+                  onToggleAllFolders={toggleAllProductFolders}
                 />
               </div>
             )}
@@ -756,6 +778,8 @@ const Dashboard = () => {
             setEditMode(false);
             setCategoryContextMenu(null);
           }}
+          allFoldersClosed={allProductFoldersClosed}
+          onToggleAllFolders={toggleAllProductFolders}
           onClose={() => setCategoryContextMenu(null)}
         />
       )}
