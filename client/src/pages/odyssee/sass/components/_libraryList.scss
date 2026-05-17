@@ -25,6 +25,16 @@
   padding: 10px 0;
   position: relative;
   flex-shrink: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  > * {
+    flex-shrink: 0;
+  }
 }
 
 // Barres indicateur de sélection/survol
@@ -58,11 +68,13 @@
   justify-content: center;
   margin: 4px 0;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 10px;
   font-weight: 700;
   color: $color-lightness;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  padding: 2px;
+  overflow: hidden;
   transition: background 0.2s;
   user-select: none;
 
@@ -160,6 +172,44 @@
 
 // ── Tooltip sidebar ──────────────────────────────────────────────────────────
 
+// Tooltip produit (position: fixed, rendu dans CatalogMain)
+.catalog-card-tooltip {
+  position: fixed;
+  background: $color-darker;
+  border: 1px solid $color-dark;
+  border-radius: 6px;
+  padding: 5px 10px 6px;
+  color: $color-lightness;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 500;
+  transform: translateY(-50%);
+
+  // Flèche gauche — bord
+  &::before {
+    content: "";
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 7px solid transparent;
+    border-right-color: $color-dark;
+  }
+
+  // Flèche gauche — remplissage
+  &::after {
+    content: "";
+    position: absolute;
+    right: calc(100% - 1px);
+    top: 50%;
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-right-color: $color-darker;
+  }
+}
+
 .sidebar-tooltip {
   position: fixed;
   left: 65px; // 60px sidebar + 5px espace (inclut la flèche)
@@ -249,9 +299,9 @@
   }
 }
 
-// ── Menu contextuel catégorie ────────────────────────────────────────────────
+// ── Menu contextuel générique ────────────────────────────────────────────────
 
-.category-ctx-menu {
+.ctx-menu {
   position: fixed;
   background: $color-darker;
   border: 1px solid $color-dark;
@@ -307,6 +357,11 @@
     transition:
       background 0.15s,
       color 0.15s;
+
+    .svgBtn {
+      width: 18px;
+      padding: 0;
+    }
 
     &--danger {
       color: $color-lightness;

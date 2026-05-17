@@ -1,9 +1,23 @@
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
-import IconPicture from "../assets/IconPicture";
-import IconTrash from "../assets/IconTrash";
+import IconPicture from '../assets/IconPicture';
+import IconTrash from '../assets/IconTrash';
 
-const ProductCard = ({ product, isSelected, onClick, onEdit, onDelete }) => {
+const ProductCard = ({
+  product,
+  isSelected,
+  onClick,
+  onEdit,
+  onDelete,
+  onHover,
+  onHoverLeave,
+  draggable,
+  onDragStart,
+}) => {
   const [imgError, setImgError] = useState(false);
   const [contextMenu, setContextMenu] = useState(null);
   const menuRef = useRef(null);
@@ -45,7 +59,10 @@ const ProductCard = ({ product, isSelected, onClick, onEdit, onDelete }) => {
         className={`catalog-card${isSelected ? " catalog-card--selected" : ""}`}
         onClick={onClick}
         onContextMenu={handleContextMenu}
-        title={displayName}
+        onMouseEnter={(e) => onHover?.(e, displayName)}
+        onMouseLeave={() => onHoverLeave?.()}
+        draggable={!!draggable}
+        onDragStart={onDragStart}
       >
         <div className="catalog-card__image">
           {hasImage ? (
@@ -62,11 +79,11 @@ const ProductCard = ({ product, isSelected, onClick, onEdit, onDelete }) => {
       {contextMenu && (
         <div
           ref={menuRef}
-          className="category-ctx-menu"
+          className="ctx-menu"
           style={{ top: contextMenu.y, left: contextMenu.x, position: "fixed" }}
         >
           <button
-            className="category-ctx-menu__item"
+            className="ctx-menu__item"
             onClick={() => {
               onEdit();
               setContextMenu(null);
@@ -74,10 +91,10 @@ const ProductCard = ({ product, isSelected, onClick, onEdit, onDelete }) => {
           >
             Modifier
           </button>
-          <div className="category-ctx-menu__separator" />
-          <div className="category-ctx-menu__actions">
+          <div className="ctx-menu__separator" />
+          <div className="ctx-menu__actions">
             <button
-              className="category-ctx-menu__action category-ctx-menu__action--danger"
+              className="ctx-menu__action ctx-menu__action--danger"
               onClick={() => {
                 onDelete();
                 setContextMenu(null);

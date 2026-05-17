@@ -17,6 +17,7 @@ const PaperProduct = ({
   editMode = false,
 }) => {
   const productId = contentFilesData._id || null;
+  const folderId = contentFilesData.folderId || null;
   const [productName, setProductName] = useState(
     contentFilesData.productName || "",
   );
@@ -95,6 +96,7 @@ const PaperProduct = ({
       }),
     );
     formData.append("categoryId", categoryId);
+    if (folderId) formData.append("folderId", folderId);
     if (imageFile) formData.append("image", imageFile);
 
     try {

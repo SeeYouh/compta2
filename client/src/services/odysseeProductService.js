@@ -1,4 +1,4 @@
-import { config } from "../config/env.js";
+import { config } from '../config/env.js';
 
 const BASE = `${config.apiUrl}/api/odyssee/products`;
 
@@ -40,7 +40,12 @@ const OdysseeProductService = {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Erreur serveur");
-      return { success: true, products: data.products, count: data.count };
+      return {
+        success: true,
+        products: data.products,
+        folders: data.folders || [],
+        count: data.count,
+      };
     } catch (error) {
       return { success: false, error: error.message };
     }

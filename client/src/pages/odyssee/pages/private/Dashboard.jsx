@@ -1,25 +1,33 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from 'react';
 
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+} from 'react-router-dom';
 
-import CatalogMain from "../../components/CatalogMain";
-import CatalogSidebar from "../../components/CatalogSidebar";
-import CategoryContextMenu from "../../components/CategoryContextMenu";
-import CategoryForm from "../../components/CategoryForm";
-import { categoryLibrary } from "../../utils/variable";
-import CategorySettings from "../../components/CategorySettings";
-import ConfirmationModal from "../../../../components/ConfirmationModal";
-import FolderContextMenu from "../../components/FolderContextMenu";
-import FolderService from "../../services/folderService";
-import FolderSettingsModal from "../../components/FolderSettingsModal";
-import Gear from "../../assets/gear";
-import OdysseeCategoryService from "../../../../services/odysseeCategoryService";
-import OdysseeProductService from "../../../../services/odysseeProductService";
-import PaperProduct from "../../components/PaperProduct";
-import ProductService from "../../services/productService";
-import SidebarTooltip from "../../components/SidebarTooltip";
-import SynapseUserMenu from "../../../../components/SynapseUserMenu";
-import { useSidebarDnd } from "../../hooks/useSidebarDnd";
+import CatalogMain from '../../components/CatalogMain';
+import CatalogSidebar from '../../components/CatalogSidebar';
+import CategoryContextMenu from '../../components/CategoryContextMenu';
+import CategoryForm from '../../components/CategoryForm';
+import { categoryLibrary } from '../../utils/variable';
+import CategorySettings from '../../components/CategorySettings';
+import ConfirmationModal from '../../../../components/ConfirmationModal';
+import FolderContextMenu from '../../components/FolderContextMenu';
+import FolderService from '../../services/folderService';
+import FolderSettingsModal from '../../components/FolderSettingsModal';
+import Gear from '../../assets/gear';
+import OdysseeCategoryService
+  from '../../../../services/odysseeCategoryService';
+import OdysseeProductService from '../../../../services/odysseeProductService';
+import PaperProduct from '../../components/PaperProduct';
+import ProductFolderService from '../../../../services/productFolderService';
+import ProductService from '../../services/productService';
+import SidebarTooltip from '../../components/SidebarTooltip';
+import SynapseUserMenu from '../../../../components/SynapseUserMenu';
+import { useSidebarDnd } from '../../hooks/useSidebarDnd';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -79,6 +87,12 @@ const Dashboard = () => {
   // Sidebar : ordre + dossiers
   const [sidebarItems, setSidebarItems] = useState([]);
   const [folders, setFolders] = useState([]);
+
+  // Dossiers de produits dans le catalogue
+  const [productFolders, setProductFolders] = useState([]);
+  const [editFolderModal, setEditFolderModal] = useState(null); // { folderId } ou null
+  const [deleteFolderProductModal, setDeleteFolderProductModal] =
+    useState(null); // { folderId, folderName } ou null
 
   // Drag & drop
   const dnd = useSidebarDnd({
@@ -192,6 +206,12 @@ const Dashboard = () => {
           cat._id === categoryId ? { ...cat, products: result.products } : cat,
         ),
       );
+      setProductFolders((prev) => {
+        const other = prev.filter(
+          (f) => String(f.categoryId) !== String(categoryId),
+        );
+        return [...other, ...(result.folders || [])];
+      });
     }
   };
 
@@ -261,6 +281,91 @@ const Dashboard = () => {
 
   const handleCategoryContextMenu = (e, categoryId) => {
     setCategoryContextMenu({ categoryId, x: e.clientX, y: e.clientY });
+  };
+
+  // ── Dossiers de produits ─────────────────────────────────────────────────────
+
+  const handleCreateProductFolder = async (
+    categoryId,
+    parentFolderId = null,
+  ) => {
+    const result = await ProductFolderService.createFolder({
+      categoryId,
+      parentFolderId: parentFolderId || null,
+    });
+    if (result.success) {
+      setProductFolders((prev) => [...prev, result.folder]);
+    }
+    setCategoryContextMenu(null);
+  };
+
+  const handleCreateSubFolder = async (parentFolderId) => {
+    const parent = productFolders.find((f) => f._id === parentFolderId);
+    if (!parent) return;
+    const result = await ProductFolderService.createFolder({
+      categoryId: parent.categoryId,
+      parentFolderId,
+    });
+    if (result.success) {
+      setProductFolders((prev) => [...prev, result.folder]);
+    }
+  };
+
+  const handleSaveProductFolderEdit = async ({ name, color }) => {
+    const folderId = editFolderModal?.folderId;
+    if (!folderId) return;
+    const result = await ProductFolderService.updateFolder(folderId, {
+      name,
+      color,
+    });
+    if (result.success) {
+      setProductFolders((prev) =>
+        prev.map((f) =>
+          f._id === folderId
+            ? { ...f, name: result.folder.name, color: result.folder.color }
+            : f,
+        ),
+      );
+    }
+    setEditFolderModal(null);
+  };
+
+  const handleConfirmDeleteProductFolder = async () => {
+    const folderId = deleteFolderProductModal?.folderId;
+    if (!folderId) return;
+    const result = await ProductFolderService.deleteFolder(folderId);
+    if (result.success) {
+      setProductFolders((prev) =>
+        prev.filter(
+          (f) =>
+            f._id !== folderId && String(f.parentFolderId) !== String(folderId),
+        ),
+      );
+      if (selectedCategory) loadProducts(selectedCategory);
+    }
+    setDeleteFolderProductModal(null);
+  };
+
+  const handleMoveProductToFolder = async (productId, folderId) => {
+    const result = await OdysseeProductService.updateProduct(productId, {
+      folderId: folderId || null,
+    });
+    if (result.success && selectedCategory) loadProducts(selectedCategory);
+  };
+
+  const handleReorderFolders = async (folderIds) => {
+    // Mise à jour optimiste
+    setProductFolders((prev) => {
+      const ordered = folderIds
+        .map((id) => prev.find((f) => String(f._id) === String(id)))
+        .filter(Boolean)
+        .map((f, i) => ({ ...f, order: i }));
+      const others = prev.filter(
+        (f) => !folderIds.some((id) => String(id) === String(f._id)),
+      );
+      return [...ordered, ...others];
+    });
+    await ProductFolderService.reorderFolders(folderIds);
   };
 
   const handleOpenDeleteCategory = async (categoryId) => {
@@ -420,97 +525,78 @@ const Dashboard = () => {
   }, [selectedCategoryLibrary]);
 
   return (
-    <div
-      className="odyssee-root flex full-vh flex-1"
-      style={{ position: "relative" }}
-    >
-      <div className="left-menu" style={{ width, height: "100%" }}>
-        <section className="container-profil">
-          <div className="flex">
-            <Link
-              to="/odyssee/settings"
-              className="container-svg"
-              onMouseEnter={onMouseEnter}
-              onMouseLeave={onMouseLeave}
-            >
-              <Gear
-                setDataTimeRotateGear={setDataTimeRotateGear}
-                dataTimeRotateGear={dataTimeRotateGear}
-              />
-            </Link>
-            {/* Avatar avec menu site-1 */}
-            <SynapseUserMenu
-              align="left"
-              menuItems={[
-                {
-                  label: "⚙️ Paramètres",
-                  onClick: () => navigate("/odyssee/settings"),
-                },
-              ]}
+    <div className="odyssee-root" style={{ position: "relative" }}>
+      <nav className="odyssee-navbar">
+        <div className="odyssee-navbar__actions">
+          <Link
+            to="/odyssee/settings"
+            className="container-svg"
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+          >
+            <Gear
+              setDataTimeRotateGear={setDataTimeRotateGear}
+              dataTimeRotateGear={dataTimeRotateGear}
             />
-          </div>
-          {/* <div className="container-profil_status-profil">
-            <p>Découverte</p>
-          </div> */}
-        </section>
-        <section className="catalog-wrapper">
-          <ul className="library-navBar">
-            {categoryLibrary.map((item, index) => {
-              const itemWidth = width * (item.width / 100);
-              return (
-                <li
-                  key={"cat" + item.name + index}
-                  style={{ width: `${itemWidth}px` }}
-                >
-                  <input
-                    type="radio"
-                    name="categoryLibrary"
-                    id={item.name}
-                    checked={item.name === selectedCategoryLibrary}
-                    onChange={() => checkCategorySelected(item.name)}
-                  />
-                  <label htmlFor={item.name}>{item.name}</label>
-                </li>
-              );
-            })}
-          </ul>
-          {selectedCategoryLibrary_old?.linkLibrary?.({
-            onSelectFile: setSelectedFileData,
-            availableHeight,
-          }) || (
-            <div className="catalog-container">
-              <CatalogSidebar
-                sidebarItems={sidebarItems}
-                folders={folders}
-                categories={categories}
-                selectedCategoryId={selectedCategory}
-                dnd={dnd}
-                onCategorySelect={handleCategorySelect}
-                onCategoryContextMenu={handleCategoryContextMenu}
-                onToggleFolder={toggleFolder}
-                onFolderContextMenu={handleFolderContextMenu}
-                onAddCategory={() => setShowCategoryModal(true)}
-                onTooltipEnter={handleTooltipEnter}
-                onTooltipLeave={handleTooltipLeave}
-              />
-              {categorySettingsId ? (
-                (() => {
-                  const cat = categories.find(
-                    (c) => c._id === categorySettingsId,
-                  );
-                  if (!cat) return null;
-                  return (
-                    <CategorySettings
-                      category={cat}
-                      onClose={() => setCategorySettingsId(null)}
+          </Link>
+          <SynapseUserMenu
+            align="right"
+            menuItems={[
+              {
+                label: "⚙️ Paramètres",
+                onClick: () => navigate("/odyssee/settings"),
+              },
+            ]}
+          />
+        </div>
+      </nav>
+      <div className="odyssee-body">
+        <div className="left-menu" style={{ width }}>
+          <section className="catalog-wrapper">
+            <ul className="library-navBar">
+              {categoryLibrary.map((item, index) => {
+                const itemWidth = width * (item.width / 100);
+                return (
+                  <li
+                    key={"cat" + item.name + index}
+                    style={{ width: `${itemWidth}px` }}
+                  >
+                    <input
+                      type="radio"
+                      name="categoryLibrary"
+                      id={item.name}
+                      checked={item.name === selectedCategoryLibrary}
+                      onChange={() => checkCategorySelected(item.name)}
                     />
-                  );
-                })()
-              ) : (
+                    <label htmlFor={item.name}>{item.name}</label>
+                  </li>
+                );
+              })}
+            </ul>
+            {selectedCategoryLibrary_old?.linkLibrary?.({
+              onSelectFile: setSelectedFileData,
+              availableHeight,
+            }) || (
+              <div className="catalog-container">
+                <CatalogSidebar
+                  sidebarItems={sidebarItems}
+                  folders={folders}
+                  categories={categories}
+                  selectedCategoryId={selectedCategory}
+                  dnd={dnd}
+                  onCategorySelect={handleCategorySelect}
+                  onCategoryContextMenu={handleCategoryContextMenu}
+                  onToggleFolder={toggleFolder}
+                  onFolderContextMenu={handleFolderContextMenu}
+                  onAddCategory={() => setShowCategoryModal(true)}
+                  onTooltipEnter={handleTooltipEnter}
+                  onTooltipLeave={handleTooltipLeave}
+                />
                 <CatalogMain
                   selectedCat={categories.find(
                     (c) => c._id === selectedCategory,
                   )}
+                  productFolders={productFolders}
                   selectedProductId={selectedFileData?._id}
                   onAdd={() => {
                     setSelectedFileData({
@@ -532,21 +618,52 @@ const Dashboard = () => {
                       productName: product.name || "ce produit",
                     })
                   }
+                  onCreateFolder={() =>
+                    handleCreateProductFolder(selectedCategory)
+                  }
+                  onCreateProductInFolder={(folderId) => {
+                    setSelectedFileData({
+                      productName: "",
+                      aliasName: { activate: false, name: "" },
+                      img: [],
+                      treatmentDuration: 1,
+                      amountToAdminister: 1,
+                      intakeTime: { advancedMode: false, daysTime: [] },
+                      folderId,
+                    });
+                    setEditMode(false);
+                  }}
+                  onCreateSubFolder={handleCreateSubFolder}
+                  onRenameFolder={(folderId) =>
+                    setEditFolderModal({ folderId })
+                  }
+                  onDeleteFolder={(folderId) => {
+                    const folder = productFolders.find(
+                      (f) => f._id === folderId,
+                    );
+                    setDeleteFolderProductModal({
+                      folderId,
+                      folderName: folder?.name || "ce dossier",
+                    });
+                  }}
+                  onMoveProductToFolder={handleMoveProductToFolder}
+                  onReorderFolders={handleReorderFolders}
+                  onCategoryContextMenu={handleCategoryContextMenu}
                 />
-              )}
-            </div>
-          )}
-        </section>
+              </div>
+            )}
+          </section>
+        </div>
+        {selectedFileData && (
+          <PaperProduct
+            key={selectedFileData._id || "new"}
+            contentFilesData={selectedFileData}
+            categoryId={selectedCategory}
+            onProductCreated={handleProductCreated}
+            editMode={editMode}
+          />
+        )}
       </div>
-      {selectedFileData && (
-        <PaperProduct
-          key={selectedFileData._id || "new"}
-          contentFilesData={selectedFileData}
-          categoryId={selectedCategory}
-          onProductCreated={handleProductCreated}
-          editMode={editMode}
-        />
-      )}
 
       {/* Modal de création de catégorie (overlay géré par CategoryForm) */}
       {showCategoryModal && (
@@ -600,6 +717,19 @@ const Dashboard = () => {
           );
         })()}
 
+      {/* Modal paramètres catégorie */}
+      {categorySettingsId &&
+        (() => {
+          const cat = categories.find((c) => c._id === categorySettingsId);
+          if (!cat) return null;
+          return (
+            <CategorySettings
+              category={cat}
+              onClose={() => setCategorySettingsId(null)}
+            />
+          );
+        })()}
+
       {/* Menu contextuel catégorie */}
       {categoryContextMenu && (
         <CategoryContextMenu
@@ -611,7 +741,56 @@ const Dashboard = () => {
           onDelete={() => {
             handleOpenDeleteCategory(categoryContextMenu.categoryId);
           }}
+          onCreateFolder={() =>
+            handleCreateProductFolder(categoryContextMenu.categoryId)
+          }
+          onCreateProduct={() => {
+            setSelectedFileData({
+              productName: "",
+              aliasName: { activate: false, name: "" },
+              img: [],
+              treatmentDuration: 1,
+              amountToAdminister: 1,
+              intakeTime: { advancedMode: false, daysTime: [] },
+            });
+            setEditMode(false);
+            setCategoryContextMenu(null);
+          }}
           onClose={() => setCategoryContextMenu(null)}
+        />
+      )}
+
+      {/* Modal édition dossier produit */}
+      {editFolderModal &&
+        (() => {
+          const folder = productFolders.find(
+            (f) => f._id === editFolderModal.folderId,
+          );
+          if (!folder) return null;
+          return (
+            <FolderSettingsModal
+              folder={folder}
+              onSave={handleSaveProductFolderEdit}
+              onCancel={() => setEditFolderModal(null)}
+            />
+          );
+        })()}
+
+      {/* Confirmation suppression dossier produit */}
+      {deleteFolderProductModal && (
+        <ConfirmationModal
+          isOpen
+          title="Supprimer le dossier"
+          message={
+            <>
+              Supprimer &ldquo;{deleteFolderProductModal.folderName}&rdquo; ?{" "}
+              <span>Les produits du dossier seront désactivés.</span>
+            </>
+          }
+          confirmText="Supprimer"
+          cancelText="Annuler"
+          onConfirm={handleConfirmDeleteProductFolder}
+          onCancel={() => setDeleteFolderProductModal(null)}
         />
       )}
 
@@ -620,14 +799,21 @@ const Dashboard = () => {
         <ConfirmationModal
           isOpen
           title="Supprimer la librairie"
-          message={`Supprimer "${deleteCategoryFlow.categoryName}" ? Cette action est irréversible.`}
+          message={
+            <>
+              Supprimer &ldquo;{deleteCategoryFlow.categoryName}&rdquo; ?{" "}
+              <span>Cette action est irréversible.</span>
+            </>
+          }
           confirmText="Supprimer"
           cancelText="Annuler"
           onConfirm={handleConfirmDeleteCategory}
           onCancel={() => setDeleteCategoryFlow(null)}
           softDanger
           toggleLabel={
-            deleteCategoryFlow.products.length > 0 ? "Tout supprimer" : null
+            deleteCategoryFlow.products.length > 0
+              ? "Cela supprimera son contenu"
+              : null
           }
           toggleChecked={deleteCategoryFlow.confirmAll}
           onToggleChange={(checked) =>

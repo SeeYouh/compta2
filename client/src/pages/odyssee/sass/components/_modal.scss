@@ -11,30 +11,70 @@
 
   .modal-body .modal-message {
     color: $color-light;
+
+    span {
+      background-image: linear-gradient($color-danger, $color-danger);
+      background-size: 0% 2px;
+      background-position: left bottom;
+      background-repeat: no-repeat;
+      padding-bottom: 2px;
+      transition: background-size 0.2s ease;
+    }
+  }
+
+  &:has(.modal-toggle__options--checked) .modal-body .modal-message span {
+    background-size: 100% 2px;
   }
 
   .modal-body .modal-toggle {
     color: $color-light;
 
+    &__label {
+      flex: 0 0 auto;
+      margin-left: auto;
+      color: $color-lightness;
+      font-weight: 600;
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: -7px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: $color-danger;
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.2s ease;
+      }
+    }
+
+    &:has(.modal-toggle__options--checked) .modal-toggle__label::after {
+      transform: scaleX(1);
+    }
+
     &__options {
       border: 1px solid $color-dark;
+
+      &::before {
+        background: $color-dark;
+      }
+
+      &--checked::before {
+        background: $color-danger;
+      }
     }
 
     &__opt {
       color: $color-light;
 
       &--active {
-        background: $color-darker;
         color: $color-lightness;
       }
 
       &--danger {
-        background: $color-danger;
         color: white;
-      }
-
-      &:not(.modal-toggle__opt--active):not(.modal-toggle__opt--danger):hover {
-        background: $color-darker;
       }
     }
   }
@@ -61,11 +101,11 @@
     }
 
     &.btn-danger-soft {
-      background: $color-danger-light;
+      background: $color-danger;
       color: white;
 
       &:hover:not(:disabled) {
-        background: $color-danger;
+        background: $color-danger-light;
       }
 
       &:focus {

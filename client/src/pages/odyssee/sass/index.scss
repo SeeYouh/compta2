@@ -34,3 +34,8 @@
 @use "./components/productGrid";
 @use "./components/categoryForm";
 @use "./components/modal";
+@use "./components/productFolder";
+
+//---- PAGES ----//
+
+@use "./pages/hierarchicalDashboard";

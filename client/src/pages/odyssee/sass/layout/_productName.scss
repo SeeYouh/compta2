@@ -1,16 +1,9 @@
 @use "../utils/_variable" as *;
 
-// .container-product-name {
-//   background-color: $color-1;
-// }
-
-// .text-product-name_element {
-//   border-right: 3px solid $color-darker;
-// }
 .paper-product-container-navBar {
-  background-color: $color-dark;
-  color: $color-lightness;
-  padding: 14px 20px;
+  background-color: $color-1;
+  // color: $color-darkest;
+  padding: 7px 20px;
   .paper-product-container-navBar_titleProduct {
     display: flex;
     align-items: center;
@@ -21,14 +14,14 @@
       background: transparent;
       border: none;
       border-bottom: 1px solid rgba($color-lightness, 0.4);
-      color: $color-lightness;
+      color: $color-darkest;
       font-size: 1rem;
-      padding: 6px 8px;
+      padding: 7px 8px;
       outline: none;
       min-width: 120px;
 
       &::placeholder {
-        color: rgba($color-lightness, 0.45);
+        color: rgba($color-darkest, 0.45);
         font-style: italic;
       }
 
@@ -39,7 +32,7 @@
 
     .paper-product__alias-input {
       font-size: 0.9rem;
-      color: rgba($color-lightness, 0.75);
+      color: rgba($color-darkest, 0.75);
     }
   }
 

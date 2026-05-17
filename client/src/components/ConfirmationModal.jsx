@@ -1,10 +1,6 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { useEffect, useRef, useState } from "react";
 
-import { APP_LABELS } from './utils';
+import { APP_LABELS } from "./utils";
 
 function ConfirmationModal({
   isOpen,
@@ -119,7 +115,9 @@ function ConfirmationModal({
           {toggleLabel && (
             <div className="modal-toggle">
               <span className="modal-toggle__label">{toggleLabel}</span>
-              <div className="modal-toggle__options">
+              <div
+                className={`modal-toggle__options${toggleChecked ? " modal-toggle__options--checked" : ""}`}
+              >
                 <button
                   type="button"
                   className={`modal-toggle__opt${!toggleChecked ? " modal-toggle__opt--active" : ""}`}

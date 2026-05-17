@@ -1,0 +1,229 @@
+@use "../utils/_variable" as *;
+
+// ── Dossier de produits (carte niveau 0) ─────────────────────────────────────
+
+.product-folder {
+  margin-bottom: 12px;
+  position: relative;
+  overflow: visible;
+
+  &--product-over {
+    .product-folder__header {
+      border-color: var(--folder-color, #969696);
+    }
+
+    .product-folder__body {
+      border-color: var(--folder-color, #969696);
+      box-shadow: 0 0 0 1px var(--folder-color, #969696);
+    }
+  }
+
+  &--drop-before {
+    &::before {
+      content: "";
+      position: absolute;
+      top: -3px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: $color-lightness;
+      border-radius: 2px;
+      z-index: 10;
+    }
+  }
+
+  &--drop-after {
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: $color-lightness;
+      border-radius: 2px;
+      z-index: 10;
+    }
+  }
+
+  &__header {
+    display: inline-flex;
+    min-width: 110px;
+    max-width: 60%;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    cursor: grab;
+    user-select: none;
+    background: var(--folder-bg-color, #{$color-darker});
+    border: 1px solid var(--folder-border-color, #{$color-dark});
+    border-radius: 6px 6px 0 0;
+    position: relative;
+    z-index: 1;
+    margin-bottom: -1px;
+    transition:
+      border-color 0.15s,
+      filter 0.15s;
+
+    &:active {
+      cursor: grabbing;
+    }
+
+    &:hover {
+      filter: brightness(1.2);
+    }
+  }
+
+  &__arrow {
+    font-size: 11px;
+    color: $color-light;
+    width: 12px;
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+
+  &__name {
+    flex: 1;
+    font-size: 13px;
+    color: $color-lightness;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+  }
+
+  &__body {
+    background: var(--folder-bg-color, #{$color-darker});
+    border: 1px solid var(--folder-border-color, #{$color-dark});
+    border-radius: 0 6px 6px 6px;
+    padding: 8px;
+    min-height: 40px;
+    position: relative;
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(55px, 1fr));
+    gap: 5px;
+    padding: 4px 2px;
+
+    .catalog-card {
+      border-radius: 8px;
+    }
+
+    .catalog-card__image {
+      padding: 3px;
+      border-radius: 8px;
+
+      img {
+        border-radius: 6px;
+      }
+    }
+  }
+}
+
+// ── Sous-dossier (carte niveau 1) ────────────────────────────────────────────
+
+.product-subfolder {
+  margin-bottom: 6px;
+  position: relative;
+
+  &--product-over {
+    .product-subfolder__header {
+      border-color: var(--folder-color, #969696);
+    }
+
+    .product-subfolder__body {
+      border-color: var(--folder-color, #969696);
+      box-shadow: 0 0 0 1px var(--folder-color, #969696);
+    }
+  }
+
+  &__header {
+    display: inline-flex;
+    min-width: 90px;
+    max-width: 55%;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    cursor: pointer;
+    user-select: none;
+    background: var(--folder-bg-color, #{$color-darker});
+    border: 1px solid var(--folder-border-color, #{$color-dark});
+    border-radius: 5px 5px 0 0;
+    position: relative;
+    z-index: 1;
+    margin-bottom: -1px;
+    transition:
+      border-color 0.15s,
+      filter 0.15s;
+
+    &:hover {
+      filter: brightness(1.2);
+    }
+  }
+
+  &__arrow {
+    font-size: 11px;
+    color: $color-light;
+    width: 12px;
+    flex-shrink: 0;
+  }
+
+  &__name {
+    flex: 1;
+    font-size: 12px;
+    color: $color-lightness;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__body {
+    background: var(--folder-bg-color, #{$color-darker});
+    border: 1px solid var(--folder-border-color, #{$color-dark});
+    border-radius: 0 5px 5px 5px;
+    padding: 6px 8px;
+    position: relative;
+    transition:
+      border-color 0.15s,
+      box-shadow 0.15s;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(55px, 1fr));
+    gap: 5px;
+
+    .catalog-card {
+      border-radius: 8px;
+    }
+
+    .catalog-card__image {
+      padding: 3px;
+      border-radius: 8px;
+
+      img {
+        border-radius: 6px;
+      }
+    }
+  }
+}
+
+// ── Zone de catalogue avec drag & drop ───────────────────────────────────────
+
+.catalog-content {
+  flex: 1;
+  padding: 8px;
+
+  &--drag-over {
+    outline: 2px dashed $color-light;
+    outline-offset: -2px;
+    border-radius: 8px;
+  }
+}

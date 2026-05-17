@@ -6,22 +6,38 @@
   padding: 20px;
   overflow: auto;
   background: $color-darker;
-}
-
-// Paramètres catégorie
-.category-settings {
-  flex: 1;
   display: flex;
   flex-direction: column;
+}
+
+// Paramètres catégorie (modal overlay)
+.category-settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 700;
+}
+
+.category-settings {
   background: $color-darker;
-  overflow: auto;
+  border: 1px solid $color-dark;
+  border-radius: 12px;
+  width: 420px;
+  max-width: 90vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 
   &__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 20px 0;
-    margin-bottom: 20px;
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid $color-dark;
 
     h4 {
       margin: 0;
@@ -51,7 +67,8 @@
 
   &__body {
     flex: 1;
-    padding: 0 20px 20px;
+    padding: 20px;
+    overflow: auto;
   }
 }
 
@@ -140,7 +157,6 @@
 // Carte produit
 .catalog-card {
   border-radius: 12px;
-  overflow: hidden;
   cursor: pointer;
   position: relative;
   transition: opacity 0.2s ease;
@@ -157,6 +173,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    border-radius: 12px;
     padding: 6px;
 
     img {

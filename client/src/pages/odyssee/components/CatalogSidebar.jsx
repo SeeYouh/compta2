@@ -1,14 +1,20 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
-import { darken } from "../utils/colorUtils";
+import { darken } from '../utils/colorUtils';
 import {
   DARKEN_BG,
   DARKEN_BORDER,
   DEFAULT_FOLDER_COLOR,
-} from "../config/folderColors";
-import IconDossierFull from "../assets/IconDossierFull";
-import SidebarCategoryItem from "./SidebarCategoryItem";
-import SidebarFolderItem from "./SidebarFolderItem";
+} from '../config/folderColors';
+import IconDossierFull from '../assets/IconDossierFull';
+import SidebarCategoryItem from './SidebarCategoryItem';
+import SidebarFolderItem from './SidebarFolderItem';
 
 const getInitials = (name) =>
   name
@@ -60,7 +66,6 @@ const CatalogSidebar = ({
     const folder = folders.find((f) =>
       f.categoryIds?.includes(selectedCategoryId),
     );
-    const sidebarRect = sidebarRef.current.getBoundingClientRect();
 
     // Chercher d'abord la catégorie dans le DOM (dossier ouvert)
     let el = sidebarRef.current.querySelector(
@@ -73,8 +78,7 @@ const CatalogSidebar = ({
     }
 
     if (!el) return;
-    const itemRect = el.getBoundingClientRect();
-    const y = itemRect.top + itemRect.height / 2 - sidebarRect.top;
+    const y = el.offsetTop + el.offsetHeight / 2;
     setActiveY(y);
     setActiveColor(folder?.color ?? null);
     // Repositionner la barre curseur si elle n'est pas visible
@@ -84,7 +88,6 @@ const CatalogSidebar = ({
   const handleMouseMove = useCallback(
     (e) => {
       if (!sidebarRef.current) return;
-      const sidebarRect = sidebarRef.current.getBoundingClientRect();
       const mouseY = e.clientY;
 
       // Trouver l'icône catégorie, dossier fermé (ou le bouton +) dont le centre Y est le plus proche du curseur
@@ -109,7 +112,7 @@ const CatalogSidebar = ({
         const dist = Math.abs(mouseY - centerY);
         if (dist < minDist) {
           minDist = dist;
-          snapY = centerY - sidebarRect.top;
+          snapY = icon.offsetTop + icon.offsetHeight / 2;
           snapCatId = icon.dataset.catId ?? null;
           snapFolderId = icon.dataset.folderId ?? null;
         }
@@ -164,9 +167,7 @@ const CatalogSidebar = ({
       if (sidebarRef.current) {
         const el = sidebarRef.current.querySelector(`[data-cat-id="${catId}"]`);
         if (el) {
-          const sidebarRect = sidebarRef.current.getBoundingClientRect();
-          const itemRect = el.getBoundingClientRect();
-          const y = itemRect.top + itemRect.height / 2 - sidebarRect.top;
+          const y = el.offsetTop + el.offsetHeight / 2;
           setActiveY(y);
           if (transitionPhaseRef.current === "idle") setIndicatorY(y);
         }

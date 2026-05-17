@@ -17,19 +17,44 @@
 
 .library-navBar {
   background-color: $color-darkest;
-  border-bottom: 2px solid $color-dark;
+  border-bottom: 5px solid $color-dark;
   gap: 0;
 
   li {
+    position: relative;
     font-size: 0.95rem;
     background-color: $color-darker;
-    border-right: 1px solid $color-darkest;
 
-    &:last-child {
-      border-right: none;
+    &:first-child::after,
+    &:last-child::before {
+      content: "";
+      position: absolute;
+      top: 25%;
+      height: 50%;
+      width: 3px;
+      background-color: $color-dark;
+    }
+
+    &:first-child::after {
+      right: 0;
+    }
+    &:last-child::before {
+      left: 0;
+    }
+
+    &:first-child:has(input[type="radio"]:checked)::after {
+      display: none;
+    }
+
+    &:last-child:has(input[type="radio"]:checked)::before {
+      display: none;
     }
 
     &:hover {
+      background-color: $color-dark;
+    }
+
+    &:has(input[type="radio"]:checked) {
       background-color: $color-dark;
     }
 
@@ -37,13 +62,21 @@
       display: none;
     }
 
-    input[type="radio"]:checked + label {
-      background-color: $color-dark;
-    }
-
     label {
       cursor: pointer;
       color: $color-lightness;
+    }
+
+    input[type="radio"]:checked + label {
+      color: $color-lightness;
+    }
+  }
+
+  // Odyssée actif → cache les deux séparateurs
+  &:has(li:nth-child(2) input[type="radio"]:checked) {
+    li:first-child::after,
+    li:last-child::before {
+      display: none;
     }
   }
 }

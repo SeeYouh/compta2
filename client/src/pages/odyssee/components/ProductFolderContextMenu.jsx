@@ -4,13 +4,19 @@ import ContextMenu from './ContextMenu';
 import Gear from '../assets/gear';
 import IconTrash from '../assets/IconTrash';
 
-const CategoryContextMenu = ({
+/**
+ * Menu contextuel d'un dossier de produits.
+ * depth 0 = dossier (peut créer sous-dossier + produit)
+ * depth 1 = sous-dossier (peut créer produit uniquement)
+ */
+const ProductFolderContextMenu = ({
   x,
   y,
+  depth,
+  onCreateSubFolder,
+  onCreateProduct,
   onSettings,
   onDelete,
-  onCreateFolder,
-  onCreateProduct,
   onClose,
 }) => {
   const [dataTimeRotateGear, setDataTimeRotateGear] = useState({
@@ -22,15 +28,17 @@ const CategoryContextMenu = ({
 
   return (
     <ContextMenu x={x} y={y} onClose={onClose}>
-      <button
-        className="ctx-menu__item"
-        onClick={() => {
-          onCreateFolder();
-          onClose();
-        }}
-      >
-        Créer un dossier
-      </button>
+      {depth === 0 && (
+        <button
+          className="ctx-menu__item"
+          onClick={() => {
+            onCreateSubFolder();
+            onClose();
+          }}
+        >
+          Créer un sous-dossier
+        </button>
+      )}
       <button
         className="ctx-menu__item"
         onClick={() => {
@@ -70,4 +78,4 @@ const CategoryContextMenu = ({
   );
 };
 
-export default CategoryContextMenu;
+export default ProductFolderContextMenu;
