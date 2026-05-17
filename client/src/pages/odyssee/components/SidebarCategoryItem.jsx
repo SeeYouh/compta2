@@ -20,6 +20,7 @@ const SidebarCategoryItem = ({
   return (
     <div
       className={`catalog-sidebar__icon${cat.active ? " active" : ""}${isDropOnCat ? " drop-target" : ""}`}
+      data-cat-id={cat._id}
       draggable
       onDragStart={(e) =>
         handleDragStart(e, {

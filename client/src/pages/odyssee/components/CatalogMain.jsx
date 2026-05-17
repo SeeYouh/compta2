@@ -1,6 +1,13 @@
 import ProductCard from "./ProductCard";
 
-const CatalogMain = ({ selectedCat, onAdd, onSelect, onEdit, onDelete }) => {
+const CatalogMain = ({
+  selectedCat,
+  selectedProductId,
+  onAdd,
+  onSelect,
+  onEdit,
+  onDelete,
+}) => {
   const currentProducts = selectedCat?.products || [];
 
   return (
@@ -36,6 +43,7 @@ const CatalogMain = ({ selectedCat, onAdd, onSelect, onEdit, onDelete }) => {
             <ProductCard
               key={i}
               product={product}
+              isSelected={product._id === selectedProductId}
               onClick={() => onSelect(product)}
               onEdit={() => onEdit(product)}
               onDelete={() => onDelete(product)}

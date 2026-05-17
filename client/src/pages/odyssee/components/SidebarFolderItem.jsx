@@ -1,11 +1,8 @@
-import { Fragment } from 'react';
+import { Fragment } from "react";
 
-import { darken } from '../utils/colorUtils';
-import {
-  DARKEN_BG,
-  DARKEN_BORDER,
-} from '../config/folderColors';
-import IconDossierFull from '../assets/IconDossierFull';
+import { darken } from "../utils/colorUtils";
+import { DARKEN_BG, DARKEN_BORDER } from "../config/folderColors";
+import IconDossierFull from "../assets/IconDossierFull";
 
 const SidebarFolderItem = ({
   folder,
@@ -47,6 +44,7 @@ const SidebarFolderItem = ({
     >
       <div
         className="catalog-sidebar__icon catalog-sidebar__icon--folder"
+        data-folder-id={item.id}
         draggable
         onDragStart={(e) =>
           handleDragStart(e, {
@@ -77,6 +75,7 @@ const SidebarFolderItem = ({
                   )}
                 <div
                   className={`catalog-sidebar__icon catalog-sidebar__icon--nested${cat.active ? " active" : ""}`}
+                  data-cat-id={catId}
                   style={
                     cat.image
                       ? { background: "transparent" }

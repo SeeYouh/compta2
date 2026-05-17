@@ -15,9 +15,9 @@
   overflow: hidden;
 }
 
-// Sidebar gauche (60px)
+// Sidebar gauche
 .catalog-sidebar {
-  width: 60px;
+  width: 68px;
   background: $color-darkest;
   display: flex;
   flex-direction: column;
@@ -27,16 +27,36 @@
   flex-shrink: 0;
 }
 
+// Barres indicateur de sélection/survol
+.catalog-sidebar__indicator {
+  position: absolute;
+  left: 0;
+  width: 3px;
+  height: 22px;
+  background: $color-lightness;
+  border-radius: 0 3px 3px 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+
+  &--active {
+    height: 32px;
+    opacity: 1;
+    transition:
+      top 0.2s ease,
+      background-color 0.2s ease;
+  }
+}
+
 // Icône de catégorie (initiales)
 .catalog-sidebar__icon {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   background: $color-darker;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 8px 0;
+  margin: 4px 0;
   cursor: pointer;
   font-size: 13px;
   font-weight: 700;
@@ -77,6 +97,11 @@
     font-size: 10px;
     border-radius: 6px;
     margin: 4px 0;
+    transition: filter 0.2s;
+
+    &:hover {
+      filter: brightness(1.4);
+    }
 
     img {
       width: 26px;
@@ -98,6 +123,7 @@
   border-radius: 10px;
   border: 2px solid transparent; // remplacé par inline style dynamique
   padding: 2px;
+  margin: 4px 0;
   transition:
     border-color 0.2s,
     background 0.2s;
@@ -437,28 +463,38 @@
   }
 }
 
-// Bouton + en bas de la sidebar
+// Bouton + à la suite des catégories
 .catalog-sidebar__add {
-  position: absolute;
-  bottom: 20px;
-  width: 40px;
-  height: 40px;
-  background: $color-dark;
-  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  background: $color-darker;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 24px;
-  color: $color-lightness;
-  transition:
-    background 0.2s,
-    transform 0.2s;
+  transition: filter 0.2s;
   user-select: none;
+  flex-shrink: 0;
+  margin-bottom: 4px;
 
   &:hover {
-    background: $color-darker;
-    transform: scale(1.1);
+    filter: brightness(1.4);
+  }
+
+  &-circle {
+    width: 20px;
+    height: 20px;
+    background: $color-lightness;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    color: $color-dark;
+    pointer-events: none;
   }
 }
 

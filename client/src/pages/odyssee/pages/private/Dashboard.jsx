@@ -1,32 +1,25 @@
-import {
-  useEffect,
-  useState,
-} from 'react';
+import { useEffect, useState } from "react";
 
-import {
-  Link,
-  useNavigate,
-} from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
 
-import CatalogMain from '../../components/CatalogMain';
-import CatalogSidebar from '../../components/CatalogSidebar';
-import CategoryContextMenu from '../../components/CategoryContextMenu';
-import CategoryForm from '../../components/CategoryForm';
-import { categoryLibrary } from '../../utils/variable';
-import CategorySettings from '../../components/CategorySettings';
-import ConfirmationModal from '../../../../components/ConfirmationModal';
-import FolderContextMenu from '../../components/FolderContextMenu';
-import FolderService from '../../services/folderService';
-import FolderSettingsModal from '../../components/FolderSettingsModal';
-import Gear from '../../assets/gear';
-import OdysseeCategoryService
-  from '../../../../services/odysseeCategoryService';
-import OdysseeProductService from '../../../../services/odysseeProductService';
-import PaperProduct from '../../components/PaperProduct';
-import ProductService from '../../services/productService';
-import SidebarTooltip from '../../components/SidebarTooltip';
-import SynapseUserMenu from '../../../../components/SynapseUserMenu';
-import { useSidebarDnd } from '../../hooks/useSidebarDnd';
+import CatalogMain from "../../components/CatalogMain";
+import CatalogSidebar from "../../components/CatalogSidebar";
+import CategoryContextMenu from "../../components/CategoryContextMenu";
+import CategoryForm from "../../components/CategoryForm";
+import { categoryLibrary } from "../../utils/variable";
+import CategorySettings from "../../components/CategorySettings";
+import ConfirmationModal from "../../../../components/ConfirmationModal";
+import FolderContextMenu from "../../components/FolderContextMenu";
+import FolderService from "../../services/folderService";
+import FolderSettingsModal from "../../components/FolderSettingsModal";
+import Gear from "../../assets/gear";
+import OdysseeCategoryService from "../../../../services/odysseeCategoryService";
+import OdysseeProductService from "../../../../services/odysseeProductService";
+import PaperProduct from "../../components/PaperProduct";
+import ProductService from "../../services/productService";
+import SidebarTooltip from "../../components/SidebarTooltip";
+import SynapseUserMenu from "../../../../components/SynapseUserMenu";
+import { useSidebarDnd } from "../../hooks/useSidebarDnd";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -490,6 +483,7 @@ const Dashboard = () => {
                 sidebarItems={sidebarItems}
                 folders={folders}
                 categories={categories}
+                selectedCategoryId={selectedCategory}
                 dnd={dnd}
                 onCategorySelect={handleCategorySelect}
                 onCategoryContextMenu={handleCategoryContextMenu}
@@ -517,6 +511,7 @@ const Dashboard = () => {
                   selectedCat={categories.find(
                     (c) => c._id === selectedCategory,
                   )}
+                  selectedProductId={selectedFileData?._id}
                   onAdd={() => {
                     setSelectedFileData({
                       productName: "",
