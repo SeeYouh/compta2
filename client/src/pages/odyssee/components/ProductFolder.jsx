@@ -6,6 +6,7 @@ import {
   DARKEN_BORDER,
   DEFAULT_FOLDER_COLOR,
 } from "../config/folderColors";
+import IconDossierFull from "../assets/IconDossierFull";
 import ProductCard from "./ProductCard";
 import ProductFolderContextMenu from "./ProductFolderContextMenu";
 
@@ -33,6 +34,14 @@ const ProductFolder = ({
 }) => {
   const [contextMenu, setContextMenu] = useState(null);
   const [isProductDragOver, setIsProductDragOver] = useState(false);
+  const [folderTooltip, setFolderTooltip] = useState(null);
+
+  const handleTooltipEnter = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setFolderTooltip({ x: rect.right + 8, y: rect.top + rect.height / 2 });
+  };
+
+  const handleTooltipLeave = () => setFolderTooltip(null);
 
   const handleContextMenu = (e) => {
     e.preventDefault();
@@ -75,6 +84,7 @@ const ProductFolder = ({
 
   const classNames = [
     "product-folder",
+    !isOpen && "product-folder--closed",
     isProductDragOver && "product-folder--product-over",
     isDragOver && dragPosition === "before" && "product-folder--drop-before",
     isDragOver && dragPosition === "after" && "product-folder--drop-after",
@@ -96,46 +106,88 @@ const ProductFolder = ({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        <div
-          className="product-folder__header"
-          draggable
-          onDragStart={(e) => {
-            e.stopPropagation();
-            e.dataTransfer.effectAllowed = "move";
-            e.dataTransfer.setData("folderId", folder._id);
-          }}
-          onClick={onToggle}
-        >
-          <span className="product-folder__arrow">{isOpen ? "▾" : "▸"}</span>
-          <span className="product-folder__name">{folder.name}</span>
-        </div>
+        {isOpen ? (
+          <>
+            <div
+              className="product-folder__header"
+              draggable
+              onDragStart={(e) => {
+                e.stopPropagation();
+                e.dataTransfer.effectAllowed = "move";
+                e.dataTransfer.setData("folderId", folder._id);
+              }}
+              onClick={onToggle}
+            >
+              <IconDossierFull color={color} size={16} />
+              {folder.name && (
+                <span className="product-folder__name">{folder.name}</span>
+              )}
+            </div>
 
-        {isOpen && (
-          <div className="product-folder__body">
-            {products.length > 0 && (
-              <div className="product-folder__grid">
-                {products.map((product) => (
-                  <ProductCard
-                    key={product._id}
-                    product={product}
-                    isSelected={product._id === selectedProductId}
-                    onClick={() => onSelectProduct(product)}
-                    onEdit={() => onEditProduct(product)}
-                    onDelete={() => onDeleteProduct(product)}
-                    onHover={onHover}
-                    onHoverLeave={onHoverLeave}
-                    draggable
-                    onDragStart={(e) => {
-                      e.stopPropagation();
-                      e.dataTransfer.setData("productId", product._id);
-                    }}
-                  />
-                ))}
-              </div>
-            )}
+            <div className="product-folder__body">
+              {products.length > 0 && (
+                <div className="product-folder__grid">
+                  {products.map((product) => (
+                    <ProductCard
+                      key={product._id}
+                      product={product}
+                      isSelected={product._id === selectedProductId}
+                      onClick={() => onSelectProduct(product)}
+                      onEdit={() => onEditProduct(product)}
+                      onDelete={() => onDeleteProduct(product)}
+                      onHover={onHover}
+                      onHoverLeave={onHoverLeave}
+                      draggable
+                      onDragStart={(e) => {
+                        e.stopPropagation();
+                        e.dataTransfer.setData("productId", product._id);
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <div
+            className="product-folder__icon"
+            draggable
+            onDragStart={(e) => {
+              e.stopPropagation();
+              e.dataTransfer.effectAllowed = "move";
+              e.dataTransfer.setData("folderId", folder._id);
+            }}
+            onClick={() => {
+              handleTooltipLeave();
+              onToggle();
+            }}
+            onMouseEnter={handleTooltipEnter}
+            onMouseLeave={handleTooltipLeave}
+          >
+            <IconDossierFull color={color} size={26} />
           </div>
         )}
       </div>
+
+      {folderTooltip && (
+        <div
+          className="product-folder__tooltip"
+          style={{ left: folderTooltip.x, top: folderTooltip.y }}
+        >
+          {folder.name ? (
+            <span>{folder.name}</span>
+          ) : (
+            <ul>
+              {products.slice(0, 5).map((p, i) => (
+                <li key={i}>
+                  {p.contentFilesData?.productName || p.name || "Produit"}
+                </li>
+              ))}
+              {products.length > 5 && <li>…</li>}
+            </ul>
+          )}
+        </div>
+      )}
 
       {contextMenu && (
         <ProductFolderContextMenu

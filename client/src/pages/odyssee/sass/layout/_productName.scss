@@ -1,8 +1,8 @@
 @use "../utils/_variable" as *;
 
 .paper-product-container-navBar {
-  background-color: $color-1;
-  // color: $color-darkest;
+  background-color: var(--color-1);
+  // color: var(--color-darkest);
   padding: 7px 20px;
   .paper-product-container-navBar_titleProduct {
     display: flex;
@@ -13,40 +13,42 @@
     .paper-product__alias-input {
       background: transparent;
       border: none;
-      border-bottom: 1px solid rgba($color-lightness, 0.4);
-      color: $color-darkest;
+      border-bottom: 1px solid
+        color-mix(in srgb, var(--color-lightness) 40%, transparent);
+      color: var(--color-darkest);
       font-size: 1rem;
       padding: 7px 8px;
       outline: none;
       min-width: 120px;
 
       &::placeholder {
-        color: rgba($color-darkest, 0.45);
+        color: color-mix(in srgb, var(--color-darkest) 45%, transparent);
         font-style: italic;
       }
 
       &:focus {
-        border-bottom-color: $color-lightness;
+        border-bottom-color: var(--color-lightness);
       }
     }
 
     .paper-product__alias-input {
       font-size: 0.9rem;
-      color: rgba($color-darkest, 0.75);
+      color: color-mix(in srgb, var(--color-darkest) 75%, transparent);
     }
   }
 
   input[type="submit"] {
-    background-color: $color-darker;
-    color: $color-lightness;
-    border: 1px solid rgba($color-lightness, 0.35);
+    background-color: var(--color-darker);
+    color: var(--color-lightness);
+    border: 1px solid
+      color-mix(in srgb, var(--color-lightness) 35%, transparent);
     border-radius: 6px;
     padding: 8px 20px;
     cursor: pointer;
     font-size: 0.85rem;
 
     &:hover {
-      background-color: $color-darkest;
+      background-color: var(--color-darkest);
     }
   }
 }
@@ -58,15 +60,15 @@
   font-size: 14px;
 
   &--success {
-    background-color: $color-dark;
-    color: $color-lightness;
-    border-left: 3px solid $color-1;
+    background-color: var(--color-dark);
+    color: var(--color-lightness);
+    border-left: 3px solid var(--color-1);
   }
 
   &--error {
-    background-color: $color-darkest;
-    color: $color-danger-light;
-    border-left: 3px solid $color-danger;
+    background-color: var(--color-darkest);
+    color: var(--color-danger-light);
+    border-left: 3px solid var(--color-danger);
   }
 }
 
@@ -87,9 +89,9 @@
     justify-content: center;
     width: 100px;
     height: 100px;
-    border: 2px dashed $color-dark;
+    border: 2px dashed var(--color-dark);
     border-radius: 8px;
-    color: $color-light;
+    color: var(--color-light);
     font-size: 0.85rem;
     cursor: pointer;
     text-align: center;
@@ -98,8 +100,8 @@
       color 0.2s;
 
     &:hover {
-      border-color: $color-1;
-      color: $color-lightness;
+      border-color: var(--color-1);
+      color: var(--color-lightness);
     }
   }
 
@@ -112,16 +114,16 @@
       height: 100px;
       object-fit: cover;
       border-radius: 8px;
-      border: 2px solid $color-dark;
+      border: 2px solid var(--color-dark);
     }
 
     .paper-product__image-remove {
       position: absolute;
       top: -6px;
       right: -6px;
-      background-color: $color-darkest;
-      color: $color-lightness;
-      border: 1px solid $color-dark;
+      background-color: var(--color-darkest);
+      color: var(--color-lightness);
+      border: 1px solid var(--color-dark);
       border-radius: 50%;
       width: 20px;
       height: 20px;
@@ -133,19 +135,19 @@
       padding: 0;
 
       &:hover {
-        background-color: $color-danger;
+        background-color: var(--color-danger);
       }
     }
   }
 
   .paper-product__image-error {
-    color: $color-danger-light;
+    color: var(--color-danger-light);
     font-size: 0.8rem;
     margin: 0;
   }
 }
 .paper-product-container {
-  color: $color-darkest;
+  color: var(--color-darkest);
 
   .paper-product-bloc-img {
     height: 440px;
@@ -161,28 +163,28 @@
 
   .inTakeTime-container {
     h4 {
-      border: 1px solid $color-darkest;
-      background-color: $color-darkest;
-      color: $color-light;
+      border: 1px solid var(--color-darkest);
+      background-color: var(--color-darkest);
+      color: var(--color-light);
     }
 
     .title-inTakeTime-container {
       label {
-        border: 1px solid $color-darkest;
+        border: 1px solid var(--color-darkest);
         border-radius: 10px;
       }
 
       input[type="checkbox"]:checked + label {
         & p:first-child {
-          background-color: $color-1;
-          color: $color-light;
+          background-color: var(--color-1);
+          color: var(--color-light);
           border-top-left-radius: 9px;
           border-bottom-left-radius: 9px;
         }
 
         & p:last-child {
           background-color: transparent;
-          color: $color-darkest;
+          color: var(--color-darkest);
         }
       }
 
@@ -195,8 +197,8 @@
       }
 
       p:last-child {
-        background-color: $color-1;
-        color: $color-light;
+        background-color: var(--color-1);
+        color: var(--color-light);
         border-top-right-radius: 9px;
         border-bottom-right-radius: 9px;
       }
@@ -204,12 +206,12 @@
 
     .inTakeTime-moment {
       label {
-        border: 2px solid $color-dark;
+        border: 2px solid var(--color-dark);
         border-radius: 8px;
       }
       input[type="checkbox"]:checked + label {
-        background-color: $color-1;
-        color: $color-light;
+        background-color: var(--color-1);
+        color: var(--color-light);
       }
     }
   }
@@ -222,13 +224,13 @@
         input[type="range"] {
           @each $range in $variable-range-custom-selected {
             &#{$range} {
-              background-color: $color-1;
+              background-color: var(--color-1);
             }
           }
         }
 
         .inTakeTime-container_moment__label::after {
-          background-color: $color-1;
+          background-color: var(--color-1);
         }
       }
     }
@@ -239,7 +241,7 @@
       position: relative;
       width: 200%;
       height: 6px;
-      background-color: $color-darkest;
+      background-color: var(--color-darkest);
       border-radius: 3px;
       bottom: -8px;
       left: 0;
@@ -271,7 +273,7 @@
         z-index: 10;
         // WebKit + Blink track
         &::-webkit-slider-runnable-track {
-          background: $color-darker;
+          background: var(--color-darker);
           height: 6px;
           border-radius: 3px;
         }
@@ -281,7 +283,7 @@
           appearance: none;
           width: 18px;
           height: 18px;
-          background: $color-1;
+          background: var(--color-1);
           border: none;
           border-radius: 50%;
           margin-top: -6px; // pour centrer verticalement
@@ -290,14 +292,14 @@
 
         // Firefox track
         &::-moz-range-track {
-          background: $color-darker;
+          background: var(--color-darker);
           height: 6px;
           border-radius: 3px;
         }
 
         // Firefox filled part (avant le thumb)
         &::-moz-range-progress {
-          background-color: $color-darker;
+          background-color: var(--color-darker);
           height: 6px;
           border-radius: 3px;
         }
@@ -306,7 +308,7 @@
         &::-moz-range-thumb {
           width: 18px;
           height: 18px;
-          background: $color-darker;
+          background: var(--color-darker);
           border: none;
           border-radius: 50%;
           cursor: pointer;
@@ -338,7 +340,7 @@
 
       label {
         padding-bottom: 10px;
-        border-bottom: 3px solid $color-light;
+        border-bottom: 3px solid var(--color-light);
         min-width: 35px;
         text-align: center;
 
@@ -348,9 +350,9 @@
           top: 0;
           right: 2%;
           z-index: 10;
-          background-color: $color-light;
+          background-color: var(--color-light);
           padding: 10px;
-          border: 2px solid $color-1;
+          border: 2px solid var(--color-1);
           border-radius: 5px;
           font-size: 0.8rem;
         }
@@ -364,7 +366,7 @@
     }
     input[type="radio"]:checked + label {
       transition: border 0.2s ease-in-out;
-      border-bottom: 3px solid $color-1;
+      border-bottom: 3px solid var(--color-1);
     }
   }
 }

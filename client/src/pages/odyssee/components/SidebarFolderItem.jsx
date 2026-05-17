@@ -1,8 +1,12 @@
-import { Fragment } from "react";
+import { Fragment } from 'react';
 
-import { darken } from "../utils/colorUtils";
-import { DARKEN_BG, DARKEN_BORDER } from "../config/folderColors";
-import IconDossierFull from "../assets/IconDossierFull";
+import { darken } from '../utils/colorUtils';
+import {
+  DARKEN_BG,
+  DARKEN_BORDER,
+  DEFAULT_FOLDER_COLOR,
+} from '../config/folderColors';
+import IconDossierFull from '../assets/IconDossierFull';
 
 const SidebarFolderItem = ({
   folder,

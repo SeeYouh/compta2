@@ -17,3 +17,21 @@ export function lighten(hex, percent) {
   const factor = percent / 100;
   return `rgb(${Math.round(r + (255 - r) * factor)}, ${Math.round(g + (255 - g) * factor)}, ${Math.round(b + (255 - b) * factor)})`;
 }
+
+// Reproduit get-contrast() du SCSS Odyssée.
+// Retourne "black" si la couleur est claire (lightness > 50%), sinon "white".
+// Accepte un hex (#rrggbb) ou un rgb(r, g, b).
+export function getContrast(color) {
+  let r, g, b;
+  if (color.startsWith("#")) {
+    r = parseInt(color.slice(1, 3), 16);
+    g = parseInt(color.slice(3, 5), 16);
+    b = parseInt(color.slice(5, 7), 16);
+  } else {
+    const match = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    if (!match) return "white";
+    [, r, g, b] = match.map(Number);
+  }
+  const lightness = (Math.max(r, g, b) + Math.min(r, g, b)) / 2 / 255;
+  return lightness > 0.5 ? "black" : "white";
+}

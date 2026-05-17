@@ -1,19 +1,20 @@
-@use "../utils/_variable" as *;
-
 .modal-content {
-  background: $color-darkest;
-  border: 1px solid $color-darker;
+  background: var(--color-darkest);
+  border: 1px solid var(--color-darker);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 
   .modal-header .modal-title {
-    color: $color-lightness;
+    color: var(--color-lightness);
   }
 
   .modal-body .modal-message {
-    color: $color-light;
+    color: var(--color-light);
 
     span {
-      background-image: linear-gradient($color-danger, $color-danger);
+      background-image: linear-gradient(
+        var(--color-danger),
+        var(--color-danger)
+      );
       background-size: 0% 2px;
       background-position: left bottom;
       background-repeat: no-repeat;
@@ -27,12 +28,12 @@
   }
 
   .modal-body .modal-toggle {
-    color: $color-light;
+    color: var(--color-light);
 
     &__label {
       flex: 0 0 auto;
       margin-left: auto;
-      color: $color-lightness;
+      color: var(--color-lightness);
       font-weight: 600;
       position: relative;
 
@@ -43,7 +44,7 @@
         left: 0;
         width: 100%;
         height: 2px;
-        background: $color-danger;
+        background: var(--color-danger);
         transform: scaleX(0);
         transform-origin: left;
         transition: transform 0.2s ease;
@@ -55,22 +56,22 @@
     }
 
     &__options {
-      border: 1px solid $color-dark;
+      border: 1px solid var(--color-dark);
 
       &::before {
-        background: $color-dark;
+        background: var(--color-dark);
       }
 
       &--checked::before {
-        background: $color-danger;
+        background: var(--color-danger);
       }
     }
 
     &__opt {
-      color: $color-light;
+      color: var(--color-light);
 
       &--active {
-        color: $color-lightness;
+        color: var(--color-lightness);
       }
 
       &--danger {
@@ -81,35 +82,35 @@
 
   .modal-footer .btn {
     &.btn-secondary {
-      background: $color-darker;
-      color: $color-lightness;
-      border-color: $color-darker;
+      background: var(--color-darker);
+      color: var(--color-lightness);
+      border-color: var(--color-darker);
 
       &:hover {
-        background: $color-dark;
+        background: var(--color-dark);
       }
     }
 
     &.btn-danger {
-      background: $color-darker;
-      color: $color-lightness;
-      border: 1px solid $color-dark;
+      background: var(--color-darker);
+      color: var(--color-lightness);
+      border: 1px solid var(--color-dark);
 
       &:hover:not(:disabled) {
-        background: $color-dark;
+        background: var(--color-dark);
       }
     }
 
     &.btn-danger-soft {
-      background: $color-danger;
+      background: var(--color-danger);
       color: white;
 
       &:hover:not(:disabled) {
-        background: $color-danger-light;
+        background: var(--color-danger-light);
       }
 
       &:focus {
-        outline: 2px solid $color-danger;
+        outline: 2px solid var(--color-danger);
         outline-offset: 2px;
       }
     }

@@ -1,9 +1,12 @@
 // Styles pour la page d'authentification
-@use "../utils/_variable" as *;
 
 .auth-container {
   min-height: calc(100vh - 101px);
-  background: linear-gradient(135deg, $color-dark 0%, $color-darker 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-dark) 0%,
+    var(--color-darker) 100%
+  );
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -13,7 +16,7 @@
 }
 
 .auth-title {
-  color: get-contrast($color-darker);
+  color: var(--color-contrast-darker);
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 2rem;
@@ -31,19 +34,19 @@
 
 .form-section {
   flex: 1;
-  background: $color-lightness;
+  background: var(--color-lightness);
   border-radius: 12px;
   padding: 2rem;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
 
   h2 {
-    color: get-contrast($color-lightness);
+    color: var(--color-contrast-lightness);
     font-size: 1.8rem;
     font-weight: 600;
     margin-bottom: 1.5rem;
     text-align: center;
-    border-bottom: 2px solid $color-darker;
+    border-bottom: 2px solid var(--color-darker);
     padding-bottom: 0.5rem;
   }
 }
@@ -59,7 +62,7 @@
   flex-direction: column;
 
   label {
-    color: $color-dark;
+    color: var(--color-dark);
     font-weight: 500;
     margin-bottom: 0.5rem;
     font-size: 0.9rem;
@@ -67,27 +70,27 @@
 
   input {
     padding: 0.75rem;
-    border: 2px solid $color-light;
+    border: 2px solid var(--color-light);
     border-radius: 8px;
     font-size: 1rem;
     transition: all 0.3s ease;
-    background: $color-lightness;
+    background: var(--color-lightness);
 
     &:focus {
       outline: none;
-      border-color: $color-darker;
-      background: $color-lightness;
-      box-shadow: 0 0 0 3px $color-lightness;
+      border-color: var(--color-darker);
+      background: var(--color-lightness);
+      box-shadow: 0 0 0 3px var(--color-lightness);
     }
 
     &::placeholder {
-      color: $color-1;
+      color: var(--color-1);
     }
   }
 }
 
 .field-error {
-  color: $color-dark;
+  color: var(--color-dark);
   font-size: 0.8rem;
   margin-top: 0.25rem;
   font-weight: 500;
@@ -110,13 +113,13 @@
 
 .loader-content {
   text-align: center;
-  color: get-contrast($color-darker);
+  color: var(--color-contrast-darker);
 
   .spinner {
     width: 50px;
     height: 50px;
-    border: 4px solid $color-light;
-    border-top: 4px solid $color-lightness;
+    border: 4px solid var(--color-light);
+    border-top: 4px solid var(--color-lightness);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 1rem;
@@ -157,22 +160,38 @@
 }
 
 .signup-btn {
-  background: linear-gradient(135deg, $color-dark 0%, $color-darker 100%);
-  color: get-contrast($color-darker);
+  background: linear-gradient(
+    135deg,
+    var(--color-dark) 0%,
+    var(--color-darker) 100%
+  );
+  color: var(--color-contrast-darker);
 
   &:hover:not(:disabled) {
-    background: linear-gradient(135deg, $color-darker 0%, $color-darkest 100%);
+    background: linear-gradient(
+      135deg,
+      var(--color-darker) 0%,
+      var(--color-darkest) 100%
+    );
     transform: translateY(-1px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   }
 }
 
 .login-btn {
-  background: linear-gradient(135deg, $color-darker 0%, $color-darkest 100%);
-  color: get-contrast($color-darkest);
+  background: linear-gradient(
+    135deg,
+    var(--color-darker) 0%,
+    var(--color-darkest) 100%
+  );
+  color: var(--color-contrast-darkest);
 
   &:hover:not(:disabled) {
-    background: linear-gradient(135deg, $color-darkest 0%, $color-darkest 100%);
+    background: linear-gradient(
+      135deg,
+      var(--color-darkest) 0%,
+      var(--color-darkest) 100%
+    );
     transform: translateY(-1px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   }
@@ -192,21 +211,21 @@
   background: linear-gradient(
     to bottom,
     transparent,
-    get-contrast($color-darker),
+    var(--color-contrast-darker),
     transparent
   );
 }
 
 .separator-text {
-  color: get-contrast($color-darker);
+  color: var(--color-contrast-darker);
   font-weight: 600;
   font-size: 1.2rem;
-  background: $color-dark;
+  background: var(--color-dark);
   backdrop-filter: blur(10px);
   padding: 0.5rem 1rem;
   border-radius: 20px;
   margin: 1rem 0;
-  border: 1px solid $color-1;
+  border: 1px solid var(--color-1);
 }
 
 .message {
@@ -217,27 +236,27 @@
   font-weight: 500;
 
   &.success {
-    background: $color-lightness;
-    color: $color-darkest;
-    border: 1px solid $color-light;
+    background: var(--color-lightness);
+    color: var(--color-darkest);
+    border: 1px solid var(--color-light);
   }
 
   &.error {
-    background: $color-lightness;
-    color: $color-darkest;
-    border: 1px solid $color-1;
+    background: var(--color-lightness);
+    color: var(--color-darkest);
+    border: 1px solid var(--color-1);
   }
 }
 
 .debug-info {
   margin-top: 2rem;
   padding: 1rem;
-  background: $color-dark;
+  background: var(--color-dark);
   backdrop-filter: blur(10px);
   border-radius: 8px;
-  color: get-contrast($color-darker);
+  color: var(--color-contrast-darker);
   font-size: 0.9rem;
-  border: 1px solid $color-1;
+  border: 1px solid var(--color-1);
 
   p {
     margin: 0.5rem 0;
@@ -262,7 +281,7 @@
     background: linear-gradient(
       to right,
       transparent,
-      get-contrast($color-darker),
+      var(--color-contrast-darker),
       transparent
     );
   }

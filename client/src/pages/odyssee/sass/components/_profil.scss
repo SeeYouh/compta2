@@ -1,7 +1,5 @@
-@use "../utils/_variable" as *;
-
 .left-menu {
-  color: $color-lightness;
+  color: var(--color-lightness);
 
   & .container-profil_status-profil {
     width: 25px;
