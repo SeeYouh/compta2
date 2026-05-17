@@ -1,8 +1,9 @@
-import { fileURLToPath } from "url";
-import fs from "fs";
-import path from "path";
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+import path from 'path';
 
-import { OdysseeProduct } from "../models/OdysseeProduct.js";
+import { OdysseeProduct } from '../models/OdysseeProduct.js';
+import { OdysseeProductFolder } from '../models/OdysseeProductFolder.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,6 +17,7 @@ export const createProduct = async (req, res) => {
       amountToAdminister,
       intakeTime,
       categoryId,
+      folderId,
     } = req.body;
 
     if (!categoryId) {
@@ -54,6 +56,7 @@ export const createProduct = async (req, res) => {
       },
       categoryId,
       userId: req.userId,
+      folderId: folderId || null,
     };
 
     if (req.file) {
@@ -84,14 +87,16 @@ export const createProduct = async (req, res) => {
 export const getProductsByCategory = async (req, res) => {
   try {
     const { categoryId } = req.params;
-    const products = await OdysseeProduct.findByUserAndCategory(
-      req.userId,
-      categoryId,
-    );
+
+    const [products, folders] = await Promise.all([
+      OdysseeProduct.findByUserAndCategory(req.userId, categoryId),
+      OdysseeProductFolder.find({ userId: req.userId, categoryId }).lean(),
+    ]);
 
     res.status(200).json({
       success: true,
       products,
+      folders,
       count: products.length,
     });
   } catch (error) {

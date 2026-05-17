@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
   name: {
@@ -66,6 +66,11 @@ const productSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "OdysseeCategory",
     required: true,
+  },
+  folderId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "OdysseeProductFolder",
+    default: null,
   },
   // userId stocké en String (format site-1 : "user-UUID")
   userId: {
