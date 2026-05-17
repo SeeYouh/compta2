@@ -1,6 +1,6 @@
 {
   "name": "compta-server",
-  "version": "2.0.5-0003",
+  "version": "2.0.5-0004",
   "type": "module",
   "description": "Backend API pour l'application de comptabilité",
   "main": "src/server.js",
