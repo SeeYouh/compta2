@@ -1,5 +1,5 @@
-import { OdysseeProduct } from '../models/OdysseeProduct.js';
-import { OdysseeProductFolder } from '../models/OdysseeProductFolder.js';
+import { OdysseeProduct } from "../models/OdysseeProduct.js";
+import { OdysseeProductFolder } from "../models/OdysseeProductFolder.js";
 
 export const createProductFolder = async (req, res) => {
   try {
@@ -35,7 +35,7 @@ export const createProductFolder = async (req, res) => {
       userId: req.userId,
       categoryId,
       parentFolderId: parentFolderId || null,
-      name: name || "Nouveau dossier",
+      name: name || "",
       color: color || "#969696",
       depth,
     });
