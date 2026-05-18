@@ -1,26 +1,33 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from 'react';
 
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+} from 'react-router-dom';
 
-import CatalogMain from "../../components/CatalogMain";
-import CatalogSidebar from "../../components/CatalogSidebar";
-import CategoryContextMenu from "../../components/CategoryContextMenu";
-import CategoryForm from "../../components/CategoryForm";
-import { categoryLibrary } from "../../utils/variable";
-import CategorySettings from "../../components/CategorySettings";
-import ConfirmationModal from "../../../../components/ConfirmationModal";
-import FolderContextMenu from "../../components/FolderContextMenu";
-import FolderService from "../../services/folderService";
-import FolderSettingsModal from "../../components/FolderSettingsModal";
-import Gear from "../../assets/gear";
-import OdysseeCategoryService from "../../../../services/odysseeCategoryService";
-import OdysseeProductService from "../../../../services/odysseeProductService";
-import PaperProduct from "../../components/PaperProduct";
-import ProductFolderService from "../../../../services/productFolderService";
-import ProductService from "../../services/productService";
-import SidebarTooltip from "../../components/SidebarTooltip";
-import SynapseUserMenu from "../../../../components/SynapseUserMenu";
-import { useSidebarDnd } from "../../hooks/useSidebarDnd";
+import CatalogMain from '../../components/CatalogMain';
+import CatalogSidebar from '../../components/CatalogSidebar';
+import CategoryContextMenu from '../../components/CategoryContextMenu';
+import CategoryForm from '../../components/CategoryForm';
+import { categoryLibrary } from '../../utils/variable';
+import CategorySettings from '../../components/CategorySettings';
+import ConfirmationModal from '../../../../components/ConfirmationModal';
+import FolderContextMenu from '../../components/FolderContextMenu';
+import FolderService from '../../services/folderService';
+import FolderSettingsModal from '../../components/FolderSettingsModal';
+import Gear from '../../assets/gear';
+import OdysseeCategoryService
+  from '../../../../services/odysseeCategoryService';
+import OdysseeProductService from '../../../../services/odysseeProductService';
+import PaperProduct from '../../components/PaperProduct';
+import ProductFolderService from '../../../../services/productFolderService';
+import ProductService from '../../services/productService';
+import SidebarTooltip from '../../components/SidebarTooltip';
+import SynapseUserMenu from '../../../../components/SynapseUserMenu';
+import { useSidebarDnd } from '../../hooks/useSidebarDnd';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -84,8 +91,10 @@ const Dashboard = () => {
   // Dossiers de produits dans le catalogue
   const [productFolders, setProductFolders] = useState([]);
   const [editFolderModal, setEditFolderModal] = useState(null); // { folderId } ou null
-  const [deleteFolderProductModal, setDeleteFolderProductModal] =
-    useState(null); // { folderId, folderName } ou null
+  const [deleteFolderFlow, setDeleteFolderFlow] = useState(null);
+  // deleteFolderFlow phases :
+  // { phase: 'confirm', folderId, folderName, products: [], confirmAll: false }
+  // { phase: 'products', folderId, folderName, products: [], pendingIndex: 0 }
 
   // Drag & drop
   const dnd = useSidebarDnd({
@@ -206,6 +215,17 @@ const Dashboard = () => {
         );
         return [...other, ...(result.folders || [])];
       });
+      setFolderOpenStates((prev) => {
+        const updated = { ...prev };
+        (result.folders || []).forEach((f) => {
+          if (f.isOpen === false) {
+            updated[String(f._id)] = false;
+          } else {
+            delete updated[String(f._id)];
+          }
+        });
+        return updated;
+      });
     }
   };
 
@@ -220,6 +240,10 @@ const Dashboard = () => {
   };
 
   const handleSelectProduct = (product) => {
+    if (selectedFileData?._id === product._id) {
+      setSelectedFileData(null);
+      return;
+    }
     setSelectedFileData({ ...product.contentFilesData, _id: product._id });
     setEditMode(false);
   };
@@ -284,9 +308,10 @@ const Dashboard = () => {
     relevantFolders.every((f) => folderOpenStates[String(f._id)] === false);
 
   const toggleAllProductFolders = () => {
+    const opening = allProductFoldersClosed;
     setFolderOpenStates((prev) => {
       const updated = { ...prev };
-      if (allProductFoldersClosed) {
+      if (opening) {
         relevantFolders.forEach((f) => {
           delete updated[String(f._id)];
         });
@@ -297,13 +322,17 @@ const Dashboard = () => {
       }
       return updated;
     });
+    relevantFolders.forEach((f) =>
+      ProductFolderService.updateFolder(f._id, { isOpen: opening }),
+    );
   };
 
-  const toggleProductFolder = (folderId) =>
-    setFolderOpenStates((prev) => ({
-      ...prev,
-      [String(folderId)]: prev[String(folderId)] !== false ? false : true,
-    }));
+  const toggleProductFolder = (folderId) => {
+    const newState =
+      folderOpenStates[String(folderId)] !== false ? false : true;
+    setFolderOpenStates((prev) => ({ ...prev, [String(folderId)]: newState }));
+    ProductFolderService.updateFolder(folderId, { isOpen: newState });
+  };
   // ── Dossiers de produits ─────────────────────────────────────────────────────
 
   const handleCreateProductFolder = async (
@@ -339,21 +368,44 @@ const Dashboard = () => {
     setEditFolderModal(null);
   };
 
-  const handleConfirmDeleteProductFolder = async () => {
-    const folderId = deleteFolderProductModal?.folderId;
-    if (!folderId) return;
+  const executeDeleteProductFolder = async (folderId) => {
     const result = await ProductFolderService.deleteFolder(folderId);
     if (result.success) {
       setProductFolders((prev) => prev.filter((f) => f._id !== folderId));
       if (selectedCategory) loadProducts(selectedCategory);
     }
-    setDeleteFolderProductModal(null);
+    setDeleteFolderFlow(null);
   };
 
-  const handleMoveProductToFolder = async (productId, folderId) => {
-    const result = await OdysseeProductService.updateProduct(productId, {
-      folderId: folderId || null,
-    });
+  const handleConfirmDeleteFolder = () => {
+    const { folderId, products, confirmAll } = deleteFolderFlow;
+    if (products.length === 0 || confirmAll) {
+      executeDeleteProductFolder(folderId);
+    } else {
+      setDeleteFolderFlow((prev) => ({
+        ...prev,
+        phase: "products",
+        pendingIndex: 0,
+      }));
+    }
+  };
+
+  const handleConfirmFolderProduct = () => {
+    const { folderId, products, pendingIndex } = deleteFolderFlow;
+    if (pendingIndex < products.length - 1) {
+      setDeleteFolderFlow((prev) => ({
+        ...prev,
+        pendingIndex: prev.pendingIndex + 1,
+      }));
+    } else {
+      executeDeleteProductFolder(folderId);
+    }
+  };
+
+  const handleMoveProductToFolder = async (productId, folderId, rootOrder) => {
+    const update = { folderId: folderId || null };
+    if (rootOrder !== undefined) update.rootOrder = rootOrder;
+    const result = await OdysseeProductService.updateProduct(productId, update);
     if (result.success && selectedCategory) loadProducts(selectedCategory);
   };
 
@@ -658,9 +710,18 @@ const Dashboard = () => {
                     const folder = productFolders.find(
                       (f) => f._id === folderId,
                     );
-                    setDeleteFolderProductModal({
+                    const cat = categories.find(
+                      (c) => c._id === selectedCategory,
+                    );
+                    const products = (cat?.products || []).filter(
+                      (p) => String(p.folderId) === String(folderId),
+                    );
+                    setDeleteFolderFlow({
+                      phase: "confirm",
                       folderId,
                       folderName: folder?.name || "ce dossier",
+                      products,
+                      confirmAll: false,
                     });
                   }}
                   onMoveProductToFolder={handleMoveProductToFolder}
@@ -800,21 +861,44 @@ const Dashboard = () => {
           );
         })()}
 
-      {/* Confirmation suppression dossier produit */}
-      {deleteFolderProductModal && (
+      {/* Phase 1 : confirmation suppression dossier produit */}
+      {deleteFolderFlow?.phase === "confirm" && (
         <ConfirmationModal
           isOpen
           title="Supprimer le dossier"
           message={
             <>
-              Supprimer &ldquo;{deleteFolderProductModal.folderName}&rdquo; ?{" "}
-              <span>Les produits du dossier seront désactivés.</span>
+              Supprimer &ldquo;{deleteFolderFlow.folderName}&rdquo; ?{" "}
+              <span>Cette action est irréversible.</span>
             </>
           }
           confirmText="Supprimer"
           cancelText="Annuler"
-          onConfirm={handleConfirmDeleteProductFolder}
-          onCancel={() => setDeleteFolderProductModal(null)}
+          onConfirm={handleConfirmDeleteFolder}
+          onCancel={() => setDeleteFolderFlow(null)}
+          softDanger
+          toggleLabel={
+            deleteFolderFlow.products.length > 0
+              ? "Cela supprimera son contenu"
+              : null
+          }
+          toggleChecked={deleteFolderFlow.confirmAll}
+          onToggleChange={(checked) =>
+            setDeleteFolderFlow((prev) => ({ ...prev, confirmAll: checked }))
+          }
+        />
+      )}
+
+      {/* Phase 2 : confirmation produit par produit */}
+      {deleteFolderFlow?.phase === "products" && (
+        <ConfirmationModal
+          isOpen
+          title={`Produit ${deleteFolderFlow.pendingIndex + 1} / ${deleteFolderFlow.products.length}`}
+          message={`Supprimer "${deleteFolderFlow.products[deleteFolderFlow.pendingIndex]?.name || "ce produit"}" ?`}
+          confirmText="Supprimer"
+          cancelText="Tout annuler"
+          onConfirm={handleConfirmFolderProduct}
+          onCancel={() => setDeleteFolderFlow(null)}
         />
       )}
 

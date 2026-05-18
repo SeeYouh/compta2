@@ -1,9 +1,38 @@
 // ── Dossier de produits (carte niveau 0) ─────────────────────────────────────
 
 .product-folder {
-  margin-bottom: 12px;
+  margin-bottom: 0;
+  grid-column: 1 / -1;
   position: relative;
   overflow: visible;
+
+  &--product-before {
+    &::before {
+      content: "";
+      position: absolute;
+      left: -3px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--color-1);
+      border-radius: 2px;
+      z-index: 10;
+    }
+  }
+
+  &--product-after {
+    &::after {
+      content: "";
+      position: absolute;
+      right: -3px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--color-1);
+      border-radius: 2px;
+      z-index: 10;
+    }
+  }
 
   &--product-over {
     .product-folder__header {
@@ -24,7 +53,7 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: var(--color-lightness);
+      background: var(--color-1);
       border-radius: 2px;
       z-index: 10;
     }
@@ -38,7 +67,35 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: var(--color-lightness);
+      background: var(--color-1);
+      border-radius: 2px;
+      z-index: 10;
+    }
+  }
+
+  &--drop-left {
+    &::before {
+      content: "";
+      position: absolute;
+      left: -3px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--color-1);
+      border-radius: 2px;
+      z-index: 10;
+    }
+  }
+
+  &--drop-right {
+    &::after {
+      content: "";
+      position: absolute;
+      right: -3px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--color-1);
       border-radius: 2px;
       z-index: 10;
     }
@@ -151,10 +208,11 @@
 }
 
 .product-folder--closed {
-  display: inline-flex;
+  grid-column: auto;
+  display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 6px 6px 0;
+  margin: 0;
   border-radius: 10px;
   background: var(--folder-bg-color);
   border: 2px solid var(--folder-border-color);
@@ -217,10 +275,29 @@
 .catalog-content {
   flex: 1;
   padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+  gap: 8px;
+  align-items: start;
+  align-content: start;
 
   &--drag-over {
     outline: 2px dashed var(--color-light);
     outline-offset: -2px;
     border-radius: 8px;
+  }
+
+  &:hover > .catalog-card {
+    opacity: 0.5;
+  }
+
+  &:hover > .catalog-card:hover,
+  &:hover > .catalog-card--selected {
+    opacity: 1;
+  }
+
+  &:has(> .catalog-card--selected)
+    > .catalog-card:not(.catalog-card--selected) {
+    opacity: 0.5;
   }
 }

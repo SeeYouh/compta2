@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-import { darken } from "../utils/colorUtils";
+import { darken } from '../utils/colorUtils';
 import {
   DARKEN_BG,
   DARKEN_BORDER,
   DEFAULT_FOLDER_COLOR,
-} from "../config/folderColors";
-import IconDossierFull from "../assets/IconDossierFull";
-import ProductCard from "./ProductCard";
-import ProductFolderContextMenu from "./ProductFolderContextMenu";
+} from '../config/folderColors';
+import IconDossierFull from '../assets/IconDossierFull';
+import ProductCard from './ProductCard';
+import ProductFolderContextMenu from './ProductFolderContextMenu';
 
 const ProductFolder = ({
   folder,
@@ -21,20 +21,32 @@ const ProductFolder = ({
   onRenameFolder,
   onDeleteFolder,
   onDrop,
+  onProductDropZone,
   onFolderDragOver,
   onFolderDrop,
   isDragOver,
   dragPosition,
+  indicatorType,
   onHover,
   onHoverLeave,
   isOpen,
   onToggle,
   allFoldersClosed,
   onToggleAllFolders,
+  productGapZone,
 }) => {
   const [contextMenu, setContextMenu] = useState(null);
-  const [isProductDragOver, setIsProductDragOver] = useState(false);
+  const [productDropZone, setProductDropZone] = useState(null); // 'before' | 'inside' | 'after' | null
   const [folderTooltip, setFolderTooltip] = useState(null);
+
+  const getProductZone = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const relX = e.clientX - rect.left;
+    const pct = relX / rect.width;
+    if (pct < 0.3) return "before";
+    if (pct > 0.7) return "after";
+    return "inside";
+  };
 
   const handleTooltipEnter = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -54,7 +66,9 @@ const ProductFolder = ({
     if (types.includes("productid")) {
       e.preventDefault();
       e.stopPropagation();
-      setIsProductDragOver(true);
+      const zone = getProductZone(e);
+      setProductDropZone(zone);
+      if (onProductDropZone) onProductDropZone(folder._id, zone);
     } else if (types.includes("folderid")) {
       if (onFolderDragOver) onFolderDragOver(e, folder._id);
     }
@@ -62,18 +76,20 @@ const ProductFolder = ({
 
   const handleDragLeave = (e) => {
     if (!e.currentTarget.contains(e.relatedTarget)) {
-      setIsProductDragOver(false);
+      setProductDropZone(null);
+      if (onProductDropZone) onProductDropZone(null, null);
     }
   };
 
   const handleDrop = (e) => {
     e.stopPropagation();
-    setIsProductDragOver(false);
+    const zone = productDropZone;
+    setProductDropZone(null);
     const productId = e.dataTransfer.getData("productId");
     const folderId = e.dataTransfer.getData("folderId");
     if (productId) {
       e.preventDefault();
-      if (onDrop) onDrop(productId, folder._id, null);
+      if (onDrop) onDrop(productId, folder._id, zone);
     } else if (folderId) {
       e.preventDefault();
       if (onFolderDrop) onFolderDrop(e, folder._id);
@@ -85,9 +101,31 @@ const ProductFolder = ({
   const classNames = [
     "product-folder",
     !isOpen && "product-folder--closed",
-    isProductDragOver && "product-folder--product-over",
-    isDragOver && dragPosition === "before" && "product-folder--drop-before",
-    isDragOver && dragPosition === "after" && "product-folder--drop-after",
+    productDropZone === "inside" && "product-folder--product-over",
+    productDropZone === "before" && "product-folder--product-before",
+    productDropZone === "after" && "product-folder--product-after",
+    !productDropZone &&
+      productGapZone === "before" &&
+      "product-folder--product-before",
+    !productDropZone &&
+      productGapZone === "after" &&
+      "product-folder--product-after",
+    isDragOver &&
+      dragPosition === "before" &&
+      indicatorType !== "vertical" &&
+      "product-folder--drop-before",
+    isDragOver &&
+      dragPosition === "after" &&
+      indicatorType !== "vertical" &&
+      "product-folder--drop-after",
+    isDragOver &&
+      dragPosition === "before" &&
+      indicatorType === "vertical" &&
+      "product-folder--drop-left",
+    isDragOver &&
+      dragPosition === "after" &&
+      indicatorType === "vertical" &&
+      "product-folder--drop-right",
   ]
     .filter(Boolean)
     .join(" ");
@@ -96,6 +134,7 @@ const ProductFolder = ({
     <>
       <div
         className={classNames}
+        data-folder-id={folder._id}
         style={{
           "--folder-color": color,
           "--folder-bg-color": darken(color, DARKEN_BG),

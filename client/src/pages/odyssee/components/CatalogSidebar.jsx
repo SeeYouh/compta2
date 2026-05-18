@@ -317,7 +317,15 @@ const CatalogSidebar = ({
         renderGhost()}
 
       <div className="catalog-sidebar__add" onClick={onAddCategory}>
-        <span className="catalog-sidebar__add-circle">+</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 2.56 2.56"
+          width="20"
+          height="20"
+          fill="currentColor"
+        >
+          <path d="M1.39,0s.09.01.14.02c1.04.21,1.39,1.54.58,2.23C1.41,2.87.26,2.51.04,1.6c-.02-.06-.02-.13-.04-.19,0-.08,0-.16,0-.24C.05.56.56.05,1.17,0h.23ZM1.36.61h-.17v.58h-.57v.17h.57v.58h.17v-.58h.59v-.17h-.59v-.58Z" />
+        </svg>
       </div>
     </div>
   );
