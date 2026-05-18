@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const productFolderSchema = new mongoose.Schema({
   userId: { type: String, required: true },
@@ -14,6 +14,7 @@ const productFolderSchema = new mongoose.Schema({
   },
   name: { type: String, default: "", trim: true },
   color: { type: String, default: "#969696" },
+  isOpen: { type: Boolean, default: true },
   depth: { type: Number, enum: [0, 1], default: 0 },
   order: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },

@@ -72,6 +72,10 @@ const productSchema = new mongoose.Schema({
     ref: "OdysseeProductFolder",
     default: null,
   },
+  rootOrder: {
+    type: Number,
+    default: null,
+  },
   // userId stocké en String (format site-1 : "user-UUID")
   userId: {
     type: String,

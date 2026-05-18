@@ -1,5 +1,5 @@
-import { OdysseeProduct } from "../models/OdysseeProduct.js";
-import { OdysseeProductFolder } from "../models/OdysseeProductFolder.js";
+import { OdysseeProduct } from '../models/OdysseeProduct.js';
+import { OdysseeProductFolder } from '../models/OdysseeProductFolder.js';
 
 export const createProductFolder = async (req, res) => {
   try {
@@ -127,11 +127,11 @@ export const deleteProductFolder = async (req, res) => {
 
     const allFolderIds = [folder._id, ...subFolderIds];
 
-    // Supprimer les produits dans ces dossiers (soft delete)
-    await OdysseeProduct.updateMany(
-      { folderId: { $in: allFolderIds }, userId: req.userId },
-      { $set: { isActive: false } },
-    );
+    // Supprimer les produits dans ces dossiers
+    await OdysseeProduct.deleteMany({
+      folderId: { $in: allFolderIds },
+      userId: req.userId,
+    });
 
     // Supprimer les sous-dossiers puis le dossier
     await OdysseeProductFolder.deleteMany({ _id: { $in: allFolderIds } });
