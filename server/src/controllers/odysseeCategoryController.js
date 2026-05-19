@@ -1,6 +1,7 @@
-import { OdysseeCategory } from '../models/OdysseeCategory.js';
-import { OdysseeFolder } from '../models/OdysseeFolder.js';
-import { OdysseeProduct } from '../models/OdysseeProduct.js';
+import { OdysseeCategory } from "../models/OdysseeCategory.js";
+import { OdysseeFolder } from "../models/OdysseeFolder.js";
+import { OdysseeProduct } from "../models/OdysseeProduct.js";
+import { OdysseeProductFolder } from "../models/OdysseeProductFolder.js";
 
 export const createCategory = async (req, res) => {
   try {
@@ -60,10 +61,11 @@ export const updateCategory = async (req, res) => {
 
 export const deleteCategory = async (req, res) => {
   try {
-    const category = await OdysseeCategory.findOneAndDelete({
-      _id: req.params.id,
-      userId: req.userId,
-    });
+    const category = await OdysseeCategory.findOneAndUpdate(
+      { _id: req.params.id, userId: req.userId, deletedAt: null },
+      { $set: { deletedAt: new Date() } },
+      { new: true },
+    );
 
     if (!category) {
       return res
@@ -71,10 +73,15 @@ export const deleteCategory = async (req, res) => {
         .json({ error: "Catégorie non trouvée ou non autorisée" });
     }
 
-    await OdysseeProduct.deleteMany({
-      categoryId: req.params.id,
-      userId: req.userId,
-    });
+    await OdysseeProduct.updateMany(
+      { categoryId: req.params.id, userId: req.userId },
+      { $set: { deletedAt: new Date() } },
+    );
+
+    await OdysseeProductFolder.updateMany(
+      { categoryId: req.params.id, userId: req.userId },
+      { $set: { deletedAt: new Date() } },
+    );
 
     // Cascade : retirer la catégorie des dossiers qui la référencent
     await OdysseeFolder.updateMany(
@@ -99,6 +106,7 @@ export const getOneCategory = async (req, res) => {
       _id: req.params.id,
       userId: req.userId,
       isActive: true,
+      deletedAt: null,
     });
 
     if (!category) {
@@ -118,6 +126,7 @@ export const getAllCategories = async (req, res) => {
     const categories = await OdysseeCategory.find({
       userId: req.userId,
       isActive: true,
+      deletedAt: null,
     }).sort({ createdAt: 1 });
     res.status(200).json({ categories });
   } catch (error) {
@@ -135,6 +144,7 @@ export const searchCategories = async (req, res) => {
     const categories = await OdysseeCategory.find({
       userId: req.userId,
       isActive: true,
+      deletedAt: null,
       name: { $regex: q, $options: "i" },
     });
 

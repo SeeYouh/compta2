@@ -8,6 +8,7 @@ import odysseeCategoriesRoutes from './odysseeCategories.js';
 import odysseeProductFoldersRoutes from './odysseeProductFolders.js';
 import odysseeProductsRoutes from './odysseeProducts.js';
 import odysseeSidebarRoutes from './odysseeSidebar.js';
+import odysseeTrashRoutes from './odysseeTrash.js';
 import organigrammeRoutes from './organigramme.js';
 import projectionsRoutes from './projections.js';
 import settingsRoutes from './settings.js';
@@ -32,5 +33,6 @@ router.use("/odyssee/products", odysseeProductsRoutes);
 router.use("/odyssee/categories", odysseeCategoriesRoutes);
 router.use("/odyssee/sidebar", odysseeSidebarRoutes);
 router.use("/odyssee/product-folders", odysseeProductFoldersRoutes);
+router.use("/odyssee/trash", odysseeTrashRoutes);
 
 export default router;

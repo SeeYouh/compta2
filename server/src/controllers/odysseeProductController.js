@@ -1,5 +1,4 @@
 import { fileURLToPath } from 'url';
-import fs from 'fs';
 import path from 'path';
 
 import { OdysseeProduct } from '../models/OdysseeProduct.js';
@@ -90,7 +89,11 @@ export const getProductsByCategory = async (req, res) => {
 
     const [products, folders] = await Promise.all([
       OdysseeProduct.findByUserAndCategory(req.userId, categoryId),
-      OdysseeProductFolder.find({ userId: req.userId, categoryId }).lean(),
+      OdysseeProductFolder.find({
+        userId: req.userId,
+        categoryId,
+        deletedAt: null,
+      }).lean(),
     ]);
 
     res.status(200).json({
@@ -203,23 +206,9 @@ export const deleteProduct = async (req, res) => {
         .json({ error: "Produit non trouvé ou non autorisé" });
     }
 
-    if (product.img && product.img.length > 0) {
-      product.img.forEach((imageUrl) => {
-        const filename = imageUrl.split("/odyssee-images/")[1];
-        if (filename) {
-          const imagePath = path.join(
-            __dirname,
-            "../../odyssee-images",
-            filename,
-          );
-          fs.unlink(imagePath, (err) => {
-            if (err) console.error("Erreur suppression image:", err);
-          });
-        }
-      });
-    }
-
-    await OdysseeProduct.findByIdAndDelete(req.params.id);
+    await OdysseeProduct.findByIdAndUpdate(req.params.id, {
+      deletedAt: new Date(),
+    });
 
     res.status(200).json({ success: true, message: "Produit supprimé !" });
   } catch (error) {

@@ -1,14 +1,20 @@
-import cors from "cors";
-import express from "express";
-import { fileURLToPath } from "url";
-import helmet from "helmet";
-import path from "path";
-import rateLimit from "express-rate-limit";
+import cors from 'cors';
+import cron from 'node-cron';
+import express from 'express';
+import { fileURLToPath } from 'url';
+import helmet from 'helmet';
+import path from 'path';
+import rateLimit from 'express-rate-limit';
 
-import { config } from "./config/index.js";
-import { connectDB } from "./config/database.js";
-import { errorHandler, notFound } from "./middleware/errorHandler.js";
-import routes from "./routes/index.js";
+import { config } from './config/index.js';
+import { connectDB } from './config/database.js';
+import {
+  errorHandler,
+  notFound,
+} from './middleware/errorHandler.js';
+import { OdysseeProduct } from './models/OdysseeProduct.js';
+import { OdysseeProductFolder } from './models/OdysseeProductFolder.js';
+import routes from './routes/index.js';
 
 // Configuration pour ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -102,6 +108,22 @@ const server = app.listen(PORT, () => {
   console.log(`🚀 Serveur démarré sur le port ${PORT}`);
   console.log(`📍 Environnement: ${config.server.env}`);
   console.log(`🔗 API: http://localhost:${PORT}/api`);
+});
+
+// Purge quotidienne à 3h du matin : suppression définitive des éléments en corbeille depuis > 30 jours
+cron.schedule("0 3 * * *", async () => {
+  const threshold = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  try {
+    const [products, folders] = await Promise.all([
+      OdysseeProduct.deleteMany({ deletedAt: { $lt: threshold } }),
+      OdysseeProductFolder.deleteMany({ deletedAt: { $lt: threshold } }),
+    ]);
+    console.log(
+      `🗑️  Purge corbeille : ${products.deletedCount} produit(s), ${folders.deletedCount} dossier(s) supprimés définitivement`,
+    );
+  } catch (err) {
+    console.error("❌ Erreur purge corbeille:", err);
+  }
 });
 
 server.on("error", (err) => {

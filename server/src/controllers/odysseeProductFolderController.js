@@ -107,6 +107,7 @@ export const deleteProductFolder = async (req, res) => {
     const folder = await OdysseeProductFolder.findOne({
       _id: req.params.id,
       userId: req.userId,
+      deletedAt: null,
     });
 
     if (!folder) {
@@ -115,26 +116,32 @@ export const deleteProductFolder = async (req, res) => {
         .json({ success: false, error: "Dossier introuvable" });
     }
 
+    const now = new Date();
+
     // Récupérer les IDs des sous-dossiers (si dossier niveau 0)
     const subFolderIds = [];
     if (folder.depth === 0) {
       const subFolders = await OdysseeProductFolder.find({
         parentFolderId: folder._id,
         userId: req.userId,
+        deletedAt: null,
       });
       subFolderIds.push(...subFolders.map((f) => f._id));
     }
 
     const allFolderIds = [folder._id, ...subFolderIds];
 
-    // Supprimer les produits dans ces dossiers
-    await OdysseeProduct.deleteMany({
-      folderId: { $in: allFolderIds },
-      userId: req.userId,
-    });
+    // Soft-delete des produits dans ces dossiers
+    await OdysseeProduct.updateMany(
+      { folderId: { $in: allFolderIds }, userId: req.userId, deletedAt: null },
+      { $set: { deletedAt: now } },
+    );
 
-    // Supprimer les sous-dossiers puis le dossier
-    await OdysseeProductFolder.deleteMany({ _id: { $in: allFolderIds } });
+    // Soft-delete des dossiers
+    await OdysseeProductFolder.updateMany(
+      { _id: { $in: allFolderIds }, userId: req.userId },
+      { $set: { deletedAt: now } },
+    );
 
     res.status(200).json({ success: true, message: "Dossier supprimé" });
   } catch (error) {

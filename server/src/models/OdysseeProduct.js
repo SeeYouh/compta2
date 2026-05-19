@@ -85,6 +85,10 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  deletedAt: {
+    type: Date,
+    default: null,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -110,15 +114,20 @@ productSchema.pre("save", function (next) {
 });
 
 productSchema.statics.findByUser = function (userId) {
-  return this.find({ userId, isActive: true });
+  return this.find({ userId, isActive: true, deletedAt: null });
 };
 
 productSchema.statics.findByUserAndCategory = function (userId, categoryId) {
-  return this.find({ userId, categoryId, isActive: true });
+  return this.find({ userId, categoryId, isActive: true, deletedAt: null });
 };
 
 productSchema.statics.searchProducts = function (searchTerm, userId) {
-  return this.find({ userId, isActive: true, $text: { $search: searchTerm } });
+  return this.find({
+    userId,
+    isActive: true,
+    deletedAt: null,
+    $text: { $search: searchTerm },
+  });
 };
 
 export const OdysseeProduct = mongoose.model("OdysseeProduct", productSchema);
