@@ -1,33 +1,26 @@
-import {
-  useEffect,
-  useState,
-} from 'react';
+import { useEffect, useState } from "react";
 
-import {
-  Link,
-  useNavigate,
-} from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
 
-import CatalogMain from '../../components/CatalogMain';
-import CatalogSidebar from '../../components/CatalogSidebar';
-import CategoryContextMenu from '../../components/CategoryContextMenu';
-import CategoryForm from '../../components/CategoryForm';
-import { categoryLibrary } from '../../utils/variable';
-import CategorySettings from '../../components/CategorySettings';
-import ConfirmationModal from '../../../../components/ConfirmationModal';
-import FolderContextMenu from '../../components/FolderContextMenu';
-import FolderService from '../../services/folderService';
-import FolderSettingsModal from '../../components/FolderSettingsModal';
-import Gear from '../../assets/gear';
-import OdysseeCategoryService
-  from '../../../../services/odysseeCategoryService';
-import OdysseeProductService from '../../../../services/odysseeProductService';
-import PaperProduct from '../../components/PaperProduct';
-import ProductFolderService from '../../../../services/productFolderService';
-import ProductService from '../../services/productService';
-import SidebarTooltip from '../../components/SidebarTooltip';
-import SynapseUserMenu from '../../../../components/SynapseUserMenu';
-import { useSidebarDnd } from '../../hooks/useSidebarDnd';
+import CatalogMain from "../../components/CatalogMain";
+import CatalogSidebar from "../../components/CatalogSidebar";
+import CategoryContextMenu from "../../components/CategoryContextMenu";
+import CategoryForm from "../../components/CategoryForm";
+import { categoryLibrary } from "../../utils/variable";
+import CategorySettings from "../../components/CategorySettings";
+import ConfirmationModal from "../../../../components/ConfirmationModal";
+import FolderContextMenu from "../../components/FolderContextMenu";
+import FolderService from "../../services/folderService";
+import FolderSettingsModal from "../../components/FolderSettingsModal";
+import Gear from "../../assets/gear";
+import OdysseeCategoryService from "../../../../services/odysseeCategoryService";
+import OdysseeProductService from "../../../../services/odysseeProductService";
+import PaperProduct from "../../components/PaperProduct";
+import ProductFolderService from "../../../../services/productFolderService";
+import ProductService from "../../services/productService";
+import SidebarTooltip from "../../components/SidebarTooltip";
+import SynapseUserMenu from "../../../../components/SynapseUserMenu";
+import { useSidebarDnd } from "../../hooks/useSidebarDnd";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -866,12 +859,7 @@ const Dashboard = () => {
         <ConfirmationModal
           isOpen
           title="Supprimer le dossier"
-          message={
-            <>
-              Supprimer &ldquo;{deleteFolderFlow.folderName}&rdquo; ?{" "}
-              <span>Cette action est irréversible.</span>
-            </>
-          }
+          message={`Supprimer "${deleteFolderFlow.folderName}" ?`}
           confirmText="Supprimer"
           cancelText="Annuler"
           onConfirm={handleConfirmDeleteFolder}
@@ -907,12 +895,7 @@ const Dashboard = () => {
         <ConfirmationModal
           isOpen
           title="Supprimer la librairie"
-          message={
-            <>
-              Supprimer &ldquo;{deleteCategoryFlow.categoryName}&rdquo; ?{" "}
-              <span>Cette action est irréversible.</span>
-            </>
-          }
+          message={`Supprimer "${deleteCategoryFlow.categoryName}" ?`}
           confirmText="Supprimer"
           cancelText="Annuler"
           onConfirm={handleConfirmDeleteCategory}

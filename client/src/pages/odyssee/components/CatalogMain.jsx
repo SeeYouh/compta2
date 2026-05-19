@@ -1,11 +1,8 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useEffect, useRef, useState } from "react";
 
-import ProductCard from './ProductCard';
-import ProductFolder from './ProductFolder';
+import EmptyLibraryMessage from "./EmptyLibraryMessage";
+import ProductCard from "./ProductCard";
+import ProductFolder from "./ProductFolder";
 
 const getTitleFontSize = (name) => {
   const len = (name ?? "").length;
@@ -288,15 +285,7 @@ const CatalogMain = ({
       </div>
 
       {isEmpty ? (
-        <div className="catalog-empty">
-          <div className="catalog-empty__icon">📦</div>
-          <div className="catalog-empty__title">
-            Aucun produit dans cette librairie
-          </div>
-          <div className="catalog-empty__hint">
-            Cliquez sur le bouton + pour créer votre premier produit
-          </div>
-        </div>
+        <EmptyLibraryMessage />
       ) : (
         <div
           className="catalog-content"

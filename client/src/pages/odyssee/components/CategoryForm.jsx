@@ -65,13 +65,13 @@ const CategoryForm = ({ onSubmit, onCancel }) => {
   return (
     <div className="cat-form-overlay">
       <div className="cat-form">
-        <h3 className="cat-form__title">Nouvelle catégorie</h3>
+        <h3 className="cat-form__title">Nouvelle librairie</h3>
 
         <form onSubmit={handleSubmit}>
           {/* Nom */}
           <div className="cat-form__field">
             <label className="cat-form__label" htmlFor="cat-name">
-              Nom <span className="cat-form__hint">(15 caractères max)</span>
+              Nom
             </label>
             <input
               id="cat-name"
@@ -79,7 +79,7 @@ const CategoryForm = ({ onSubmit, onCancel }) => {
               type="text"
               value={categoryName}
               onChange={(e) => setCategoryName(e.target.value.slice(0, 30))}
-              placeholder="Nom de la catégorie"
+              placeholder="Nom de la librairie"
               maxLength={30}
               autoFocus
             />
