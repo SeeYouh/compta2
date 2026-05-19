@@ -285,7 +285,9 @@ const CatalogMain = ({
       </div>
 
       {isEmpty ? (
-        <EmptyLibraryMessage />
+        selectedCat ? (
+          <EmptyLibraryMessage />
+        ) : null
       ) : (
         <div
           className="catalog-content"

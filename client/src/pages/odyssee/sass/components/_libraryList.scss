@@ -517,6 +517,22 @@
 }
 
 // Bouton + à la suite des catégories
+.catalog-no-library {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+  user-select: none;
+
+  &:hover {
+    opacity: 0.75;
+  }
+}
+
 .catalog-sidebar__add {
   width: 32px;
   height: 32px;

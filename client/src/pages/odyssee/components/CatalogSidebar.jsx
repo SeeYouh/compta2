@@ -1,20 +1,14 @@
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 
-import { darken } from '../utils/colorUtils';
+import { darken } from "../utils/colorUtils";
 import {
   DARKEN_BG,
   DARKEN_BORDER,
   DEFAULT_FOLDER_COLOR,
-} from '../config/folderColors';
-import IconDossierFull from '../assets/IconDossierFull';
-import SidebarCategoryItem from './SidebarCategoryItem';
-import SidebarFolderItem from './SidebarFolderItem';
+} from "../config/folderColors";
+import IconDossierFull from "../assets/IconDossierFull";
+import SidebarCategoryItem from "./SidebarCategoryItem";
+import SidebarFolderItem from "./SidebarFolderItem";
 
 const getInitials = (name) =>
   name

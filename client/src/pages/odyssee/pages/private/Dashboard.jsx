@@ -13,6 +13,7 @@ import FolderContextMenu from "../../components/FolderContextMenu";
 import FolderService from "../../services/folderService";
 import FolderSettingsModal from "../../components/FolderSettingsModal";
 import Gear from "../../assets/gear";
+import IconLibrary from "../../assets/IconLibrary";
 import OdysseeCategoryService from "../../../../services/odysseeCategoryService";
 import OdysseeProductService from "../../../../services/odysseeProductService";
 import PaperProduct from "../../components/PaperProduct";
@@ -24,7 +25,10 @@ import { useSidebarDnd } from "../../hooks/useSidebarDnd";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [width, _setWidth] = useState(400);
+  const [width, setWidth] = useState(() => {
+    const saved = localStorage.getItem("odyssee-sidebar-width");
+    return saved ? parseInt(saved, 10) : 400;
+  });
   const [availableHeight, setAvailableHeight] = useState(null);
   const [selectedCategoryLibrary, setSelectedCategoryLibrary] = useState(
     categoryLibrary[2].name,
@@ -257,12 +261,18 @@ const Dashboard = () => {
     const result = await OdysseeCategoryService.createCategory(categoryData);
     if (result.success) {
       const newCat = enrichCategory(result.category);
-      setCategories((prev) => [...prev, newCat]);
+      setCategories((prev) =>
+        [...prev, newCat].map((cat) => ({
+          ...cat,
+          active: cat._id === newCat._id,
+        })),
+      );
       setSidebarItems((prev) => {
         const newItems = [...prev, { type: "category", id: newCat._id }];
         FolderService.updateLayout(newItems);
         return newItems;
       });
+      setSelectedCategory(newCat._id);
     }
     setShowCategoryModal(false);
   };
@@ -615,6 +625,32 @@ const Dashboard = () => {
       </nav>
       <div className="odyssee-body">
         <div className="left-menu" style={{ width }}>
+          <div
+            className="left-menu-resizer"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              const startX = e.clientX;
+              const startWidth = width;
+              const onMouseMove = (moveE) => {
+                const next = Math.min(
+                  800,
+                  Math.max(300, startWidth + moveE.clientX - startX),
+                );
+                setWidth(next);
+                localStorage.setItem("odyssee-sidebar-width", String(next));
+              };
+              const onMouseUp = () => {
+                document.removeEventListener("mousemove", onMouseMove);
+                document.removeEventListener("mouseup", onMouseUp);
+                document.body.style.userSelect = "";
+                document.body.style.cursor = "";
+              };
+              document.body.style.userSelect = "none";
+              document.body.style.cursor = "ew-resize";
+              document.addEventListener("mousemove", onMouseMove);
+              document.addEventListener("mouseup", onMouseUp);
+            }}
+          />
           <section className="catalog-wrapper">
             <ul className="library-navBar">
               {categoryLibrary.map((item, index) => {
@@ -639,95 +675,107 @@ const Dashboard = () => {
             {selectedCategoryLibrary_old?.linkLibrary?.({
               onSelectFile: setSelectedFileData,
               availableHeight,
-            }) || (
-              <div className="catalog-container">
-                <CatalogSidebar
-                  sidebarItems={sidebarItems}
-                  folders={folders}
-                  categories={categories}
-                  selectedCategoryId={selectedCategory}
-                  dnd={dnd}
-                  onCategorySelect={handleCategorySelect}
-                  onCategoryContextMenu={handleCategoryContextMenu}
-                  onToggleFolder={toggleFolder}
-                  onFolderContextMenu={handleFolderContextMenu}
-                  onAddCategory={() => setShowCategoryModal(true)}
-                  onTooltipEnter={handleTooltipEnter}
-                  onTooltipLeave={handleTooltipLeave}
-                />
-                <CatalogMain
-                  selectedCat={categories.find(
-                    (c) => c._id === selectedCategory,
-                  )}
-                  productFolders={productFolders}
-                  selectedProductId={selectedFileData?._id}
-                  onAdd={() => {
-                    setSelectedFileData({
-                      productName: "",
-                      aliasName: { activate: false, name: "" },
-                      img: [],
-                      treatmentDuration: 1,
-                      amountToAdminister: 1,
-                      intakeTime: { advancedMode: false, daysTime: [] },
-                    });
-                    setEditMode(false);
-                  }}
-                  onSelect={handleSelectProduct}
-                  onEdit={handleEditProduct}
-                  onDelete={(product) =>
-                    setDeleteModal({
-                      open: true,
-                      productId: product._id,
-                      productName: product.name || "ce produit",
-                    })
-                  }
-                  onCreateFolder={() =>
-                    handleCreateProductFolder(selectedCategory)
-                  }
-                  onCreateProductInFolder={(folderId) => {
-                    setSelectedFileData({
-                      productName: "",
-                      aliasName: { activate: false, name: "" },
-                      img: [],
-                      treatmentDuration: 1,
-                      amountToAdminister: 1,
-                      intakeTime: { advancedMode: false, daysTime: [] },
-                      folderId,
-                    });
-                    setEditMode(false);
-                  }}
-                  onRenameFolder={(folderId) =>
-                    setEditFolderModal({ folderId })
-                  }
-                  onDeleteFolder={(folderId) => {
-                    const folder = productFolders.find(
-                      (f) => f._id === folderId,
-                    );
-                    const cat = categories.find(
+            }) ||
+              (categories.length === 0 ? (
+                <div
+                  className="catalog-no-library"
+                  onClick={() => setShowCategoryModal(true)}
+                >
+                  <IconLibrary
+                    colorBooks="var(--color-1)"
+                    colorPlus="var(--color-lightness)"
+                    height={120}
+                  />
+                </div>
+              ) : (
+                <div className="catalog-container">
+                  <CatalogSidebar
+                    sidebarItems={sidebarItems}
+                    folders={folders}
+                    categories={categories}
+                    selectedCategoryId={selectedCategory}
+                    dnd={dnd}
+                    onCategorySelect={handleCategorySelect}
+                    onCategoryContextMenu={handleCategoryContextMenu}
+                    onToggleFolder={toggleFolder}
+                    onFolderContextMenu={handleFolderContextMenu}
+                    onAddCategory={() => setShowCategoryModal(true)}
+                    onTooltipEnter={handleTooltipEnter}
+                    onTooltipLeave={handleTooltipLeave}
+                  />
+                  <CatalogMain
+                    selectedCat={categories.find(
                       (c) => c._id === selectedCategory,
-                    );
-                    const products = (cat?.products || []).filter(
-                      (p) => String(p.folderId) === String(folderId),
-                    );
-                    setDeleteFolderFlow({
-                      phase: "confirm",
-                      folderId,
-                      folderName: folder?.name || "ce dossier",
-                      products,
-                      confirmAll: false,
-                    });
-                  }}
-                  onMoveProductToFolder={handleMoveProductToFolder}
-                  onGroupProducts={handleGroupProducts}
-                  onReorderFolders={handleReorderFolders}
-                  onCategoryContextMenu={handleCategoryContextMenu}
-                  folderOpenStates={folderOpenStates}
-                  onToggleFolder={toggleProductFolder}
-                  allFoldersClosed={allProductFoldersClosed}
-                  onToggleAllFolders={toggleAllProductFolders}
-                />
-              </div>
-            )}
+                    )}
+                    productFolders={productFolders}
+                    selectedProductId={selectedFileData?._id}
+                    onAdd={() => {
+                      setSelectedFileData({
+                        productName: "",
+                        aliasName: { activate: false, name: "" },
+                        img: [],
+                        treatmentDuration: 1,
+                        amountToAdminister: 1,
+                        intakeTime: { advancedMode: false, daysTime: [] },
+                      });
+                      setEditMode(false);
+                    }}
+                    onSelect={handleSelectProduct}
+                    onEdit={handleEditProduct}
+                    onDelete={(product) =>
+                      setDeleteModal({
+                        open: true,
+                        productId: product._id,
+                        productName: product.name || "ce produit",
+                      })
+                    }
+                    onCreateFolder={() =>
+                      handleCreateProductFolder(selectedCategory)
+                    }
+                    onCreateProductInFolder={(folderId) => {
+                      setSelectedFileData({
+                        productName: "",
+                        aliasName: { activate: false, name: "" },
+                        img: [],
+                        treatmentDuration: 1,
+                        amountToAdminister: 1,
+                        intakeTime: { advancedMode: false, daysTime: [] },
+                        folderId,
+                      });
+                      setEditMode(false);
+                    }}
+                    onRenameFolder={(folderId) =>
+                      setEditFolderModal({ folderId })
+                    }
+                    onDeleteFolder={(folderId) => {
+                      const folder = productFolders.find(
+                        (f) => f._id === folderId,
+                      );
+                      const cat = categories.find(
+                        (c) => c._id === selectedCategory,
+                      );
+                      const products = (cat?.products || []).filter(
+                        (p) => String(p.folderId) === String(folderId),
+                      );
+                      setDeleteFolderFlow({
+                        phase: "confirm",
+                        folderId,
+                        folderName: folder?.name || "ce dossier",
+                        products,
+                        confirmAll: false,
+                      });
+                    }}
+                    onMoveProductToFolder={handleMoveProductToFolder}
+                    onGroupProducts={handleGroupProducts}
+                    onReorderFolders={handleReorderFolders}
+                    onCategoryContextMenu={handleCategoryContextMenu}
+                    folderOpenStates={folderOpenStates}
+                    onToggleFolder={toggleProductFolder}
+                    allFoldersClosed={allProductFoldersClosed}
+                    onToggleAllFolders={toggleAllProductFolders}
+                  />
+                </div>
+              ))}
           </section>
         </div>
         {selectedFileData && (
