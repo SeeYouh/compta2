@@ -8,6 +8,7 @@ import { categoryLibrary } from "../../utils/variable";
 import FolderService from "../../services/folderService";
 import Gear from "../../assets/gear";
 import OdysseeCategoryService from "../../../../services/odysseeCategoryService";
+import OdysseeItem from "../../components/OdysseeItem";
 import OdysseeProductService from "../../../../services/odysseeProductService";
 import {
   odysseyCategoryService,
@@ -17,6 +18,7 @@ import {
   odysseySidebarService,
 } from "../../services/odysseyServices";
 import PaperProduct from "../../components/PaperProduct";
+import PassagerItem from "../../components/PassagerItem";
 import {
   passengersCategoryService,
   passengersItemDeleteService,
@@ -36,13 +38,17 @@ const Dashboard = () => {
     return saved ? parseInt(saved, 10) : 400;
   });
   const [selectedCategoryLibrary, setSelectedCategoryLibrary] = useState(
-    categoryLibrary[2].name,
+    () =>
+      localStorage.getItem("odyssee-selected-library") ??
+      categoryLibrary[2].name,
   );
 
   const checkCategorySelected = (radioId) => {
-    setSelectedCategoryLibrary((selected) =>
-      selected === radioId ? categoryLibrary[0].name : radioId,
-    );
+    setSelectedCategoryLibrary((selected) => {
+      const next = selected === radioId ? categoryLibrary[0].name : radioId;
+      localStorage.setItem("odyssee-selected-library", next);
+      return next;
+    });
   };
 
   const [dataTimeRotateGear, setDataTimeRotateGear] = useState({
@@ -229,6 +235,10 @@ const Dashboard = () => {
             />
           </section>
         </div>
+        {selectedCategoryLibrary === "Passagers" &&
+          passengersEngine.selectedFileData && <PassagerItem />}
+        {selectedCategoryLibrary === "Odyssée" &&
+          odysseeEngine.selectedFileData && <OdysseeItem />}
         {selectedCategoryLibrary === "Catalogues" &&
           cataloguesEngine.selectedFileData && (
             <PaperProduct
