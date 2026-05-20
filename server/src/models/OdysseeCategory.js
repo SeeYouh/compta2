@@ -1,8 +1,13 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const categorySchema = new mongoose.Schema({
   userId: {
     type: String,
+    required: true,
+  },
+  type: {
+    type: String,
+    enum: ["catalog", "passengers", "odyssey"],
     required: true,
   },
   name: {
@@ -36,8 +41,8 @@ const categorySchema = new mongoose.Schema({
   },
 });
 
-// Unicité du nom par utilisateur
-categorySchema.index({ userId: 1, name: 1 }, { unique: true });
+// Unicité du nom par utilisateur et type
+categorySchema.index({ userId: 1, type: 1, name: 1 }, { unique: true });
 
 categorySchema.pre("save", function (next) {
   this.updatedAt = Date.now();

@@ -3,6 +3,8 @@ import express from 'express';
 import accountsRoutes from './accounts.js';
 import authRoutes from './auth.js';
 import contactsRoutes from './contacts.js';
+import genericItemsRoutes from './genericItems.js';
+import { injectType } from '../middleware/injectType.js';
 import labelsRoutes from './labels.js';
 import odysseeCategoriesRoutes from './odysseeCategories.js';
 import odysseeProductFoldersRoutes from './odysseeProductFolders.js';
@@ -29,10 +31,68 @@ router.use("/settings", settingsRoutes);
 router.use("/sharing", sharingRoutes);
 router.use("/themes", themesRoutes);
 router.use("/transactions", transactionsRoutes);
-router.use("/odyssee/products", odysseeProductsRoutes);
-router.use("/odyssee/categories", odysseeCategoriesRoutes);
-router.use("/odyssee/sidebar", odysseeSidebarRoutes);
-router.use("/odyssee/product-folders", odysseeProductFoldersRoutes);
-router.use("/odyssee/trash", odysseeTrashRoutes);
+
+// Routes Odyssée — Catalogues
+router.use(
+  "/odyssee/catalog/categories",
+  injectType("catalog"),
+  odysseeCategoriesRoutes,
+);
+router.use(
+  "/odyssee/catalog/sidebar",
+  injectType("catalog"),
+  odysseeSidebarRoutes,
+);
+router.use(
+  "/odyssee/catalog/products",
+  injectType("catalog"),
+  odysseeProductsRoutes,
+);
+router.use(
+  "/odyssee/catalog/product-folders",
+  injectType("catalog"),
+  odysseeProductFoldersRoutes,
+);
+router.use("/odyssee/catalog/trash", injectType("catalog"), odysseeTrashRoutes);
+
+// Routes Odyssée — Passagers
+router.use(
+  "/odyssee/passengers/categories",
+  injectType("passengers"),
+  odysseeCategoriesRoutes,
+);
+router.use(
+  "/odyssee/passengers/sidebar",
+  injectType("passengers"),
+  odysseeSidebarRoutes,
+);
+router.use(
+  "/odyssee/passengers/items",
+  injectType("passengers"),
+  genericItemsRoutes,
+);
+router.use(
+  "/odyssee/passengers/item-folders",
+  injectType("passengers"),
+  odysseeProductFoldersRoutes,
+);
+
+// Routes Odyssée — Odyssey
+router.use(
+  "/odyssee/odyssey/categories",
+  injectType("odyssey"),
+  odysseeCategoriesRoutes,
+);
+router.use(
+  "/odyssee/odyssey/sidebar",
+  injectType("odyssey"),
+  odysseeSidebarRoutes,
+);
+router.use("/odyssee/odyssey/items", injectType("odyssey"), genericItemsRoutes);
+router.use(
+  "/odyssee/odyssey/item-folders",
+  injectType("odyssey"),
+  odysseeProductFoldersRoutes,
+);
 
 export default router;

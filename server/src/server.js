@@ -52,6 +52,7 @@ console.log("🔒 Configuration CORS:", {
 });
 
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 // Rate limiting
 const limiter = rateLimit({

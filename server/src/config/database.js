@@ -21,6 +21,19 @@ export async function connectDB() {
     } catch {
       // Index inexistant ou déjà supprimé, on ignore
     }
+
+    // Supprimer l'ancien index userId_1 (unique sur userId seul) de odysseesidebarlayouts,
+    // remplacé par l'index composé (userId + type).
+    try {
+      const db = mongoose.connection.db;
+      const indexes = await db.collection("odysseesidebarlayouts").indexes();
+      if (indexes.some((i) => i.name === "userId_1")) {
+        await db.collection("odysseesidebarlayouts").dropIndex("userId_1");
+        console.log("✅ Index odysseesidebarlayouts.userId_1 supprimé");
+      }
+    } catch {
+      // Index inexistant ou déjà supprimé, on ignore
+    }
   } catch (error) {
     console.error("❌ Erreur connexion MongoDB:", error.message);
     process.exit(1);

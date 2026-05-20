@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const itemSchema = new mongoose.Schema(
   {
@@ -9,9 +9,16 @@ const itemSchema = new mongoose.Schema(
 );
 
 const sidebarLayoutSchema = new mongoose.Schema({
-  userId: { type: String, required: true, unique: true },
+  userId: { type: String, required: true },
+  type: {
+    type: String,
+    enum: ["catalog", "passengers", "odyssey"],
+    required: true,
+  },
   items: [itemSchema],
 });
+
+sidebarLayoutSchema.index({ userId: 1, type: 1 }, { unique: true });
 
 export const OdysseeSidebarLayout = mongoose.model(
   "OdysseeSidebarLayout",

@@ -1,7 +1,14 @@
-import { OdysseeCategory } from "../models/OdysseeCategory.js";
-import { OdysseeFolder } from "../models/OdysseeFolder.js";
-import { OdysseeProduct } from "../models/OdysseeProduct.js";
-import { OdysseeProductFolder } from "../models/OdysseeProductFolder.js";
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+import path from 'path';
+
+import { OdysseeCategory } from '../models/OdysseeCategory.js';
+import { OdysseeFolder } from '../models/OdysseeFolder.js';
+import { OdysseeProduct } from '../models/OdysseeProduct.js';
+import { OdysseeProductFolder } from '../models/OdysseeProductFolder.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const createCategory = async (req, res) => {
   try {
@@ -9,6 +16,7 @@ export const createCategory = async (req, res) => {
 
     const category = new OdysseeCategory({
       userId: req.userId,
+      type: req.categoryType,
       name,
       description,
       image: req.savedImagePath || null,
@@ -37,7 +45,7 @@ export const updateCategory = async (req, res) => {
     if (req.savedImagePath) updates.image = req.savedImagePath;
 
     const category = await OdysseeCategory.findOneAndUpdate(
-      { _id: req.params.id, userId: req.userId },
+      { _id: req.params.id, userId: req.userId, type: req.categoryType },
       updates,
       { new: true, runValidators: true },
     );
@@ -61,11 +69,11 @@ export const updateCategory = async (req, res) => {
 
 export const deleteCategory = async (req, res) => {
   try {
-    const category = await OdysseeCategory.findOneAndUpdate(
-      { _id: req.params.id, userId: req.userId, deletedAt: null },
-      { $set: { deletedAt: new Date() } },
-      { new: true },
-    );
+    const category = await OdysseeCategory.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.userId,
+      type: req.categoryType,
+    });
 
     if (!category) {
       return res
@@ -73,15 +81,30 @@ export const deleteCategory = async (req, res) => {
         .json({ error: "Catégorie non trouvée ou non autorisée" });
     }
 
-    await OdysseeProduct.updateMany(
-      { categoryId: req.params.id, userId: req.userId },
-      { $set: { deletedAt: new Date() } },
-    );
+    if (category.image) {
+      const filename = category.image.split("/odyssee-images/")[1];
+      if (filename) {
+        const imagePath = path.join(
+          __dirname,
+          "../../odyssee-images",
+          filename,
+        );
+        fs.unlink(imagePath, (err) => {
+          if (err && err.code !== "ENOENT")
+            console.error("Erreur suppression image catégorie:", err);
+        });
+      }
+    }
 
-    await OdysseeProductFolder.updateMany(
-      { categoryId: req.params.id, userId: req.userId },
-      { $set: { deletedAt: new Date() } },
-    );
+    await OdysseeProduct.deleteMany({
+      categoryId: req.params.id,
+      userId: req.userId,
+    });
+
+    await OdysseeProductFolder.deleteMany({
+      categoryId: req.params.id,
+      userId: req.userId,
+    });
 
     // Cascade : retirer la catégorie des dossiers qui la référencent
     await OdysseeFolder.updateMany(
@@ -105,6 +128,7 @@ export const getOneCategory = async (req, res) => {
     const category = await OdysseeCategory.findOne({
       _id: req.params.id,
       userId: req.userId,
+      type: req.categoryType,
       isActive: true,
       deletedAt: null,
     });
@@ -125,6 +149,7 @@ export const getAllCategories = async (req, res) => {
   try {
     const categories = await OdysseeCategory.find({
       userId: req.userId,
+      type: req.categoryType,
       isActive: true,
       deletedAt: null,
     }).sort({ createdAt: 1 });
@@ -143,6 +168,7 @@ export const searchCategories = async (req, res) => {
 
     const categories = await OdysseeCategory.find({
       userId: req.userId,
+      type: req.categoryType,
       isActive: true,
       deletedAt: null,
       name: { $regex: q, $options: "i" },
