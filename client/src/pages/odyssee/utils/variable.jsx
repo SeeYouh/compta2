@@ -1,21 +1,20 @@
 import { globalFolders } from "./data/folders";
-import LibraryOdyssey from "../components/LibraryOdyssey";
-import LibraryPassengers from "../components/LibraryPassengers";
 
 export const categoryLibrary = [
   {
     name: "Passagers",
     width: 35,
-    linkLibrary: (props) => <LibraryPassengers {...props} />,
+    labels: { item: "passager", itemCapitalized: "Passager" },
   },
   {
     name: "Odyssée",
     width: 30,
-    linkLibrary: (props) => <LibraryOdyssey {...props} />,
+    labels: { item: "voyage", itemCapitalized: "Voyage" },
   },
   {
     name: "Catalogues",
     width: 35,
+    labels: { item: "produit", itemCapitalized: "Produit" },
   },
 ];
 

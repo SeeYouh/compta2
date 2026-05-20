@@ -1,6 +1,6 @@
 import { config } from '../config/env.js';
 
-const BASE = `${config.apiUrl}/api/odyssee/trash`;
+const BASE = `${config.apiUrl}/api/odyssee/catalog/trash`;
 
 function authHeaders() {
   return {

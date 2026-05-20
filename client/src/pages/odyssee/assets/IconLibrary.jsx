@@ -2,7 +2,6 @@ const IconLibrary = ({ colorBooks, colorPlus, height }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 1400.37 1244"
-    width="auto"
     height={height}
   >
     <path

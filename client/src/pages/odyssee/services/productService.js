@@ -2,7 +2,7 @@
  * Service pour gérer les produits
  */
 
-import { config } from "../../../config/env.js";
+import { config } from '../../../config/env.js';
 
 class ProductService {
   /**
@@ -18,7 +18,7 @@ class ProductService {
       }
 
       const response = await fetch(
-        `${config.apiUrl}/api/odyssee/products/user`,
+        `${config.apiUrl}/api/odyssee/catalog/products/user`,
         {
           method: "GET",
           headers: {
@@ -63,7 +63,7 @@ class ProductService {
       }
 
       const response = await fetch(
-        `${config.apiUrl}/api/odyssee/products/folder/${folder}`,
+        `${config.apiUrl}/api/odyssee/catalog/products/folder/${folder}`,
         {
           method: "GET",
           headers: {
@@ -107,13 +107,16 @@ class ProductService {
         throw new Error("Token d'authentification manquant");
       }
 
-      const response = await fetch(`${config.apiUrl}/api/odyssee/products`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${config.apiUrl}/api/odyssee/catalog/products`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: productData,
         },
-        body: productData,
-      });
+      );
 
       const data = await response.json();
 
@@ -140,7 +143,7 @@ class ProductService {
       if (!token) throw new Error("Token d'authentification manquant");
 
       const response = await fetch(
-        `${config.apiUrl}/api/odyssee/products/${id}`,
+        `${config.apiUrl}/api/odyssee/catalog/products/${id}`,
         {
           method: "PUT",
           headers: { Authorization: `Bearer ${token}` },
@@ -164,7 +167,7 @@ class ProductService {
       if (!token) throw new Error("Token d'authentification manquant");
 
       const response = await fetch(
-        `${config.apiUrl}/api/odyssee/products/${id}`,
+        `${config.apiUrl}/api/odyssee/catalog/products/${id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },

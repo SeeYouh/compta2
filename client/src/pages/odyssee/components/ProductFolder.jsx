@@ -40,11 +40,12 @@ const ProductFolder = ({
   const [folderTooltip, setFolderTooltip] = useState(null);
 
   const getProductZone = (e) => {
+    if (!isOpen) return "inside";
     const rect = e.currentTarget.getBoundingClientRect();
     const relX = e.clientX - rect.left;
     const pct = relX / rect.width;
-    if (pct < 0.3) return "before";
-    if (pct > 0.7) return "after";
+    if (pct < 0.05) return "before";
+    if (pct > 0.95) return "after";
     return "inside";
   };
 

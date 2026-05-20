@@ -1,6 +1,6 @@
 import { config } from '../config/env.js';
 
-const BASE = `${config.apiUrl}/api/odyssee/categories`;
+const BASE = `${config.apiUrl}/api/odyssee/catalog/categories`;
 
 function getToken() {
   return localStorage.getItem("token");

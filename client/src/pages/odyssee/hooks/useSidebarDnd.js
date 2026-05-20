@@ -1,12 +1,11 @@
 import { useRef, useState } from "react";
 
-import FolderService from "../services/folderService";
-
 export const useSidebarDnd = ({
   sidebarItems,
   setSidebarItems,
   folders,
   setFolders,
+  folderService,
 }) => {
   const dragRef = useRef(null);
   const [ghostIndex, setGhostIndex] = useState(null);
@@ -27,14 +26,14 @@ export const useSidebarDnd = ({
     const newCategoryIds = folder.categoryIds.filter((id) => id !== categoryId);
 
     if (newCategoryIds.length === 0) {
-      await FolderService.deleteFolder(folderId);
+      await folderService.deleteFolder(folderId);
       return {
         newFolders: currentFolders.filter((f) => f._id !== folderId),
         newItems: currentItems.filter((item) => item.id !== folderId),
       };
     }
 
-    await FolderService.updateFolder(folderId, { categoryIds: newCategoryIds });
+    await folderService.updateFolder(folderId, { categoryIds: newCategoryIds });
     return {
       newFolders: currentFolders.map((f) =>
         f._id === folderId ? { ...f, categoryIds: newCategoryIds } : f,
@@ -87,7 +86,7 @@ export const useSidebarDnd = ({
     setFolders((prev) =>
       prev.map((f) => (f._id === folderId ? { ...f, categoryIds: newIds } : f)),
     );
-    await FolderService.updateFolder(folderId, { categoryIds: newIds });
+    await folderService.updateFolder(folderId, { categoryIds: newIds });
   };
 
   const handleDropBetween = async (insertIndex) => {
@@ -126,7 +125,7 @@ export const useSidebarDnd = ({
 
     setFolders(newFolders);
     setSidebarItems(newItems);
-    FolderService.updateLayout(newItems);
+    folderService.updateLayout(newItems);
   };
 
   const handleDropOnItem = async (e, target) => {
@@ -156,7 +155,7 @@ export const useSidebarDnd = ({
         newItems = newItems.filter((item) => item.id !== drag.id);
       }
       const targetIndex = newItems.findIndex((item) => item.id === target.id);
-      const folderResult = await FolderService.createFolder([
+      const folderResult = await folderService.createFolder([
         drag.id,
         target.id,
       ]);
@@ -170,7 +169,7 @@ export const useSidebarDnd = ({
       }
       setFolders(newFolders);
       setSidebarItems(newItems);
-      FolderService.updateLayout(newItems);
+      folderService.updateLayout(newItems);
       return;
     }
 
@@ -194,7 +193,7 @@ export const useSidebarDnd = ({
       const targetFolder = newFolders.find((f) => f._id === target.id);
       if (!targetFolder) return;
       const newCategoryIds = [...targetFolder.categoryIds, drag.id];
-      const folderResult = await FolderService.updateFolder(target.id, {
+      const folderResult = await folderService.updateFolder(target.id, {
         categoryIds: newCategoryIds,
       });
       if (!folderResult.success) return;
@@ -203,7 +202,7 @@ export const useSidebarDnd = ({
       );
       setFolders(newFolders);
       setSidebarItems(newItems);
-      FolderService.updateLayout(newItems);
+      folderService.updateLayout(newItems);
     }
   };
 
