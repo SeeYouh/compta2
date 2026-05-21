@@ -5,6 +5,103 @@ import { useSidebarDnd } from "./useSidebarDnd";
 // Cache persistant par type de service — survit aux re-montages, pas aux rechargements de page
 const engineCache = new Map();
 
+const enrichCategory = (cat) => ({ ...cat, active: false, products: [] });
+
+export async function fetchAndProcessEngine(
+  categoryService,
+  sidebarFolderService,
+) {
+  if (engineCache.has(categoryService)) return engineCache.get(categoryService);
+
+  const [catResult, sidebarResult] = await Promise.all([
+    categoryService.getUserCategories(),
+    sidebarFolderService.getSidebar(),
+  ]);
+
+  let finalCategories = [];
+  let finalSidebarItems = [];
+  let finalFolders = [];
+
+  if (catResult.success && catResult.categories.length > 0) {
+    const enriched = catResult.categories.map(enrichCategory);
+    enriched[0].active = true;
+    finalCategories = enriched;
+  }
+
+  if (sidebarResult.success) {
+    const existingCatIds = new Set(
+      (catResult.success ? catResult.categories : []).map((c) => c._id),
+    );
+
+    const ghostFolders = sidebarResult.folders.filter((f) =>
+      f.categoryIds.every((id) => !existingCatIds.has(id)),
+    );
+
+    if (ghostFolders.length > 0) {
+      await Promise.all(
+        ghostFolders.map((f) => sidebarFolderService.deleteFolder(f._id)),
+      );
+    }
+
+    const ghostIds = new Set(ghostFolders.map((f) => f._id));
+
+    const partialFolders = sidebarResult.folders.filter(
+      (f) =>
+        !ghostIds.has(f._id) &&
+        f.categoryIds.some((id) => !existingCatIds.has(id)),
+    );
+    await Promise.all(
+      partialFolders.map((f) =>
+        sidebarFolderService.updateFolder(f._id, {
+          categoryIds: f.categoryIds.filter((id) => existingCatIds.has(id)),
+        }),
+      ),
+    );
+
+    const cleanFolders = sidebarResult.folders
+      .filter((f) => !ghostIds.has(f._id))
+      .map((f) =>
+        partialFolders.find((p) => p._id === f._id)
+          ? {
+              ...f,
+              categoryIds: f.categoryIds.filter((id) => existingCatIds.has(id)),
+            }
+          : f,
+      );
+
+    const cleanLayout = sidebarResult.layout.filter(
+      (i) =>
+        !(i.type === "folder" && ghostIds.has(i.id)) &&
+        !(i.type === "category" && !existingCatIds.has(i.id)),
+    );
+
+    const hadStaleItems = sidebarResult.layout.length !== cleanLayout.length;
+    finalFolders = cleanFolders;
+
+    if (cleanLayout.length > 0) {
+      finalSidebarItems = cleanLayout;
+      if (ghostFolders.length > 0 || hadStaleItems)
+        sidebarFolderService.updateLayout(cleanLayout);
+    } else if (sidebarResult.layout.length === 0) {
+      if (catResult.success && catResult.categories.length > 0) {
+        finalSidebarItems = catResult.categories.map((c) => ({
+          type: "category",
+          id: c._id,
+        }));
+      }
+    }
+  }
+
+  const result = {
+    categories: finalCategories,
+    sidebarItems: finalSidebarItems,
+    folders: finalFolders,
+    itemsByCategory: {},
+  };
+  engineCache.set(categoryService, result);
+  return result;
+}
+
 const useCatalogEngine = ({
   categoryService,
   itemService,
@@ -14,10 +111,24 @@ const useCatalogEngine = ({
   transformItemForEdit,
   newItemTemplate,
 }) => {
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [sidebarItems, setSidebarItems] = useState([]);
-  const [folders, setFolders] = useState([]);
+  const [isLoading, setIsLoading] = useState(
+    () => !engineCache.has(categoryService),
+  );
+  const [categories, setCategories] = useState(
+    () => engineCache.get(categoryService)?.categories ?? [],
+  );
+  const [selectedCategory, setSelectedCategory] = useState(() => {
+    const cached = engineCache.get(categoryService);
+    const firstCat =
+      cached?.categories.find((c) => c.active) || cached?.categories[0];
+    return firstCat?._id ?? null;
+  });
+  const [sidebarItems, setSidebarItems] = useState(
+    () => engineCache.get(categoryService)?.sidebarItems ?? [],
+  );
+  const [folders, setFolders] = useState(
+    () => engineCache.get(categoryService)?.folders ?? [],
+  );
   const [productFolders, setProductFolders] = useState([]);
   const [editFolderModal, setEditFolderModal] = useState(null);
   const [deleteFolderFlow, setDeleteFolderFlow] = useState(null);
@@ -60,125 +171,21 @@ const useCatalogEngine = ({
     folderService: sidebarFolderService,
   });
 
-  const enrichCategory = (cat) => ({ ...cat, active: false, products: [] });
-
   // ── Chargement initial ───────────────────────────────────────────────────────
 
   useEffect(() => {
-    const init = async () => {
-      // ── Cache hit → restaurer sans appel serveur ──────────────────────────
-      const cached = engineCache.get(categoryService);
-      if (cached) {
-        setCategories(cached.categories);
-        setSidebarItems(cached.sidebarItems);
-        setFolders(cached.folders);
+    if (engineCache.has(categoryService)) return;
+
+    fetchAndProcessEngine(categoryService, sidebarFolderService)
+      .then((data) => {
+        setCategories(data.categories);
+        setSidebarItems(data.sidebarItems);
+        setFolders(data.folders);
         const firstCat =
-          cached.categories.find((c) => c.active) || cached.categories[0];
+          data.categories.find((c) => c.active) || data.categories[0];
         if (firstCat) setSelectedCategory(firstCat._id);
-        return;
-      }
-
-      // ── Cache miss → fetch serveur ────────────────────────────────────────
-      const [catResult, sidebarResult] = await Promise.all([
-        categoryService.getUserCategories(),
-        sidebarFolderService.getSidebar(),
-      ]);
-
-      let finalCategories = [];
-      let finalSidebarItems = [];
-      let finalFolders = [];
-
-      if (catResult.success && catResult.categories.length > 0) {
-        const enriched = catResult.categories.map(enrichCategory);
-        enriched[0].active = true;
-        setCategories(enriched);
-        setSelectedCategory(enriched[0]._id);
-        finalCategories = enriched;
-      }
-
-      if (sidebarResult.success) {
-        const existingCatIds = new Set(
-          (catResult.success ? catResult.categories : []).map((c) => c._id),
-        );
-
-        const ghostFolders = sidebarResult.folders.filter((f) =>
-          f.categoryIds.every((id) => !existingCatIds.has(id)),
-        );
-
-        if (ghostFolders.length > 0) {
-          await Promise.all(
-            ghostFolders.map((f) => sidebarFolderService.deleteFolder(f._id)),
-          );
-        }
-
-        const ghostIds = new Set(ghostFolders.map((f) => f._id));
-
-        const partialFolders = sidebarResult.folders.filter(
-          (f) =>
-            !ghostIds.has(f._id) &&
-            f.categoryIds.some((id) => !existingCatIds.has(id)),
-        );
-        await Promise.all(
-          partialFolders.map((f) =>
-            sidebarFolderService.updateFolder(f._id, {
-              categoryIds: f.categoryIds.filter((id) => existingCatIds.has(id)),
-            }),
-          ),
-        );
-
-        const cleanFolders = sidebarResult.folders
-          .filter((f) => !ghostIds.has(f._id))
-          .map((f) =>
-            partialFolders.find((p) => p._id === f._id)
-              ? {
-                  ...f,
-                  categoryIds: f.categoryIds.filter((id) =>
-                    existingCatIds.has(id),
-                  ),
-                }
-              : f,
-          );
-
-        const cleanLayout = sidebarResult.layout.filter(
-          (i) =>
-            !(i.type === "folder" && ghostIds.has(i.id)) &&
-            !(i.type === "category" && !existingCatIds.has(i.id)),
-        );
-
-        const hadStaleItems =
-          sidebarResult.layout.length !== cleanLayout.length;
-
-        setFolders(cleanFolders);
-        finalFolders = cleanFolders;
-
-        if (cleanLayout.length > 0) {
-          setSidebarItems(cleanLayout);
-          finalSidebarItems = cleanLayout;
-          if (ghostFolders.length > 0 || hadStaleItems)
-            sidebarFolderService.updateLayout(cleanLayout);
-        } else if (sidebarResult.layout.length === 0) {
-          if (catResult.success && catResult.categories.length > 0) {
-            const defaultLayout = catResult.categories.map((c) => ({
-              type: "category",
-              id: c._id,
-            }));
-            setSidebarItems(defaultLayout);
-            finalSidebarItems = defaultLayout;
-          } else {
-            setSidebarItems([]);
-          }
-        }
-      }
-
-      // ── Stocker en cache ──────────────────────────────────────────────────
-      engineCache.set(categoryService, {
-        categories: finalCategories,
-        sidebarItems: finalSidebarItems,
-        folders: finalFolders,
-        itemsByCategory: {},
-      });
-    };
-    init();
+      })
+      .finally(() => setIsLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -692,6 +699,7 @@ const useCatalogEngine = ({
   // ── Retour ───────────────────────────────────────────────────────────────────
 
   return {
+    isLoading,
     categories,
     selectedCategory,
     sidebarItems,

@@ -79,13 +79,16 @@ const Dashboard = () => {
     sidebarFolderService: passengersSidebarService,
     itemFolderService: passengersItemFolderService,
     transformItemForEdit: (item) => ({
+      ...item.contentFilesData,
       _id: item._id,
-      name: item.name,
-      ...item.contentData,
     }),
     newItemTemplate: (folderId) => ({
-      name: "",
-      contentData: {},
+      productName: "",
+      aliasName: { activate: false, name: "" },
+      img: [],
+      treatmentDuration: 1,
+      amountToAdminister: 1,
+      intakeTime: { advancedMode: false, daysTime: [] },
       ...(folderId ? { folderId } : {}),
     }),
   });
@@ -97,13 +100,16 @@ const Dashboard = () => {
     sidebarFolderService: odysseySidebarService,
     itemFolderService: odysseyItemFolderService,
     transformItemForEdit: (item) => ({
+      ...item.contentFilesData,
       _id: item._id,
-      name: item.name,
-      ...item.contentData,
     }),
     newItemTemplate: (folderId) => ({
-      name: "",
-      contentData: {},
+      productName: "",
+      aliasName: { activate: false, name: "" },
+      img: [],
+      treatmentDuration: 1,
+      amountToAdminister: 1,
+      intakeTime: { advancedMode: false, daysTime: [] },
       ...(folderId ? { folderId } : {}),
     }),
   });
@@ -236,9 +242,25 @@ const Dashboard = () => {
           </section>
         </div>
         {selectedCategoryLibrary === "Passagers" &&
-          passengersEngine.selectedFileData && <PassagerItem />}
+          passengersEngine.selectedFileData && (
+            <PassagerItem
+              key={passengersEngine.selectedFileData._id || "new"}
+              contentFilesData={passengersEngine.selectedFileData}
+              categoryId={passengersEngine.selectedCategory}
+              onProductCreated={passengersEngine.handleItemCreated}
+              editMode={passengersEngine.editMode}
+            />
+          )}
         {selectedCategoryLibrary === "Odyssée" &&
-          odysseeEngine.selectedFileData && <OdysseeItem />}
+          odysseeEngine.selectedFileData && (
+            <OdysseeItem
+              key={odysseeEngine.selectedFileData._id || "new"}
+              contentFilesData={odysseeEngine.selectedFileData}
+              categoryId={odysseeEngine.selectedCategory}
+              onProductCreated={odysseeEngine.handleItemCreated}
+              editMode={odysseeEngine.editMode}
+            />
+          )}
         {selectedCategoryLibrary === "Catalogues" &&
           cataloguesEngine.selectedFileData && (
             <PaperProduct

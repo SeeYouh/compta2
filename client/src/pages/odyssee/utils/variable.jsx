@@ -4,17 +4,29 @@ export const categoryLibrary = [
   {
     name: "Passagers",
     width: 35,
-    labels: { item: "passager", itemCapitalized: "Passager" },
+    labels: {
+      item: "passager",
+      itemCapitalized: "Passager",
+      createLabel: "passager",
+    },
   },
   {
     name: "Odyssée",
     width: 30,
-    labels: { item: "voyage", itemCapitalized: "Voyage" },
+    labels: {
+      item: "voyage",
+      itemCapitalized: "Voyage",
+      createLabel: "odyssée",
+    },
   },
   {
     name: "Catalogues",
     width: 35,
-    labels: { item: "produit", itemCapitalized: "Produit" },
+    labels: {
+      item: "produit",
+      itemCapitalized: "Produit",
+      createLabel: "article",
+    },
   },
 ];
 

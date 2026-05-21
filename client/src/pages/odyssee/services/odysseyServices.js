@@ -1,4 +1,4 @@
-import { config } from '../../../config/env.js';
+import { config } from "../../../config/env.js";
 
 const TYPE = "odyssey";
 const BASE_CAT = `${config.apiUrl}/api/odyssee/${TYPE}/categories`;
@@ -150,7 +150,26 @@ export const odysseyItemService = {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Erreur serveur");
-      return { success: true, products: data.items || [], folders: [] };
+      return {
+        success: true,
+        products: data.products || [],
+        folders: data.folders || [],
+      };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  async createItem(formData) {
+    try {
+      const res = await fetch(BASE_ITEMS, {
+        method: "POST",
+        headers: authHeadersMultipart(),
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur serveur");
+      return { success: true, product: data.product };
     } catch (error) {
       return { success: false, error: error.message };
     }
@@ -165,7 +184,22 @@ export const odysseyItemService = {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Erreur serveur");
-      return { success: true, product: data.item };
+      return { success: true, product: data.product };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  async updateItemForm(id, formData) {
+    try {
+      const res = await fetch(`${BASE_ITEMS}/${id}`, {
+        method: "PUT",
+        headers: authHeadersMultipart(),
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur serveur");
+      return { success: true, product: data.product };
     } catch (error) {
       return { success: false, error: error.message };
     }

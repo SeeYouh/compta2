@@ -1,15 +1,16 @@
-import CatalogMain from './CatalogMain';
-import CatalogSidebar from './CatalogSidebar';
-import CategoryContextMenu from './CategoryContextMenu';
-import CategorySettings from './CategorySettings';
-import ConfirmationModal from '../../../components/ConfirmationModal';
-import FolderContextMenu from './FolderContextMenu';
-import FolderSettingsModal from './FolderSettingsModal';
-import IconLibrary from '../assets/IconLibrary';
-import SidebarTooltip from './SidebarTooltip';
+import CatalogMain from "./CatalogMain";
+import CatalogSidebar from "./CatalogSidebar";
+import CategoryContextMenu from "./CategoryContextMenu";
+import CategorySettings from "./CategorySettings";
+import ConfirmationModal from "../../../components/ConfirmationModal";
+import FolderContextMenu from "./FolderContextMenu";
+import FolderSettingsModal from "./FolderSettingsModal";
+import IconLibrary from "../assets/IconLibrary";
+import SidebarTooltip from "./SidebarTooltip";
 
 const CatalogContent = ({ engine, CategoryFormComponent, labels }) => {
   const {
+    isLoading,
     categories,
     selectedCategory,
     sidebarItems,
@@ -66,7 +67,13 @@ const CatalogContent = ({ engine, CategoryFormComponent, labels }) => {
 
   return (
     <>
-      {categories.length === 0 ? (
+      {isLoading ? (
+        <div className="catalog-no-library">
+          <div className="loader-content">
+            <div className="spinner" />
+          </div>
+        </div>
+      ) : categories.length === 0 ? (
         <div
           className="catalog-no-library"
           onClick={() => setShowCategoryModal(true)}
@@ -97,6 +104,7 @@ const CatalogContent = ({ engine, CategoryFormComponent, labels }) => {
             selectedCat={categories.find((c) => c._id === selectedCategory)}
             productFolders={productFolders}
             selectedProductId={engine.selectedFileData?._id}
+            createLabel={labels?.createLabel}
             onAdd={() => handleAddItem(undefined)}
             onSelect={handleSelectItem}
             onEdit={handleEditItem}

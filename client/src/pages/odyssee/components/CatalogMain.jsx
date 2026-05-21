@@ -17,6 +17,7 @@ const CatalogMain = ({
   selectedCat,
   productFolders,
   selectedProductId,
+  createLabel,
   onAdd,
   onSelect,
   onEdit,
@@ -275,7 +276,7 @@ const CatalogMain = ({
                       setAddMenuPos(null);
                     }}
                   >
-                    Créer un produit
+                    Créer un {createLabel}
                   </div>
                 </div>
               )}

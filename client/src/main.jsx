@@ -2,7 +2,7 @@ import "./sass/index.scss";
 
 import { lazy, StrictMode, Suspense } from "react";
 
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 
 import AcceptInvitation from "./pages/AcceptInvitation";
@@ -15,6 +15,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import { LabelsProvider } from "./contexts/LabelsContext";
 import LabelsSettings from "./pages/LabelsSettings";
 import Login from "./pages/Login";
+import { odysseeDashboardLoader } from "./pages/odyssee/loaders/odysseeDashboardLoader";
 import ProjectionsSettings from "./pages/ProjectionsSettings";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Register from "./pages/Register";
@@ -44,117 +45,119 @@ initTheme();
 
 const container = document.getElementById("root");
 const root = window.__reactRoot ?? (window.__reactRoot = createRoot(container));
+
+const router = createBrowserRouter([
+  { path: "/login", element: <Login /> },
+  {
+    path: "/",
+    element: (
+      <ProtectedRoute>
+        <Dashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/trame",
+    element: (
+      <ProtectedRoute>
+        <Suspense fallback={null}>
+          <TramePage />
+        </Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  { path: "/register", element: <Register /> },
+  { path: "/verify-email", element: <VerifyEmail /> },
+  { path: "/forgot-password", element: <ForgotPassword /> },
+  { path: "/reset-password", element: <ResetPassword /> },
+  { path: "/accept-invitation", element: <AcceptInvitation /> },
+  {
+    path: "/labels-settings",
+    element: (
+      <ProtectedRoute>
+        <LabelsProvider>
+          <AccountsProvider>
+            <LabelsSettings />
+          </AccountsProvider>
+        </LabelsProvider>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/projections-settings",
+    element: (
+      <ProtectedRoute>
+        <LabelsProvider>
+          <AccountsProvider>
+            <ThemesProvider>
+              <ProjectionsSettings />
+            </ThemesProvider>
+          </AccountsProvider>
+        </LabelsProvider>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/account-sharing/:accountId",
+    element: (
+      <ProtectedRoute>
+        <LabelsProvider>
+          <AccountsProvider>
+            <AccountSharingSettings />
+          </AccountsProvider>
+        </LabelsProvider>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/settings",
+    element: (
+      <ProtectedRoute>
+        <AccountsProvider>
+          <SettingsPage />
+        </AccountsProvider>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/contacts",
+    element: (
+      <ProtectedRoute>
+        <AccountsProvider>
+          <ContactsPage />
+        </AccountsProvider>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/odyssee/*",
+    loader: odysseeDashboardLoader,
+    element: (
+      <ProtectedRoute>
+        <Suspense fallback={null}>
+          <OdysseeDashboard />
+        </Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/synapse/*",
+    element: (
+      <ProtectedRoute>
+        <LabelsProvider>
+          <AccountsProvider>
+            <ThemesProvider>
+              <App />
+            </ThemesProvider>
+          </AccountsProvider>
+        </LabelsProvider>
+      </ProtectedRoute>
+    ),
+  },
+]);
+
 root.render(
   <StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/trame"
-          element={
-            <ProtectedRoute>
-              <Suspense fallback={null}>
-                <TramePage />
-              </Suspense>
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/register" element={<Register />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/accept-invitation" element={<AcceptInvitation />} />
-        <Route
-          path="/labels-settings"
-          element={
-            <ProtectedRoute>
-              <LabelsProvider>
-                <AccountsProvider>
-                  <LabelsSettings />
-                </AccountsProvider>
-              </LabelsProvider>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/projections-settings"
-          element={
-            <ProtectedRoute>
-              <LabelsProvider>
-                <AccountsProvider>
-                  <ThemesProvider>
-                    <ProjectionsSettings />
-                  </ThemesProvider>
-                </AccountsProvider>
-              </LabelsProvider>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/account-sharing/:accountId"
-          element={
-            <ProtectedRoute>
-              <LabelsProvider>
-                <AccountsProvider>
-                  <AccountSharingSettings />
-                </AccountsProvider>
-              </LabelsProvider>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <AccountsProvider>
-                <SettingsPage />
-              </AccountsProvider>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/contacts"
-          element={
-            <ProtectedRoute>
-              <AccountsProvider>
-                <ContactsPage />
-              </AccountsProvider>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/odyssee/*"
-          element={
-            <ProtectedRoute>
-              <Suspense fallback={null}>
-                <OdysseeDashboard />
-              </Suspense>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/synapse/*"
-          element={
-            <ProtectedRoute>
-              <LabelsProvider>
-                <AccountsProvider>
-                  <ThemesProvider>
-                    <App />
-                  </ThemesProvider>
-                </AccountsProvider>
-              </LabelsProvider>
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+    <RouterProvider router={router} fallbackElement={null} />
   </StrictMode>,
 );
