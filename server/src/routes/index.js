@@ -1,22 +1,23 @@
-import express from 'express';
+import express from "express";
 
-import accountsRoutes from './accounts.js';
-import authRoutes from './auth.js';
-import contactsRoutes from './contacts.js';
-import genericItemsRoutes from './genericItems.js';
-import { injectType } from '../middleware/injectType.js';
-import labelsRoutes from './labels.js';
-import odysseeCategoriesRoutes from './odysseeCategories.js';
-import odysseeProductFoldersRoutes from './odysseeProductFolders.js';
-import odysseeProductsRoutes from './odysseeProducts.js';
-import odysseeSidebarRoutes from './odysseeSidebar.js';
-import odysseeTrashRoutes from './odysseeTrash.js';
-import organigrammeRoutes from './organigramme.js';
-import projectionsRoutes from './projections.js';
-import settingsRoutes from './settings.js';
-import sharingRoutes from './sharing.js';
-import themesRoutes from './themes.js';
-import transactionsRoutes from './transactions.js';
+import accountsRoutes from "./accounts.js";
+import authRoutes from "./auth.js";
+import contactsRoutes from "./contacts.js";
+import { injectType } from "../middleware/injectType.js";
+import labelsRoutes from "./labels.js";
+import odysseeCategoriesRoutes from "./odysseeCategories.js";
+import odysseeProductFoldersRoutes from "./odysseeProductFolders.js";
+import odysseeProductsRoutes from "./odysseeProducts.js";
+import odysseeSidebarRoutes from "./odysseeSidebar.js";
+import odysseeTrashRoutes from "./odysseeTrash.js";
+import odysseyItemsRoutes from "./odysseyItems.js";
+import organigrammeRoutes from "./organigramme.js";
+import passengerItemsRoutes from "./passengerItems.js";
+import projectionsRoutes from "./projections.js";
+import settingsRoutes from "./settings.js";
+import sharingRoutes from "./sharing.js";
+import themesRoutes from "./themes.js";
+import transactionsRoutes from "./transactions.js";
 
 const router = express.Router();
 
@@ -69,7 +70,7 @@ router.use(
 router.use(
   "/odyssee/passengers/items",
   injectType("passengers"),
-  genericItemsRoutes,
+  passengerItemsRoutes,
 );
 router.use(
   "/odyssee/passengers/item-folders",
@@ -88,7 +89,7 @@ router.use(
   injectType("odyssey"),
   odysseeSidebarRoutes,
 );
-router.use("/odyssee/odyssey/items", injectType("odyssey"), genericItemsRoutes);
+router.use("/odyssee/odyssey/items", injectType("odyssey"), odysseyItemsRoutes);
 router.use(
   "/odyssee/odyssey/item-folders",
   injectType("odyssey"),
