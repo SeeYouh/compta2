@@ -1,14 +1,14 @@
-import CatalogMain from "./CatalogMain";
-import CatalogSidebar from "./CatalogSidebar";
-import CategoryContextMenu from "./CategoryContextMenu";
-import CategorySettings from "./CategorySettings";
-import ConfirmationModal from "../../../components/ConfirmationModal";
-import FolderContextMenu from "./FolderContextMenu";
-import FolderSettingsModal from "./FolderSettingsModal";
-import IconLibrary from "../assets/IconLibrary";
-import SidebarTooltip from "./SidebarTooltip";
+import CatalogMain from './CatalogMain';
+import CatalogSidebar from './CatalogSidebar';
+import CategoryContextMenu from './CategoryContextMenu';
+import CategorySettings from './CategorySettings';
+import ConfirmationModal from '../../../components/ConfirmationModal';
+import FolderContextMenu from './FolderContextMenu';
+import FolderSettingsModal from './FolderSettingsModal';
+import IconLibrary from '../assets/IconLibrary';
+import SidebarTooltip from './SidebarTooltip';
 
-const CatalogContent = ({ engine, CategoryFormComponent, labels }) => {
+const CatalogContent = ({ engine, labels }) => {
   const {
     isLoading,
     categories,
@@ -112,7 +112,7 @@ const CatalogContent = ({ engine, CategoryFormComponent, labels }) => {
               setDeleteModal({
                 open: true,
                 itemId: item._id,
-                itemName: item.name || `ce ${labels.item}`,
+                itemName: item.name,
               })
             }
             onCreateFolder={() => handleCreateItemFolder(selectedCategory)}
@@ -127,7 +127,7 @@ const CatalogContent = ({ engine, CategoryFormComponent, labels }) => {
               setDeleteFolderFlow({
                 phase: "confirm",
                 folderId,
-                folderName: folder?.name || "ce dossier",
+                folderName: folder?.name,
                 items,
                 confirmAll: false,
               });

@@ -6,17 +6,10 @@ import {
   DARKEN_BORDER,
   DEFAULT_FOLDER_COLOR,
 } from "../config/folderColors";
+import { getInitials } from "../utils/stringUtils";
 import IconDossierFull from "../assets/IconDossierFull";
 import SidebarCategoryItem from "./SidebarCategoryItem";
 import SidebarFolderItem from "./SidebarFolderItem";
-
-const getInitials = (name) =>
-  name
-    .trim()
-    .split(/\s+/)
-    .map((w) => w[0] || "")
-    .join("")
-    .slice(0, 3);
 
 const CatalogSidebar = ({
   sidebarItems,

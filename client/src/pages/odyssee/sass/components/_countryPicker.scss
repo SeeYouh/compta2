@@ -1,0 +1,144 @@
+.country-picker {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+
+  // ─── Trigger ──────────────────────────────────────────────────────────────
+  &__trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--color-dark);
+    border-radius: 6px;
+    background: var(--color-darker);
+    color: var(--color-lightness);
+    font-size: 14px;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s;
+
+    &:hover {
+      border-color: var(--color-1);
+    }
+  }
+
+  &__trigger-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__trigger-placeholder {
+    flex: 1;
+    opacity: 0.4;
+    font-style: italic;
+  }
+
+  &__chevron {
+    font-size: 10px;
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
+
+  &__flag {
+    width: 20px;
+    height: 14px;
+    object-fit: cover;
+    border-radius: 2px;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+  }
+
+  // ─── Dropdown ─────────────────────────────────────────────────────────────
+  &__dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 200;
+    background: var(--color-darkest);
+    border: 1px solid var(--color-dark);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    padding: 8px;
+    width: 320px;
+    max-width: 90vw;
+  }
+
+  &__search {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--color-dark);
+    border-radius: 6px;
+    background: var(--color-darker);
+    color: var(--color-lightness);
+    font-size: 13px;
+    margin-bottom: 6px;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: var(--color-dark);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-1);
+    }
+  }
+
+  &__hovered-label {
+    font-size: 12px;
+    text-align: center;
+    padding: 3px 0;
+    color: var(--color-lightness);
+    opacity: 0.7;
+    min-height: 22px;
+    margin-bottom: 4px;
+  }
+
+  &__grid {
+    display: grid;
+    gap: 2px;
+    max-height: 240px;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--color-dark);
+      border-radius: 2px;
+    }
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    transition:
+      background 0.1s,
+      border-color 0.1s;
+
+    &:hover {
+      background: color-mix(in srgb, var(--color-1) 12%, transparent);
+    }
+
+    &--selected {
+      border-color: var(--color-1);
+      background: color-mix(in srgb, var(--color-1) 20%, var(--color-darkest));
+    }
+
+    .country-picker__flag {
+      width: 28px;
+      height: 20px;
+    }
+  }
+}

@@ -449,8 +449,8 @@
   }
 
   &__palette {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(6, 36px);
     gap: 8px;
     margin-bottom: 24px;
   }
