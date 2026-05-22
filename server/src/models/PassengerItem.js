@@ -6,61 +6,42 @@ const passengerItemSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  img: {
-    type: [String],
-    default: [],
-  },
   tooltips: {
     type: String,
   },
   contentFilesData: {
-    productName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    aliasName: {
-      activate: {
-        type: Boolean,
-        default: true,
-      },
-      name: {
-        type: String,
-      },
-    },
-    img: [
-      {
-        adress: { type: String },
-        alt: { type: String },
-      },
-    ],
-    treatmentDuration: { type: Number },
-    amountToAdminister: { type: Number },
-    intakeTime: {
-      mode: {
-        type: String,
-        enum: ["normal", "advanced"],
-        default: "normal",
-      },
-      checkedMoments: {
-        type: [String],
-        default: [],
-      },
-      selectedTime: { type: String },
-      durationBefore: { type: Number },
-      durationAfter: { type: Number },
-      nightDuration: { type: Number },
-      advancedMode: {
-        type: Boolean,
-        default: false,
-      },
-      daysTime: [
+    firstName: { type: String, default: "" },
+    lastName: { type: String, default: "" },
+    alias: { type: String, default: "" },
+    gender: { type: String, enum: ["F", "M", "NC"], default: "NC" },
+    birthDate: { type: Date, default: null },
+    avatar: { type: String, default: null },
+    contact: {
+      phone: { type: String, default: "" },
+      email: { type: String, default: "" },
+      socialNetworks: [
         {
-          name: { type: String, required: true },
-          activateTime: { type: Boolean, default: false },
+          network: { type: String },
+          value: { type: String },
         },
       ],
     },
+    address: {
+      country: { type: String, default: "FR" },
+      postalCode: { type: String, default: "" },
+      city: { type: String, default: "" },
+      address: { type: String, default: "" },
+      addressComplement: { type: String, default: "" },
+    },
+    infoSupp: [
+      {
+        id: { type: String },
+        title: { type: String },
+        color: { type: String },
+        content: { type: String },
+        order: { type: Number },
+      },
+    ],
   },
   categoryId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -99,8 +80,8 @@ const passengerItemSchema = new mongoose.Schema({
 });
 
 passengerItemSchema.index({
-  "contentFilesData.productName": "text",
-  "contentFilesData.aliasName.name": "text",
+  "contentFilesData.firstName": "text",
+  "contentFilesData.lastName": "text",
   name: "text",
 });
 passengerItemSchema.index({ userId: 1 });

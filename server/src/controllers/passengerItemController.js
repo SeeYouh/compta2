@@ -1,20 +1,14 @@
-import { fileURLToPath } from "url";
-import path from "path";
-
 import { OdysseeProductFolder } from "../models/OdysseeProductFolder.js";
 import { PassengerItem } from "../models/PassengerItem.js";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export const createItem = async (req, res) => {
   try {
     const {
-      productName,
-      aliasName,
-      treatmentDuration,
-      amountToAdminister,
-      intakeTime,
+      firstName,
+      lastName,
+      alias,
+      gender,
+      birthDate,
       categoryId,
       folderId,
     } = req.body;
@@ -25,33 +19,36 @@ export const createItem = async (req, res) => {
         .json({ success: false, error: "categoryId est requis" });
     }
 
+    const contact = req.body.contact ? JSON.parse(req.body.contact) : {};
+    const address = req.body.address ? JSON.parse(req.body.address) : {};
+    const infoSupp = req.body.infoSupp ? JSON.parse(req.body.infoSupp) : [];
+
+    const fullName =
+      [firstName, lastName].filter(Boolean).join(" ") || "Nouveau passager";
+
     const itemData = {
-      name: productName || "Nouveau passager",
-      img: [],
-      tooltips: `Info ${productName}`,
+      name: fullName,
+      tooltips: fullName,
       contentFilesData: {
-        productName,
-        aliasName: {
-          activate: !!aliasName,
-          name: aliasName || "",
+        firstName: firstName || "",
+        lastName: lastName || "",
+        alias: alias || "",
+        gender: gender || "NC",
+        birthDate: birthDate || null,
+        avatar: null,
+        contact: {
+          phone: contact.phone || "",
+          email: contact.email || "",
+          socialNetworks: contact.socialNetworks || [],
         },
-        img: [],
-        treatmentDuration: Number(treatmentDuration) || 1,
-        amountToAdminister: Number(amountToAdminister) || 1,
-        intakeTime: {
-          mode: intakeTime?.mode || "normal",
-          checkedMoments: intakeTime?.checkedMoments || [],
-          selectedTime: intakeTime?.selectedTime || "",
-          durationBefore: intakeTime?.durationBefore || 0,
-          durationAfter: intakeTime?.durationAfter || 0,
-          nightDuration: intakeTime?.nightDuration || 0,
-          advancedMode: intakeTime?.mode === "advanced",
-          daysTime:
-            intakeTime?.checkedMoments?.map((moment) => ({
-              name: moment,
-              activateTime: true,
-            })) || [],
+        address: {
+          country: address.country || "FR",
+          postalCode: address.postalCode || "",
+          city: address.city || "",
+          address: address.address || "",
+          addressComplement: address.addressComplement || "",
         },
+        infoSupp,
       },
       categoryId,
       userId: req.userId,
@@ -59,9 +56,7 @@ export const createItem = async (req, res) => {
     };
 
     if (req.file) {
-      const imageUrl = `${req.protocol}://${req.get("host")}/odyssee-images/${req.file.filename}`;
-      itemData.img = [imageUrl];
-      itemData.contentFilesData.img = [{ adress: imageUrl, alt: productName }];
+      itemData.contentFilesData.avatar = `${req.protocol}://${req.get("host")}/odyssee-images/${req.file.filename}`;
     }
 
     const item = new PassengerItem(itemData);
@@ -155,15 +150,6 @@ export const getOneItem = async (req, res) => {
 export const updateItem = async (req, res) => {
   try {
     const { id } = req.params;
-    let itemObject = req.body.product
-      ? JSON.parse(req.body.product)
-      : { ...req.body };
-    delete itemObject._id;
-
-    if (req.file) {
-      const imageUrl = `${req.protocol}://${req.get("host")}/odyssee-images/${req.file.filename}`;
-      itemObject.img = [imageUrl];
-    }
 
     const existing = await PassengerItem.findOne({
       _id: id,
@@ -175,7 +161,61 @@ export const updateItem = async (req, res) => {
         .json({ error: "Passager non trouvé ou non autorisé" });
     }
 
-    const updated = await PassengerItem.findByIdAndUpdate(id, itemObject, {
+    let updateData;
+
+    if (req.body.firstName !== undefined || req.file) {
+      // Soumission formulaire (FormData multipart)
+      const {
+        firstName,
+        lastName,
+        alias,
+        gender,
+        birthDate,
+        categoryId,
+        folderId,
+      } = req.body;
+      const contact = req.body.contact
+        ? JSON.parse(req.body.contact)
+        : existing.contentFilesData.contact;
+      const address = req.body.address
+        ? JSON.parse(req.body.address)
+        : existing.contentFilesData.address;
+      const infoSupp = req.body.infoSupp
+        ? JSON.parse(req.body.infoSupp)
+        : existing.contentFilesData.infoSupp;
+
+      const fullName =
+        [firstName, lastName].filter(Boolean).join(" ") || existing.name;
+
+      updateData = {
+        name: fullName,
+        tooltips: fullName,
+        contentFilesData: {
+          firstName: firstName ?? existing.contentFilesData.firstName,
+          lastName: lastName ?? existing.contentFilesData.lastName,
+          alias: alias ?? existing.contentFilesData.alias,
+          gender: gender ?? existing.contentFilesData.gender,
+          birthDate: birthDate ?? existing.contentFilesData.birthDate,
+          avatar: existing.contentFilesData.avatar,
+          contact,
+          address,
+          infoSupp,
+        },
+      };
+
+      if (categoryId) updateData.categoryId = categoryId;
+      if (folderId !== undefined) updateData.folderId = folderId || null;
+
+      if (req.file) {
+        updateData.contentFilesData.avatar = `${req.protocol}://${req.get("host")}/odyssee-images/${req.file.filename}`;
+      }
+    } else {
+      // Mise à jour partielle JSON (DnD, repositionnement)
+      updateData = { ...req.body };
+      delete updateData._id;
+    }
+
+    const updated = await PassengerItem.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
     });
