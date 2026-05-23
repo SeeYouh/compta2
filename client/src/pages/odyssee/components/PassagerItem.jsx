@@ -210,7 +210,12 @@ const PassagerItem = ({
           activeInfoSuppId,
         }),
       );
-    } catch {}
+    } catch (e) {
+      console.warn(
+        "[PassagerItem] Impossible de sauvegarder le brouillon local :",
+        e,
+      );
+    }
   }, [
     isDirty,
     firstName,
