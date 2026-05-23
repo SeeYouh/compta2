@@ -6,7 +6,7 @@ export const createItem = async (req, res) => {
     const {
       firstName,
       lastName,
-      alias,
+      aliasName,
       gender,
       birthDate,
       categoryId,
@@ -22,6 +22,12 @@ export const createItem = async (req, res) => {
     const contact = req.body.contact ? JSON.parse(req.body.contact) : {};
     const address = req.body.address ? JSON.parse(req.body.address) : {};
     const infoSupp = req.body.infoSupp ? JSON.parse(req.body.infoSupp) : [];
+    const infoSuppLayout = req.body.infoSuppLayout
+      ? JSON.parse(req.body.infoSuppLayout)
+      : [];
+    const infoSuppFolders = req.body.infoSuppFolders
+      ? JSON.parse(req.body.infoSuppFolders)
+      : [];
 
     const fullName =
       [firstName, lastName].filter(Boolean).join(" ") || "Nouveau passager";
@@ -32,7 +38,7 @@ export const createItem = async (req, res) => {
       contentFilesData: {
         firstName: firstName || "",
         lastName: lastName || "",
-        alias: alias || "",
+        aliasName: { activate: !!aliasName, name: aliasName || "" },
         gender: gender || "NC",
         birthDate: birthDate || null,
         avatar: null,
@@ -49,6 +55,8 @@ export const createItem = async (req, res) => {
           addressComplement: address.addressComplement || "",
         },
         infoSupp,
+        infoSuppLayout,
+        infoSuppFolders,
       },
       categoryId,
       userId: req.userId,
@@ -168,7 +176,7 @@ export const updateItem = async (req, res) => {
       const {
         firstName,
         lastName,
-        alias,
+        aliasName,
         gender,
         birthDate,
         categoryId,
@@ -183,6 +191,12 @@ export const updateItem = async (req, res) => {
       const infoSupp = req.body.infoSupp
         ? JSON.parse(req.body.infoSupp)
         : existing.contentFilesData.infoSupp;
+      const infoSuppLayout = req.body.infoSuppLayout
+        ? JSON.parse(req.body.infoSuppLayout)
+        : existing.contentFilesData.infoSuppLayout;
+      const infoSuppFolders = req.body.infoSuppFolders
+        ? JSON.parse(req.body.infoSuppFolders)
+        : existing.contentFilesData.infoSuppFolders;
 
       const fullName =
         [firstName, lastName].filter(Boolean).join(" ") || existing.name;
@@ -193,13 +207,18 @@ export const updateItem = async (req, res) => {
         contentFilesData: {
           firstName: firstName ?? existing.contentFilesData.firstName,
           lastName: lastName ?? existing.contentFilesData.lastName,
-          alias: alias ?? existing.contentFilesData.alias,
+          aliasName:
+            aliasName !== undefined
+              ? { activate: !!aliasName, name: aliasName || "" }
+              : existing.contentFilesData.aliasName,
           gender: gender ?? existing.contentFilesData.gender,
           birthDate: birthDate ?? existing.contentFilesData.birthDate,
           avatar: existing.contentFilesData.avatar,
           contact,
           address,
           infoSupp,
+          infoSuppLayout,
+          infoSuppFolders,
         },
       };
 
@@ -250,6 +269,100 @@ export const deleteItem = async (req, res) => {
     res.status(200).json({ success: true, message: "Passager supprimé !" });
   } catch (error) {
     console.error("Erreur suppression passager:", error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const createInfoSuppFolder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { _id, categoryIds, name, color } = req.body;
+
+    const newFolder = {
+      _id: _id || `isf-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      name: name || "Nouveau dossier",
+      color: color || "#5A8F7B",
+      categoryIds: categoryIds || [],
+      isOpen: true,
+    };
+
+    const updated = await PassengerItem.findOneAndUpdate(
+      { _id: id, userId: req.userId },
+      { $push: { "contentFilesData.infoSuppFolders": newFolder } },
+      { new: true },
+    );
+    if (!updated) return res.status(404).json({ error: "Passager non trouvé" });
+
+    res.status(201).json({ success: true, folder: newFolder });
+  } catch (error) {
+    console.error("Erreur création dossier info supp:", error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const updateInfoSuppFolder = async (req, res) => {
+  try {
+    const { id, folderId } = req.params;
+    const updates = req.body;
+
+    const item = await PassengerItem.findOne({ _id: id, userId: req.userId });
+    if (!item) return res.status(404).json({ error: "Passager non trouvé" });
+
+    const folders = item.contentFilesData.infoSuppFolders || [];
+    const idx = folders.findIndex((f) => f._id === folderId);
+    if (idx === -1)
+      return res.status(404).json({ error: "Dossier non trouvé" });
+
+    folders[idx] = { ...folders[idx], ...updates };
+    item.markModified("contentFilesData.infoSuppFolders");
+    await item.save();
+
+    res.status(200).json({ success: true, folder: folders[idx] });
+  } catch (error) {
+    console.error("Erreur mise à jour dossier info supp:", error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const deleteInfoSuppFolder = async (req, res) => {
+  try {
+    const { id, folderId } = req.params;
+
+    const item = await PassengerItem.findOne({ _id: id, userId: req.userId });
+    if (!item) return res.status(404).json({ error: "Passager non trouvé" });
+
+    item.contentFilesData.infoSuppFolders = (
+      item.contentFilesData.infoSuppFolders || []
+    ).filter((f) => f._id !== folderId);
+    item.contentFilesData.infoSuppLayout = (
+      item.contentFilesData.infoSuppLayout || []
+    ).filter((i) => i.id !== folderId);
+    item.markModified("contentFilesData.infoSuppFolders");
+    item.markModified("contentFilesData.infoSuppLayout");
+    await item.save();
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("Erreur suppression dossier info supp:", error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
+export const updateInfoSuppLayout = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { items } = req.body;
+
+    const item = await PassengerItem.findOne({ _id: id, userId: req.userId });
+    if (!item) return res.status(404).json({ error: "Passager non trouvé" });
+
+    item.contentFilesData.infoSuppLayout = items;
+    item.markModified("contentFilesData.infoSuppLayout");
+    await item.save();
+
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("Erreur mise à jour layout info supp:", error);
     res.status(400).json({ error: error.message });
   }
 };

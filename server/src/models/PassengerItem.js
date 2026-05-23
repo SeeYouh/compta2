@@ -12,7 +12,10 @@ const passengerItemSchema = new mongoose.Schema({
   contentFilesData: {
     firstName: { type: String, default: "" },
     lastName: { type: String, default: "" },
-    alias: { type: String, default: "" },
+    aliasName: {
+      activate: { type: Boolean, default: false },
+      name: { type: String, default: "" },
+    },
     gender: { type: String, enum: ["F", "M", "NC"], default: "NC" },
     birthDate: { type: Date, default: null },
     avatar: { type: String, default: null },
@@ -36,12 +39,17 @@ const passengerItemSchema = new mongoose.Schema({
     infoSupp: [
       {
         id: { type: String },
+        type: { type: String, enum: ["block", "folder"], default: "block" },
         title: { type: String },
         color: { type: String },
         content: { type: String },
         order: { type: Number },
+        categoryIds: [{ type: String }],
+        isOpen: { type: Boolean, default: false },
       },
     ],
+    infoSuppLayout: [{ type: mongoose.Schema.Types.Mixed }],
+    infoSuppFolders: [{ type: mongoose.Schema.Types.Mixed }],
   },
   categoryId: {
     type: mongoose.Schema.Types.ObjectId,

@@ -57,6 +57,10 @@ const UserSchema = new mongoose.Schema(
       type: [Date],
       default: [],
     },
+    frequentCountries: {
+      type: [String],
+      default: [],
+    },
   },
   {
     timestamps: true,

@@ -499,3 +499,63 @@ export const getUsers = async (req, res) => {
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
+
+const MAX_FREQUENT_COUNTRIES = 12;
+
+export const getFrequentCountries = async (req, res) => {
+  try {
+    const user = await User.findOne({ id: req.userId }).select(
+      "frequentCountries",
+    );
+    if (!user)
+      return res.status(404).json({ error: "Utilisateur introuvable" });
+    res.json({ success: true, countries: user.frequentCountries || [] });
+  } catch (error) {
+    console.error("Erreur getFrequentCountries:", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
+export const addFrequentCountry = async (req, res) => {
+  try {
+    const { code } = req.body;
+    if (!code || typeof code !== "string" || code.length > 3) {
+      return res.status(400).json({ error: "Code pays invalide" });
+    }
+    const user = await User.findOne({ id: req.userId });
+    if (!user)
+      return res.status(404).json({ error: "Utilisateur introuvable" });
+
+    const current = user.frequentCountries || [];
+    const without = current.filter((c) => c !== code);
+    user.frequentCountries = [code, ...without].slice(
+      0,
+      MAX_FREQUENT_COUNTRIES,
+    );
+    await user.save();
+
+    res.json({ success: true, countries: user.frequentCountries });
+  } catch (error) {
+    console.error("Erreur addFrequentCountry:", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
+export const removeFrequentCountry = async (req, res) => {
+  try {
+    const { code } = req.params;
+    const user = await User.findOne({ id: req.userId });
+    if (!user)
+      return res.status(404).json({ error: "Utilisateur introuvable" });
+
+    user.frequentCountries = (user.frequentCountries || []).filter(
+      (c) => c !== code,
+    );
+    await user.save();
+
+    res.json({ success: true, countries: user.frequentCountries });
+  } catch (error) {
+    console.error("Erreur removeFrequentCountry:", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};

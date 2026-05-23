@@ -1,19 +1,22 @@
 import express from "express";
 
-import { adminAuth } from "../middleware/adminAuth.js";
-import { authenticate } from "../middleware/auth.js";
 import {
+  addFrequentCountry,
   changePassword,
   forgotPassword,
+  getFrequentCountries,
   getMe,
   getUsers,
   login,
   register,
+  removeFrequentCountry,
   resendVerification,
   resetPassword,
   updateProfile,
   verifyEmail,
 } from "../controllers/authController.js";
+import { adminAuth } from "../middleware/adminAuth.js";
+import { authenticate } from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -46,5 +49,14 @@ router.patch("/password", authenticate, changePassword);
 
 // GET /api/auth/users - Liste des utilisateurs (admin)
 router.get("/users", authenticate, adminAuth, getUsers);
+
+// GET /api/auth/frequent-countries - Pays fréquents de l'utilisateur
+router.get("/frequent-countries", authenticate, getFrequentCountries);
+
+// POST /api/auth/frequent-countries - Ajouter un pays fréquent
+router.post("/frequent-countries", authenticate, addFrequentCountry);
+
+// DELETE /api/auth/frequent-countries/:code - Supprimer un pays fréquent
+router.delete("/frequent-countries/:code", authenticate, removeFrequentCountry);
 
 export default router;
