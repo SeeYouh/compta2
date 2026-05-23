@@ -146,8 +146,9 @@
 // Grille de produits
 .catalog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
   gap: 8px;
+  justify-items: center;
 
   &:hover .catalog-card {
     opacity: 0.5;
@@ -165,6 +166,7 @@
 
 // Carte produit
 .catalog-card {
+  width: 64px;
   border-radius: 12px;
   cursor: pointer;
   position: relative;
@@ -189,7 +191,7 @@
     justify-content: center;
     overflow: hidden;
     border-radius: 12px;
-    padding: 6px;
+    padding: 10px;
 
     img {
       width: 100%;

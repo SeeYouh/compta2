@@ -132,6 +132,7 @@ const router = createBrowserRouter([
   {
     path: "/odyssee/*",
     loader: odysseeDashboardLoader,
+    hydrateFallbackElement: null,
     element: (
       <ProtectedRoute>
         <Suspense fallback={null}>
@@ -158,6 +159,6 @@ const router = createBrowserRouter([
 
 root.render(
   <StrictMode>
-    <RouterProvider router={router} fallbackElement={null} />
+    <RouterProvider router={router} />
   </StrictMode>,
 );

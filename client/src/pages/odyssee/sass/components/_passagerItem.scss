@@ -324,9 +324,8 @@
 .passager-item__info-supp {
   display: flex;
   flex-direction: column;
-  width: calc(100% - 60px);
-  margin: 0 30px 20px;
-  min-height: 300px;
+  width: 80%;
+  margin: 0 auto 20px;
   color: var(--color-darkest);
 }
 
@@ -339,38 +338,48 @@
 
 .passager-item__is-body {
   display: flex;
-  flex: 1;
-  min-height: 0;
+  padding-bottom: 20px;
 }
 
 .passager-item__is-sidebar {
-  width: 140px;
+  width: 68px;
   flex-shrink: 0;
   border-right: 2px solid var(--color-1);
   margin-top: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 8px 0;
-  gap: 4px;
+  padding: 10px 0;
   overflow-y: auto;
+  scrollbar-width: none;
+  position: relative;
 
-  // Icônes agrandies pour la sidebar Info Supp
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  // Animation via filter (iconStyle inline écrase background, filter fonctionne toujours)
   .catalog-sidebar__icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 12px;
-    font-size: 18px;
+    transition: filter 0.2s;
 
-    img {
-      width: 64px;
-      height: 64px;
+    &:hover,
+    &.active {
+      filter: brightness(1.2);
+    }
+
+    &--folder:hover {
+      filter: none;
+      opacity: 0.8;
+    }
+
+    &--nested:hover {
+      filter: brightness(1.4);
     }
   }
 
-  .catalog-sidebar__icon--ghost {
-    width: 64px;
-    height: 64px;
+  > .catalog-sidebar__icon,
+  .catalog-sidebar__folder {
+    margin-right: 5px;
   }
 }
 
@@ -383,14 +392,18 @@
 }
 
 .passager-item__is-add-btn {
-  border: none;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  padding: 2px;
+  border: 1.5px solid var(--color-1);
+  border-radius: 25%;
+  margin-right: 5px;
   background: transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px;
-  border-radius: 6px;
   transition: background 0.15s;
 
   &:hover {
@@ -404,6 +417,10 @@
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  margin: 30px 50px 12px;
+  border: 2px solid var(--color-1);
+  border-radius: 8px;
+  min-height: 460px;
 }
 
 .passager-item__is-editor-header {
@@ -412,7 +429,6 @@
   gap: 8px;
   padding: 8px 12px;
   border-bottom: 1px solid var(--color-dark);
-  border-left: 4px solid var(--color-1);
 }
 
 .passager-item__is-color-btn {

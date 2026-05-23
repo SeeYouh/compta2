@@ -39,7 +39,8 @@ const ProductCard = ({
     : undefined;
   const menuRef = useRef(null);
 
-  const hasImage = product.img?.[0] && !imgError;
+  const imgSrc = product.img?.[0] || product.contentFilesData?.avatar || null;
+  const hasImage = imgSrc && !imgError;
 
   const displayName =
     product.contentFilesData?.aliasName?.activate &&
@@ -87,7 +88,7 @@ const ProductCard = ({
         <div className="catalog-card__image">
           {hasImage ? (
             <img
-              src={product.img[0]}
+              src={imgSrc}
               alt={product.name}
               onError={() => setImgError(true)}
             />

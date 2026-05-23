@@ -1,6 +1,7 @@
 import CatalogMain from './CatalogMain';
 import CatalogSidebar from './CatalogSidebar';
 import CategoryContextMenu from './CategoryContextMenu';
+import CategoryForm from './CategoryForm';
 import CategorySettings from './CategorySettings';
 import ConfirmationModal from '../../../components/ConfirmationModal';
 import FolderContextMenu from './FolderContextMenu';
@@ -146,7 +147,7 @@ const CatalogContent = ({ engine, labels }) => {
 
       {/* Modal de création de catégorie */}
       {showCategoryModal && (
-        <CategoryFormComponent
+        <CategoryForm
           onSubmit={handleCreateCategory}
           onCancel={() => setShowCategoryModal(false)}
         />

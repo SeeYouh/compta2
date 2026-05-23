@@ -1,6 +1,16 @@
 const SidebarTooltip = ({ tooltip, categories, folders }) => {
   if (!tooltip) return null;
 
+  if (tooltip.type === "text") {
+    const style = { top: tooltip.top };
+    if (tooltip.left != null) style.left = tooltip.left;
+    return (
+      <div className="sidebar-tooltip" style={style}>
+        <span className="sidebar-tooltip__name">{tooltip.text}</span>
+      </div>
+    );
+  }
+
   if (tooltip.type === "category") {
     const cat = categories.find((c) => c._id === tooltip.id);
     if (!cat) return null;

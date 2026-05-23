@@ -1,12 +1,12 @@
-import { Fragment } from 'react';
+import { Fragment } from "react";
 
-import { darken } from '../utils/colorUtils';
+import { darken } from "../utils/colorUtils";
 import {
   DARKEN_BG,
   DARKEN_BORDER,
   DEFAULT_FOLDER_COLOR,
-} from '../config/folderColors';
-import IconDossierFull from '../assets/IconDossierFull';
+} from "../config/folderColors";
+import IconDossierFull from "../assets/IconDossierFull";
 
 const SidebarFolderItem = ({
   folder,
@@ -15,8 +15,8 @@ const SidebarFolderItem = ({
   isDropOnFolder,
   nestedGhost,
   dnd,
-  onTooltipEnter,
-  onTooltipLeave,
+  onTooltipEnter = () => {},
+  onTooltipLeave = () => {},
   onToggle,
   onContextMenu,
   onCategoryContextMenu,

@@ -204,6 +204,71 @@ export const passengersItemService = {
       return { success: false, error: error.message };
     }
   },
+
+  async createInfoSuppFolder(passengerId, folderData) {
+    try {
+      const res = await fetch(`${BASE_ITEMS}/${passengerId}/infosupp/folders`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify(folderData),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur serveur");
+      return { success: true, folder: data.folder };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  async updateInfoSuppFolder(passengerId, folderId, updates) {
+    try {
+      const res = await fetch(
+        `${BASE_ITEMS}/${passengerId}/infosupp/folders/${folderId}`,
+        {
+          method: "PUT",
+          headers: authHeaders(),
+          body: JSON.stringify(updates),
+        },
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur serveur");
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  async deleteInfoSuppFolder(passengerId, folderId) {
+    try {
+      const res = await fetch(
+        `${BASE_ITEMS}/${passengerId}/infosupp/folders/${folderId}`,
+        {
+          method: "DELETE",
+          headers: authHeaders(),
+        },
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur serveur");
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
+  async updateInfoSuppLayout(passengerId, items) {
+    try {
+      const res = await fetch(`${BASE_ITEMS}/${passengerId}/infosupp/layout`, {
+        method: "PUT",
+        headers: authHeaders(),
+        body: JSON.stringify({ items }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur serveur");
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
 };
 
 export const passengersItemDeleteService = {

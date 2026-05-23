@@ -283,12 +283,15 @@ const useCatalogEngine = ({
 
   // ── Items ────────────────────────────────────────────────────────────────────
 
-  const handleItemCreated = () => {
+  const handleItemCreated = (product) => {
     if (selectedCategory) {
       invalidateItemsCache(selectedCategory);
       loadItems(selectedCategory);
     }
-    setSelectedFileData(null);
+    if (product) {
+      setSelectedFileData(transformItemForEdit(product));
+      setEditMode(true);
+    }
   };
 
   const handleEditItem = (item) => {
@@ -638,11 +641,39 @@ const useCatalogEngine = ({
     }
   };
 
-  const handleMoveItemToFolder = async (itemId, folderId, rootOrder) => {
+  const handleMoveItemToFolder = async (
+    itemId,
+    folderId,
+    rootOrder,
+    sourceFolderId = null,
+  ) => {
+    // Vérifier avant le déplacement si le dossier source va devenir vide
+    let shouldDeleteSourceFolder = false;
+    if (sourceFolderId && !folderId) {
+      const cat = categories.find(
+        (c) => String(c._id) === String(selectedCategory),
+      );
+      const remainingItems = (cat?.products || []).filter(
+        (p) =>
+          String(p.folderId) === String(sourceFolderId) &&
+          String(p._id) !== String(itemId),
+      );
+      shouldDeleteSourceFolder = remainingItems.length === 0;
+    }
+
     const update = { folderId: folderId || null };
     if (rootOrder !== undefined) update.rootOrder = rootOrder;
     const result = await itemService.updateItem(itemId, update);
     if (result.success && selectedCategory) {
+      if (shouldDeleteSourceFolder) {
+        await itemFolderService.deleteFolder(sourceFolderId);
+        setProductFolders((prev) =>
+          prev.filter((f) => String(f._id) !== String(sourceFolderId)),
+        );
+        patchCachedProductFolders(selectedCategory, (fs) =>
+          fs.filter((f) => String(f._id) !== String(sourceFolderId)),
+        );
+      }
       invalidateItemsCache(selectedCategory);
       loadItems(selectedCategory);
     }

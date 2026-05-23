@@ -10,7 +10,9 @@ const CategoryContextMenu = ({
   onSettings,
   onDelete,
   onCreateFolder,
+  createFolderLabel = "Créer un dossier",
   onCreateProduct,
+  createProductLabel = "Créer un produit",
   allFoldersClosed,
   onToggleAllFolders,
   onClose,
@@ -24,60 +26,70 @@ const CategoryContextMenu = ({
 
   return (
     <ContextMenu x={x} y={y} onClose={onClose}>
-      <button
-        className="ctx-menu__item"
-        onClick={() => {
-          onCreateFolder();
-          onClose();
-        }}
-      >
-        Créer un dossier
-      </button>
-      <button
-        className="ctx-menu__item"
-        onClick={() => {
-          onCreateProduct();
-          onClose();
-        }}
-      >
-        Créer un produit
-      </button>
-      <button
-        className="ctx-menu__item"
-        onClick={() => {
-          onToggleAllFolders?.();
-          onClose();
-        }}
-      >
-        {allFoldersClosed
-          ? "Ouvrir tous les dossiers"
-          : "Fermer tous les dossiers"}
-      </button>
+      {onCreateFolder && (
+        <button
+          className="ctx-menu__item"
+          onClick={() => {
+            onCreateFolder();
+            onClose();
+          }}
+        >
+          {createFolderLabel}
+        </button>
+      )}
+      {onCreateProduct && (
+        <button
+          className="ctx-menu__item"
+          onClick={() => {
+            onCreateProduct();
+            onClose();
+          }}
+        >
+          {createProductLabel}
+        </button>
+      )}
+      {onToggleAllFolders && (
+        <button
+          className="ctx-menu__item"
+          onClick={() => {
+            onToggleAllFolders();
+            onClose();
+          }}
+        >
+          {allFoldersClosed
+            ? "Ouvrir tous les dossiers"
+            : "Fermer tous les dossiers"}
+        </button>
+      )}
       <div className="ctx-menu__separator" />
       <div className="ctx-menu__actions">
-        <button
-          className="ctx-menu__action"
-          onClick={() => {
-            onSettings();
-            onClose();
-          }}
-          title="Paramètres"
-        >
-          <Gear
-            dataTimeRotateGear={dataTimeRotateGear}
-            setDataTimeRotateGear={setDataTimeRotateGear}
-          />
-        </button>
-        <button
-          className="ctx-menu__action ctx-menu__action--danger"
-          onClick={() => {
-            onDelete();
-            onClose();
-          }}
-          title="Supprimer"
-        >
-          <IconTrash size={18} />
-        </button>
+        {onSettings && (
+          <button
+            className="ctx-menu__action"
+            onClick={() => {
+              onSettings();
+              onClose();
+            }}
+            title="Paramètres"
+          >
+            <Gear
+              dataTimeRotateGear={dataTimeRotateGear}
+              setDataTimeRotateGear={setDataTimeRotateGear}
+            />
+          </button>
+        )}
+        {onDelete && (
+          <button
+            className="ctx-menu__action ctx-menu__action--danger"
+            onClick={() => {
+              onDelete();
+              onClose();
+            }}
+            title="Supprimer"
+          >
+            <IconTrash size={18} />
+          </button>
+        )}
       </div>
     </ContextMenu>
   );

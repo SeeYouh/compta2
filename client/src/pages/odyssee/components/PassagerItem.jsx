@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 
+import CategoryContextMenu from "./CategoryContextMenu";
 import CountryPicker from "./CountryPicker";
 import { DEFAULT_FOLDER_COLOR } from "../config/folderColors";
 import { getInitials } from "../utils/stringUtils";
@@ -11,7 +12,9 @@ import { lighten } from "../utils/colorUtils";
 import NameColorModal from "./NameColorModal";
 import { passengersItemService } from "../services/passengersServices";
 import SidebarCategoryItem from "./SidebarCategoryItem";
-import { useInfoSuppDnd } from "../hooks/useInfoSuppDnd";
+import SidebarFolderItem from "./SidebarFolderItem";
+import { useSidebarDnd } from "../hooks/useSidebarDnd";
+import { useSidebarIndicator } from "../hooks/useSidebarIndicator";
 
 const SOCIAL_NETWORKS = [
   "Facebook",
@@ -25,14 +28,12 @@ const SOCIAL_NETWORKS = [
   "Autre",
 ];
 
-function newInfoSuppBlock(order) {
-  return {
-    id: `is-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    title: "Nouveau bloc",
-    color: DEFAULT_FOLDER_COLOR,
-    content: "",
-    order,
-  };
+function newInfoSuppBlockId() {
+  return `is-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function newInfoSuppFolderId() {
+  return `isf-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
 const PassagerItem = ({
@@ -68,8 +69,8 @@ const PassagerItem = ({
   const [lastName, setLastName] = useState(
     savedDraft?.lastName ?? contentFilesData.lastName ?? "",
   );
-  const [alias, setAlias] = useState(
-    savedDraft?.alias ?? contentFilesData.alias ?? "",
+  const [aliasName, setAliasName] = useState(
+    savedDraft?.aliasName ?? contentFilesData.aliasName?.name ?? "",
   );
   const [gender, setGender] = useState(
     savedDraft?.gender ?? contentFilesData.gender ?? "NC",
@@ -123,13 +124,65 @@ const PassagerItem = ({
   );
 
   // ─── Info Supp ────────────────────────────────────────────────────────────
-  const [infoSupp, setInfoSupp] = useState(
-    savedDraft?.infoSupp ?? contentFilesData.infoSupp ?? [],
-  );
-  const [activeInfoSuppId, setActiveInfoSuppId] = useState(
-    (savedDraft?.infoSupp ?? contentFilesData.infoSupp)?.[0]?.id || null,
-  );
-  const [blockSettingsOpen, setBlockSettingsOpen] = useState(false);
+  const [infoSuppBlocks, setInfoSuppBlocks] = useState(() => {
+    const srcBlocks = savedDraft?.infoSuppBlocks ?? null;
+    if (srcBlocks) return srcBlocks;
+    const blocks = {};
+    (contentFilesData.infoSupp || [])
+      .filter((i) => i.type !== "folder")
+      .forEach((b) => {
+        blocks[b.id] = {
+          id: b.id,
+          title: b.title ?? "Nouveau bloc",
+          color: b.color ?? DEFAULT_FOLDER_COLOR,
+          content: b.content ?? "",
+        };
+      });
+    return blocks;
+  });
+
+  const [infoSuppLayout, setInfoSuppLayout] = useState(() => {
+    if (savedDraft?.infoSuppLayout) return savedDraft.infoSuppLayout;
+    if (contentFilesData.infoSuppLayout?.length > 0)
+      return contentFilesData.infoSuppLayout;
+    // Migration depuis l'ancien format plat
+    const childIds = new Set();
+    (contentFilesData.infoSupp || [])
+      .filter((i) => i.type === "folder")
+      .forEach((f) => (f.categoryIds || []).forEach((id) => childIds.add(id)));
+    return (contentFilesData.infoSupp || [])
+      .filter((item) => !childIds.has(item.id))
+      .map((item) => ({
+        type: item.type === "folder" ? "folder" : "category",
+        id: item.id,
+      }));
+  });
+
+  const [infoSuppFolders, setInfoSuppFolders] = useState(() => {
+    if (savedDraft?.infoSuppFolders) return savedDraft.infoSuppFolders;
+    if (contentFilesData.infoSuppFolders?.length > 0)
+      return contentFilesData.infoSuppFolders;
+    // Migration depuis l'ancien format plat
+    return (contentFilesData.infoSupp || [])
+      .filter((i) => i.type === "folder")
+      .map((f) => ({
+        _id: f.id,
+        name: f.title ?? "Nouveau dossier",
+        color: f.color ?? DEFAULT_FOLDER_COLOR,
+        categoryIds: f.categoryIds ?? [],
+        isOpen: f.isOpen ?? true,
+      }));
+  });
+
+  const [activeInfoSuppId, setActiveInfoSuppId] = useState(() => {
+    if (savedDraft?.activeInfoSuppId) return savedDraft.activeInfoSuppId;
+    return (
+      (contentFilesData.infoSupp || []).find((i) => i.type !== "folder")?.id ||
+      null
+    );
+  });
+  const [settingsItemId, setSettingsItemId] = useState(null);
+  const [contextMenu, setContextMenu] = useState(null);
 
   // ─── État formulaire ──────────────────────────────────────────────────────
   const [isDirty, setIsDirty] = useState(false);
@@ -146,12 +199,15 @@ const PassagerItem = ({
         JSON.stringify({
           firstName,
           lastName,
-          alias,
+          aliasName,
           gender,
           birthDate,
           contact: { phone, email, socialNetworks },
           address: { country, postalCode, city, address, addressComplement },
-          infoSupp,
+          infoSuppBlocks,
+          infoSuppLayout,
+          infoSuppFolders,
+          activeInfoSuppId,
         }),
       );
     } catch {}
@@ -159,7 +215,7 @@ const PassagerItem = ({
     isDirty,
     firstName,
     lastName,
-    alias,
+    aliasName,
     gender,
     birthDate,
     phone,
@@ -170,7 +226,10 @@ const PassagerItem = ({
     city,
     address,
     addressComplement,
-    infoSupp,
+    infoSuppBlocks,
+    infoSuppLayout,
+    infoSuppFolders,
+    activeInfoSuppId,
     draftKey,
   ]);
 
@@ -212,34 +271,161 @@ const PassagerItem = ({
 
   // ─── Info Supp ────────────────────────────────────────────────────────────
   const addInfoSuppBlock = () => {
-    const block = newInfoSuppBlock(infoSupp.length);
-    setInfoSupp((prev) => [...prev, block]);
-    setActiveInfoSuppId(block.id);
+    const id = newInfoSuppBlockId();
+    setInfoSuppBlocks((prev) => ({
+      ...prev,
+      [id]: {
+        id,
+        title: "Nouveau bloc",
+        color: DEFAULT_FOLDER_COLOR,
+        content: "",
+      },
+    }));
+    setInfoSuppLayout((prev) => [...prev, { type: "category", id }]);
+    setActiveInfoSuppId(id);
     markDirty();
   };
 
-  const removeInfoSuppBlock = (id) => {
-    setInfoSupp((prev) => {
-      const next = prev.filter((b) => b.id !== id);
-      if (activeInfoSuppId === id) {
-        setActiveInfoSuppId(next[0]?.id || null);
-      }
-      return next;
-    });
+  const addInfoSuppFolder = async () => {
+    const _id = newInfoSuppFolderId();
+    const folder = {
+      _id,
+      name: "Nouveau dossier",
+      color: DEFAULT_FOLDER_COLOR,
+      categoryIds: [],
+      isOpen: true,
+    };
+    setInfoSuppFolders((prev) => [...prev, folder]);
+    setInfoSuppLayout((prev) => [...prev, { type: "folder", id: _id }]);
+    setSettingsItemId(_id);
     markDirty();
+    if (productId) {
+      passengersItemService.createInfoSuppFolder(productId, folder);
+    }
   };
 
-  const updateInfoSuppField = (id, field, value) => {
-    setInfoSupp((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, [field]: value } : b)),
+  const toggleAllInfoSuppFolders = () => {
+    const allClosed = infoSuppFolders.every((f) => !f.isOpen);
+    setInfoSuppFolders((prev) =>
+      prev.map((f) => ({ ...f, isOpen: allClosed })),
     );
     markDirty();
   };
 
-  const activeBlock = infoSupp.find((b) => b.id === activeInfoSuppId) || null;
+  const removeInfoSuppBlock = (id) => {
+    setInfoSuppLayout((prev) => prev.filter((i) => i.id !== id));
+    setInfoSuppFolders((prev) =>
+      prev.map((f) => ({
+        ...f,
+        categoryIds: (f.categoryIds || []).filter((cid) => cid !== id),
+      })),
+    );
+    setInfoSuppBlocks((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+    if (activeInfoSuppId === id) {
+      setActiveInfoSuppId(
+        Object.keys(infoSuppBlocks).find((k) => k !== id) || null,
+      );
+    }
+    markDirty();
+  };
+
+  const toggleFolder = (folderId) => {
+    setInfoSuppFolders((prev) =>
+      prev.map((f) => (f._id === folderId ? { ...f, isOpen: !f.isOpen } : f)),
+    );
+    markDirty();
+  };
+
+  const activeBlock = activeInfoSuppId
+    ? (infoSuppBlocks[activeInfoSuppId] ?? null)
+    : null;
+
+  const settingsItem = settingsItemId
+    ? (() => {
+        const folder = infoSuppFolders.find((f) => f._id === settingsItemId);
+        if (folder)
+          return {
+            id: folder._id,
+            type: "folder",
+            title: folder.name,
+            color: folder.color,
+          };
+        const block = infoSuppBlocks[settingsItemId];
+        if (block)
+          return {
+            id: block.id,
+            type: "block",
+            title: block.title,
+            color: block.color,
+          };
+        return null;
+      })()
+    : null;
 
   // ─── D&D Info Supp ────────────────────────────────────────────────────────
-  const dnd = useInfoSuppDnd({ infoSupp, setInfoSupp });
+  const folderService = useMemo(
+    () => ({
+      createFolder: async (categoryIds) => {
+        const _id = newInfoSuppFolderId();
+        if (!productId) {
+          return {
+            success: true,
+            folder: {
+              _id,
+              name: "Nouveau dossier",
+              color: DEFAULT_FOLDER_COLOR,
+              categoryIds,
+              isOpen: true,
+            },
+          };
+        }
+        return passengersItemService.createInfoSuppFolder(productId, {
+          _id,
+          categoryIds,
+          name: "Nouveau dossier",
+          color: DEFAULT_FOLDER_COLOR,
+        });
+      },
+      updateFolder: async (id, updates) => {
+        if (!productId) return { success: true };
+        return passengersItemService.updateInfoSuppFolder(
+          productId,
+          id,
+          updates,
+        );
+      },
+      deleteFolder: async (id) => {
+        if (!productId) return { success: true };
+        return passengersItemService.deleteInfoSuppFolder(productId, id);
+      },
+      updateLayout: async (items) => {
+        if (!productId) return { success: true };
+        return passengersItemService.updateInfoSuppLayout(productId, items);
+      },
+    }),
+    [productId],
+  );
+
+  const dnd = useSidebarDnd({
+    sidebarItems: infoSuppLayout,
+    setSidebarItems: setInfoSuppLayout,
+    folders: infoSuppFolders,
+    setFolders: setInfoSuppFolders,
+    folderService,
+  });
+
+  // ─── Indicateur sidebar Info Supp ─────────────────────────────────────────
+  const isSidebarRef = useRef(null);
+  const indicator = useSidebarIndicator({
+    sidebarRef: isSidebarRef,
+    folders: infoSuppFolders,
+    selectedId: activeInfoSuppId,
+    getItemColor: (id) => infoSuppBlocks[id]?.color ?? null,
+  });
 
   // ─── Soumission ───────────────────────────────────────────────────────────
   const handleSubmit = async (e) => {
@@ -248,7 +434,7 @@ const PassagerItem = ({
 
     formData.append("firstName", firstName);
     formData.append("lastName", lastName);
-    formData.append("alias", alias);
+    formData.append("aliasName", aliasName);
     formData.append("gender", gender);
     formData.append("birthDate", birthDate || "");
     formData.append("categoryId", categoryId);
@@ -262,7 +448,9 @@ const PassagerItem = ({
       "address",
       JSON.stringify({ country, postalCode, city, address, addressComplement }),
     );
-    formData.append("infoSupp", JSON.stringify(infoSupp));
+    formData.append("infoSupp", JSON.stringify(Object.values(infoSuppBlocks)));
+    formData.append("infoSuppLayout", JSON.stringify(infoSuppLayout));
+    formData.append("infoSuppFolders", JSON.stringify(infoSuppFolders));
 
     if (avatarFile) formData.append("image", avatarFile);
 
@@ -311,6 +499,7 @@ const PassagerItem = ({
               markDirty();
             }}
             placeholder="Prénom"
+            autoComplete="given-name"
             maxLength={60}
             readOnly={readOnly}
           />
@@ -323,15 +512,16 @@ const PassagerItem = ({
               markDirty();
             }}
             placeholder="Nom"
+            autoComplete="family-name"
             maxLength={60}
             readOnly={readOnly}
           />
           <input
             type="text"
             className="passager-item__nav-input passager-item__nav-input--alias"
-            value={alias}
+            value={aliasName}
             onChange={(e) => {
-              setAlias(e.target.value);
+              setAliasName(e.target.value);
               markDirty();
             }}
             placeholder="Alias"
@@ -605,30 +795,135 @@ const PassagerItem = ({
         </div>
         <div className="passager-item__is-body">
           <div
+            ref={isSidebarRef}
             className="passager-item__is-sidebar"
+            onMouseMove={indicator.handleMouseMove}
+            onMouseLeave={indicator.handleMouseLeave}
             onDragOver={dnd.handleSidebarDragOver}
             onDrop={dnd.handleSidebarDrop}
           >
-            {infoSupp.map((block, index) => (
-              <SidebarCategoryItem
-                key={block.id}
-                cat={{
-                  _id: block.id,
-                  name: block.title,
-                  image: null,
-                  active: block.id === activeInfoSuppId,
+            <div
+              className="catalog-sidebar__indicator"
+              style={{
+                top: indicator.indicatorY ?? 0,
+                opacity: indicator.indicatorOpacity,
+                backgroundColor: indicator.indicatorColor ?? undefined,
+                transition:
+                  "top 0.2s ease, opacity 0.15s ease, background-color 0.2s ease",
+              }}
+              onTransitionEnd={indicator.handleIndicatorTransitionEnd}
+            />
+            {indicator.activeY !== null && (
+              <div
+                className="catalog-sidebar__indicator catalog-sidebar__indicator--active"
+                style={{
+                  top: indicator.activeY,
+                  backgroundColor: indicator.activeColor ?? undefined,
                 }}
-                item={{ id: block.id }}
-                index={index}
-                isDropOnCat={false}
-                dnd={dnd}
-                onSelect={() => setActiveInfoSuppId(block.id)}
-                getInitials={getInitials}
-                iconStyle={{ background: block.color }}
               />
+            )}
+            {infoSuppLayout.map((item, index) => (
+              <Fragment key={item.id}>
+                {!dnd.isGhostRedundant(index) && dnd.ghostIndex === index && (
+                  <div className="catalog-sidebar__icon catalog-sidebar__icon--ghost" />
+                )}
+                {item.type === "folder"
+                  ? (() => {
+                      const folder = infoSuppFolders.find(
+                        (f) => f._id === item.id,
+                      );
+                      if (!folder) return null;
+                      return (
+                        <SidebarFolderItem
+                          folder={folder}
+                          item={{ id: item.id, index }}
+                          categories={(folder.categoryIds || [])
+                            .map((catId) => {
+                              const block = infoSuppBlocks[catId];
+                              return block
+                                ? {
+                                    _id: catId,
+                                    name: block.title,
+                                    image: null,
+                                    active: catId === activeInfoSuppId,
+                                  }
+                                : null;
+                            })
+                            .filter(Boolean)}
+                          isDropOnFolder={
+                            dnd.dropTarget?.action === "on" &&
+                            dnd.dropTarget?.id === item.id
+                          }
+                          nestedGhost={dnd.nestedGhost}
+                          dnd={dnd}
+                          onTooltipEnter={undefined}
+                          onTooltipLeave={undefined}
+                          onToggle={toggleFolder}
+                          onContextMenu={(e, fid) => {
+                            e.preventDefault();
+                            setContextMenu({
+                              x: e.clientX,
+                              y: e.clientY,
+                              itemId: fid,
+                              itemType: "folder",
+                            });
+                          }}
+                          onCategoryContextMenu={(e, blockId) => {
+                            e.preventDefault();
+                            setContextMenu({
+                              x: e.clientX,
+                              y: e.clientY,
+                              itemId: blockId,
+                              itemType: "block",
+                            });
+                          }}
+                          onSelect={(blockId) => {
+                            setActiveInfoSuppId(blockId);
+                            indicator.updateSelection(blockId);
+                          }}
+                          getInitials={getInitials}
+                        />
+                      );
+                    })()
+                  : (() => {
+                      const block = infoSuppBlocks[item.id];
+                      return (
+                        <SidebarCategoryItem
+                          cat={{
+                            _id: item.id,
+                            name: block?.title,
+                            image: null,
+                            active: item.id === activeInfoSuppId,
+                          }}
+                          item={{ id: item.id }}
+                          index={index}
+                          isDropOnCat={
+                            dnd.dropTarget?.action === "on" &&
+                            dnd.dropTarget?.id === item.id
+                          }
+                          dnd={dnd}
+                          onSelect={() => {
+                            setActiveInfoSuppId(item.id);
+                            indicator.updateSelection(item.id);
+                          }}
+                          onContextMenu={(e, blockId) => {
+                            e.preventDefault();
+                            setContextMenu({
+                              x: e.clientX,
+                              y: e.clientY,
+                              itemId: blockId,
+                              itemType: "block",
+                            });
+                          }}
+                          getInitials={getInitials}
+                          iconStyle={{ background: block?.color }}
+                        />
+                      );
+                    })()}
+              </Fragment>
             ))}
-            {dnd.ghostIndex === infoSupp.length && (
-              <div className="catalog-sidebar__icon--ghost" />
+            {dnd.ghostIndex === infoSuppLayout.length && (
+              <div className="catalog-sidebar__icon catalog-sidebar__icon--ghost" />
             )}
             {!readOnly && (
               <button
@@ -637,18 +932,20 @@ const PassagerItem = ({
                 onClick={addInfoSuppBlock}
                 title="Ajouter un bloc"
               >
-                <IconAddPaper size={36} />
+                <IconAddPaper size={22} />
               </button>
             )}
           </div>
 
-          <div className="passager-item__is-editor">
+          <div
+            className="passager-item__is-editor"
+            style={activeBlock ? { borderColor: activeBlock.color } : undefined}
+          >
             {activeBlock ? (
               <>
                 <div
                   className="passager-item__is-editor-header"
                   style={{
-                    borderLeftColor: activeBlock.color,
                     background: lighten(activeBlock.color, 69),
                   }}
                 >
@@ -660,31 +957,90 @@ const PassagerItem = ({
                       type="button"
                       className="passager-item__is-color-btn"
                       style={{ backgroundColor: activeBlock.color }}
-                      onClick={() => setBlockSettingsOpen(true)}
+                      onClick={() => setSettingsItemId(activeBlock.id)}
                       title="Paramètres du bloc"
                     />
                   )}
                 </div>
-                {blockSettingsOpen && (
-                  <NameColorModal
-                    title="Paramètres du bloc"
-                    nameLabel="Nom du bloc"
-                    namePlaceholder="Titre du bloc"
-                    initialName={activeBlock.title}
-                    initialColor={activeBlock.color}
-                    onSave={({ name, color }) => {
-                      updateInfoSuppField(activeBlock.id, "title", name);
-                      updateInfoSuppField(activeBlock.id, "color", color);
-                      setBlockSettingsOpen(false);
+                {contextMenu && !readOnly && (
+                  <CategoryContextMenu
+                    x={contextMenu.x}
+                    y={contextMenu.y}
+                    onSettings={() => {
+                      setSettingsItemId(contextMenu.itemId);
+                      setContextMenu(null);
                     }}
-                    onCancel={() => setBlockSettingsOpen(false)}
+                    onDelete={() => {
+                      removeInfoSuppBlock(contextMenu.itemId);
+                      setContextMenu(null);
+                    }}
+                    onCreateFolder={addInfoSuppFolder}
+                    createFolderLabel="Créer un dossier"
+                    onCreateProduct={addInfoSuppBlock}
+                    createProductLabel="Créer un bloc"
+                    onToggleAllFolders={
+                      infoSuppFolders.length > 0
+                        ? toggleAllInfoSuppFolders
+                        : undefined
+                    }
+                    allFoldersClosed={infoSuppFolders.every((f) => !f.isOpen)}
+                    onClose={() => setContextMenu(null)}
+                  />
+                )}
+                {settingsItem && (
+                  <NameColorModal
+                    title={
+                      settingsItem.type === "folder"
+                        ? "Paramètres du dossier"
+                        : "Paramètres du bloc"
+                    }
+                    nameLabel="Nom"
+                    namePlaceholder="Titre"
+                    initialName={settingsItem.title || ""}
+                    initialColor={settingsItem.color || DEFAULT_FOLDER_COLOR}
+                    onSave={({ name, color }) => {
+                      if (settingsItem.type === "folder") {
+                        setInfoSuppFolders((prev) =>
+                          prev.map((f) =>
+                            f._id === settingsItem.id
+                              ? { ...f, name, color }
+                              : f,
+                          ),
+                        );
+                        if (productId) {
+                          passengersItemService.updateInfoSuppFolder(
+                            productId,
+                            settingsItem.id,
+                            { name, color },
+                          );
+                        }
+                      } else {
+                        setInfoSuppBlocks((prev) => ({
+                          ...prev,
+                          [settingsItem.id]: {
+                            ...prev[settingsItem.id],
+                            title: name,
+                            color,
+                          },
+                        }));
+                      }
+                      setSettingsItemId(null);
+                      markDirty();
+                    }}
+                    onCancel={() => setSettingsItemId(null)}
                   />
                 )}
                 <LexicalEditor
                   key={activeBlock.id}
                   content={activeBlock.content}
                   onChange={(html) =>
-                    updateInfoSuppField(activeBlock.id, "content", html)
+                    setInfoSuppBlocks((prev) => ({
+                      ...prev,
+                      [activeBlock.id]: {
+                        ...prev[activeBlock.id],
+                        content: html,
+                      },
+                    }))
                   }
                 />
               </>

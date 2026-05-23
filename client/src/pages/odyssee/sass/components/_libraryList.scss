@@ -129,7 +129,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 52px;
+  width: fit-content;
   border-radius: 10px;
   border: 2px solid transparent; // remplacé par inline style dynamique
   padding: 2px;
@@ -141,10 +141,10 @@
 
 .catalog-sidebar__folder-children {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
   padding: 4px 0;
-  width: 100%;
 }
 
 // Ghost — icône fantome pendant le drag

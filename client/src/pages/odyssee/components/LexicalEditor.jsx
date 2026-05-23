@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   $createParagraphNode,
   $getRoot,
   $getSelection,
   $isRangeSelection,
+  DecoratorNode,
   FORMAT_ELEMENT_COMMAND,
   FORMAT_TEXT_COMMAND,
   INDENT_CONTENT_COMMAND,
@@ -14,10 +15,13 @@ import {
 } from "lexical";
 
 import {
+  $createCodeNode,
+  CodeHighlightNode,
+  CodeNode,
+} from "@lexical/code-core";
+import {
   $createHeadingNode,
   $createQuoteNode,
-  $isHeadingNode,
-  $isQuoteNode,
   HeadingNode,
   QuoteNode,
 } from "@lexical/rich-text";
@@ -40,6 +44,51 @@ import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
+// ─── ImageNode ────────────────────────────────────────────────────────────────
+
+class ImageNode extends DecoratorNode {
+  constructor(src, altText, key) {
+    super(key);
+    this.__src = src;
+    this.__altText = altText || "";
+  }
+
+  static getType() {
+    return "image";
+  }
+
+  static clone(node) {
+    return new ImageNode(node.__src, node.__altText, node.__key);
+  }
+
+  createDOM() {
+    const span = document.createElement("span");
+    span.className = "lex-image-wrapper";
+    return span;
+  }
+
+  updateDOM() {
+    return false;
+  }
+
+  static importJSON(serializedNode) {
+    return new ImageNode(serializedNode.src, serializedNode.altText);
+  }
+
+  exportJSON() {
+    return {
+      type: "image",
+      version: 1,
+      src: this.__src,
+      altText: this.__altText,
+    };
+  }
+
+  decorate() {
+    return <img src={this.__src} alt={this.__altText} className="lex-image" />;
+  }
+}
+
 // ─── Theme ───────────────────────────────────────────────────────────────────
 
 const lexicalTheme = {
@@ -59,6 +108,7 @@ const lexicalTheme = {
     h3: "lex-h3",
   },
   quote: "lex-quote",
+  code: "lex-code-block",
   list: {
     ul: "lex-ul",
     ol: "lex-ol",
@@ -77,6 +127,29 @@ const BLOCK_TYPES = [
   { value: "quote", label: "Citation" },
 ];
 
+const FONT_FAMILIES = [
+  { value: "", label: "Police" },
+  { value: "Arial, sans-serif", label: "Arial" },
+  { value: "'Courier New', monospace", label: "Courier New" },
+  { value: "Georgia, serif", label: "Georgia" },
+  { value: "Impact, sans-serif", label: "Impact" },
+  { value: "'Times New Roman', serif", label: "Times New Roman" },
+  { value: "Verdana, sans-serif", label: "Verdana" },
+];
+
+const FONT_SIZES = [
+  { value: "", label: "Taille" },
+  { value: "10px", label: "10" },
+  { value: "12px", label: "12" },
+  { value: "14px", label: "14" },
+  { value: "16px", label: "16" },
+  { value: "18px", label: "18" },
+  { value: "20px", label: "20" },
+  { value: "24px", label: "24" },
+  { value: "32px", label: "32" },
+  { value: "48px", label: "48" },
+];
+
 function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
   const [isBold, setIsBold] = useState(false);
@@ -88,6 +161,8 @@ function ToolbarPlugin() {
   const [blockType, setBlockType] = useState("paragraph");
   const [isBulletList, setIsBulletList] = useState(false);
   const [isOrderedList, setIsOrderedList] = useState(false);
+  const [showFormatMarks, setShowFormatMarks] = useState(false);
+  const imageInputRef = useRef(null);
 
   const updateToolbar = useCallback(() => {
     const selection = $getSelection();
@@ -116,6 +191,10 @@ function ToolbarPlugin() {
         setIsOrderedList(false);
       } else if (type === "quote") {
         setBlockType("quote");
+        setIsBulletList(false);
+        setIsOrderedList(false);
+      } else if (type === "code") {
+        setBlockType("code");
         setIsBulletList(false);
         setIsOrderedList(false);
       } else if (type === "listitem") {
@@ -148,22 +227,28 @@ function ToolbarPlugin() {
     editor.update(() => {
       const selection = $getSelection();
       if (!$isRangeSelection(selection)) return;
-
+      const anchorNode = selection.anchor.getNode();
+      const element = anchorNode.getTopLevelElementOrThrow();
       if (type === "paragraph") {
-        selection.getNodes().forEach((node) => {
-          const parent = node.getTopLevelElementOrThrow?.() || node;
-          if ($isHeadingNode(parent) || $isQuoteNode(parent)) {
-            parent.replace($createParagraphNode());
-          }
-        });
+        element.replace($createParagraphNode());
       } else if (type === "quote") {
-        const anchorNode = selection.anchor.getNode();
-        const element = anchorNode.getTopLevelElementOrThrow();
         element.replace($createQuoteNode());
       } else if (type.startsWith("h")) {
-        const anchorNode = selection.anchor.getNode();
-        const element = anchorNode.getTopLevelElementOrThrow();
         element.replace($createHeadingNode(type));
+      }
+    });
+  };
+
+  const formatCodeBlock = () => {
+    editor.update(() => {
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection)) return;
+      const anchorNode = selection.anchor.getNode();
+      const element = anchorNode.getTopLevelElementOrThrow();
+      if (blockType === "code") {
+        element.replace($createParagraphNode());
+      } else {
+        element.replace($createCodeNode());
       }
     });
   };
@@ -186,20 +271,65 @@ function ToolbarPlugin() {
     });
   };
 
+  const applyFontFamily = (family) => {
+    if (!family) return;
+    editor.update(() => {
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        $patchStyleText(selection, { "font-family": family });
+      }
+    });
+  };
+
+  const applyFontSize = (size) => {
+    if (!size) return;
+    editor.update(() => {
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        $patchStyleText(selection, { "font-size": size });
+      }
+    });
+  };
+
   const toggleList = (type) => {
     if (type === "bullet") {
-      if (isBulletList) {
-        editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
-      } else {
-        editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
-      }
+      editor.dispatchCommand(
+        isBulletList ? REMOVE_LIST_COMMAND : INSERT_UNORDERED_LIST_COMMAND,
+        undefined,
+      );
     } else {
-      if (isOrderedList) {
-        editor.dispatchCommand(REMOVE_LIST_COMMAND, undefined);
-      } else {
-        editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
-      }
+      editor.dispatchCommand(
+        isOrderedList ? REMOVE_LIST_COMMAND : INSERT_ORDERED_LIST_COMMAND,
+        undefined,
+      );
     }
+  };
+
+  const toggleFormatMarks = () => {
+    const root = editor.getRootElement();
+    if (root) {
+      root.classList.toggle("show-format-marks");
+      setShowFormatMarks((prev) => !prev);
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      editor.update(() => {
+        const imageNode = new ImageNode(ev.target.result, file.name);
+        const selection = $getSelection();
+        if ($isRangeSelection(selection)) {
+          selection.insertNodes([imageNode]);
+        } else {
+          $getRoot().append(imageNode);
+        }
+      });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
   };
 
   const Btn = ({ active, onClick, title, children }) => (
@@ -218,177 +348,247 @@ function ToolbarPlugin() {
 
   return (
     <div className="lex-toolbar">
-      {/* Undo / Redo */}
-      <Btn
-        onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
-        title="Annuler"
-      >
-        ↩
-      </Btn>
-      <Btn
-        onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
-        title="Rétablir"
-      >
-        ↪
-      </Btn>
-
-      <span className="lex-toolbar__sep" />
-
-      {/* Format texte */}
-      <Btn
-        active={isBold}
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")}
-        title="Gras"
-      >
-        <b>G</b>
-      </Btn>
-      <Btn
-        active={isItalic}
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")}
-        title="Italique"
-      >
-        <i>I</i>
-      </Btn>
-      <Btn
-        active={isUnderline}
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline")}
-        title="Souligné"
-      >
-        <u>S</u>
-      </Btn>
-      <Btn
-        active={isStrikethrough}
-        onClick={() =>
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough")
-        }
-        title="Barré"
-      >
-        <s>B</s>
-      </Btn>
-      <Btn
-        active={isSuperscript}
-        onClick={() =>
-          editor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript")
-        }
-        title="Exposant"
-      >
-        x²
-      </Btn>
-      <Btn
-        active={isSubscript}
-        onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript")}
-        title="Indice"
-      >
-        x₂
-      </Btn>
-
-      <span className="lex-toolbar__sep" />
+      {/* Police & Taille */}
+      <div className="lex-toolbar__group">
+        <select
+          className="lex-toolbar__select"
+          defaultValue=""
+          onChange={(e) => applyFontFamily(e.target.value)}
+          title="Famille de police"
+        >
+          {FONT_FAMILIES.map(({ value, label }) => (
+            <option key={value} value={value} disabled={value === ""}>
+              {label}
+            </option>
+          ))}
+        </select>
+        <select
+          className="lex-toolbar__select lex-toolbar__select--size"
+          defaultValue=""
+          onChange={(e) => applyFontSize(e.target.value)}
+          title="Taille de police"
+        >
+          {FONT_SIZES.map(({ value, label }) => (
+            <option key={value} value={value} disabled={value === ""}>
+              {label}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* Type de bloc */}
-      <select
-        className="lex-toolbar__select"
-        value={blockType === "list" ? "paragraph" : blockType}
-        onChange={(e) => formatBlock(e.target.value)}
-      >
-        {BLOCK_TYPES.map(({ value, label }) => (
-          <option key={value} value={value}>
-            {label}
-          </option>
-        ))}
-      </select>
+      <div className="lex-toolbar__group">
+        <select
+          className="lex-toolbar__select"
+          value={
+            blockType === "list" || blockType === "code"
+              ? "paragraph"
+              : blockType
+          }
+          onChange={(e) => formatBlock(e.target.value)}
+          title="Type de bloc"
+        >
+          {BLOCK_TYPES.map(({ value, label }) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      <span className="lex-toolbar__sep" />
+      {/* Formatage texte */}
+      <div className="lex-toolbar__group">
+        <Btn
+          active={isBold}
+          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")}
+          title="Gras"
+        >
+          <b>G</b>
+        </Btn>
+        <Btn
+          active={isItalic}
+          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")}
+          title="Italique"
+        >
+          <i>I</i>
+        </Btn>
+        <Btn
+          active={isUnderline}
+          onClick={() =>
+            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline")
+          }
+          title="Souligné"
+        >
+          <u>S</u>
+        </Btn>
+        <Btn
+          active={isStrikethrough}
+          onClick={() =>
+            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough")
+          }
+          title="Barré"
+        >
+          <s>B</s>
+        </Btn>
+        <label className="lex-toolbar__color-label" title="Couleur du texte">
+          A
+          <input
+            type="color"
+            className="lex-toolbar__color-input"
+            defaultValue="#000000"
+            onChange={(e) => applyTextColor(e.target.value)}
+          />
+        </label>
+        <label
+          className="lex-toolbar__color-label lex-toolbar__color-label--bg"
+          title="Couleur de paragraphe"
+        >
+          ▬
+          <input
+            type="color"
+            className="lex-toolbar__color-input"
+            defaultValue="#ffffff"
+            onChange={(e) => applyBgColor(e.target.value)}
+          />
+        </label>
+      </div>
 
-      {/* Listes */}
-      <Btn
-        active={isBulletList}
-        onClick={() => toggleList("bullet")}
-        title="Liste à puces"
-      >
-        • —
-      </Btn>
-      <Btn
-        active={isOrderedList}
-        onClick={() => toggleList("ordered")}
-        title="Liste numérotée"
-      >
-        1. —
-      </Btn>
+      {/* Listes & indentation */}
+      <div className="lex-toolbar__group">
+        <Btn
+          active={isOrderedList}
+          onClick={() => toggleList("ordered")}
+          title="Liste numérotée"
+        >
+          1. —
+        </Btn>
+        <Btn
+          active={isBulletList}
+          onClick={() => toggleList("bullet")}
+          title="Liste à puces"
+        >
+          • —
+        </Btn>
+        <Btn
+          onClick={() =>
+            editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined)
+          }
+          title="Désindenter"
+        >
+          ⇤
+        </Btn>
+        <Btn
+          onClick={() =>
+            editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined)
+          }
+          title="Indenter"
+        >
+          ⇥
+        </Btn>
+      </div>
 
-      <span className="lex-toolbar__sep" />
+      {/* Exposant / Indice / Code / ¶ */}
+      <div className="lex-toolbar__group">
+        <Btn
+          active={isSuperscript}
+          onClick={() =>
+            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript")
+          }
+          title="Exposant"
+        >
+          x²
+        </Btn>
+        <Btn
+          active={isSubscript}
+          onClick={() =>
+            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript")
+          }
+          title="Indice"
+        >
+          x₂
+        </Btn>
+        <Btn
+          active={blockType === "code"}
+          onClick={formatCodeBlock}
+          title="Bloc de code"
+        >
+          &lt;/&gt;
+        </Btn>
+        <Btn
+          active={showFormatMarks}
+          onClick={toggleFormatMarks}
+          title="Afficher les marques de formatage"
+        >
+          ¶
+        </Btn>
+      </div>
 
       {/* Alignement */}
-      <Btn
-        onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left")}
-        title="Gauche"
-      >
-        ⬅
-      </Btn>
-      <Btn
-        onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center")}
-        title="Centré"
-      >
-        ↔
-      </Btn>
-      <Btn
-        onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right")}
-        title="Droite"
-      >
-        ➡
-      </Btn>
-      <Btn
-        onClick={() =>
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify")
-        }
-        title="Justifié"
-      >
-        ☰
-      </Btn>
+      <div className="lex-toolbar__group">
+        <Btn
+          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left")}
+          title="Gauche"
+        >
+          ⬅
+        </Btn>
+        <Btn
+          onClick={() =>
+            editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center")
+          }
+          title="Centré"
+        >
+          ↔
+        </Btn>
+        <Btn
+          onClick={() =>
+            editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right")
+          }
+          title="Droite"
+        >
+          ➡
+        </Btn>
+        <Btn
+          onClick={() =>
+            editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify")
+          }
+          title="Justifié"
+        >
+          ☰
+        </Btn>
+      </div>
 
-      <span className="lex-toolbar__sep" />
-
-      {/* Indentation */}
-      <Btn
-        onClick={() =>
-          editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined)
-        }
-        title="Désindenter"
-      >
-        ⇤
-      </Btn>
-      <Btn
-        onClick={() =>
-          editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined)
-        }
-        title="Indenter"
-      >
-        ⇥
-      </Btn>
-
-      <span className="lex-toolbar__sep" />
-
-      {/* Couleurs */}
-      <label className="lex-toolbar__color-label" title="Couleur du texte">
-        A
+      {/* Image */}
+      <div className="lex-toolbar__group">
+        <Btn
+          onClick={() => imageInputRef.current?.click()}
+          title="Insérer une image"
+        >
+          🖼
+        </Btn>
         <input
-          type="color"
-          className="lex-toolbar__color-input"
-          defaultValue="#000000"
-          onChange={(e) => applyTextColor(e.target.value)}
+          ref={imageInputRef}
+          type="file"
+          accept="image/*"
+          className="lex-toolbar__file-input"
+          onChange={handleImageChange}
         />
-      </label>
-      <label
-        className="lex-toolbar__color-label lex-toolbar__color-label--bg"
-        title="Couleur de fond"
-      >
-        ▬
-        <input
-          type="color"
-          className="lex-toolbar__color-input"
-          defaultValue="#ffffff"
-          onChange={(e) => applyBgColor(e.target.value)}
-        />
-      </label>
+      </div>
+
+      {/* Undo / Redo */}
+      <div className="lex-toolbar__group">
+        <Btn
+          onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
+          title="Annuler"
+        >
+          ↩
+        </Btn>
+        <Btn
+          onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
+          title="Rétablir"
+        >
+          ↪
+        </Btn>
+      </div>
     </div>
   );
 }
@@ -420,7 +620,15 @@ const LexicalEditor = ({ content, onChange }) => {
   const initialConfig = {
     namespace: "LexicalEditor",
     theme: lexicalTheme,
-    nodes: [ListNode, ListItemNode, HeadingNode, QuoteNode],
+    nodes: [
+      ListNode,
+      ListItemNode,
+      HeadingNode,
+      QuoteNode,
+      CodeNode,
+      CodeHighlightNode,
+      ImageNode,
+    ],
     onError: (error) => console.error("[LexicalEditor]", error),
   };
 

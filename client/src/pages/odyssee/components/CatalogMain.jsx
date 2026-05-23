@@ -103,11 +103,18 @@ const CatalogMain = ({
   };
 
   // Drop d'un produit sur un autre produit → crée un dossier groupé
+  // Sauf si l'item vient d'un dossier : dans ce cas on le retire juste du dossier
   const handleProductDropOnProduct = (e, targetProductId) => {
     e.preventDefault();
     e.stopPropagation();
     const draggedId = e.dataTransfer.getData("productId");
+    const sourceFolderId = e.dataTransfer.getData("sourceFolderId") || null;
     if (!draggedId || draggedId === targetProductId) return;
+    if (sourceFolderId) {
+      if (onMoveProductToFolder)
+        onMoveProductToFolder(draggedId, null, null, sourceFolderId);
+      return;
+    }
     if (onGroupProducts) onGroupProducts(draggedId, targetProductId);
   };
 
@@ -115,6 +122,7 @@ const CatalogMain = ({
   const handleRootDrop = (e) => {
     e.preventDefault();
     const productId = e.dataTransfer.getData("productId");
+    const sourceFolderId = e.dataTransfer.getData("sourceFolderId") || null;
     const folderId = e.dataTransfer.getData("folderId");
     if (productId) {
       if (productGapInfo) {
@@ -122,11 +130,13 @@ const CatalogMain = ({
           productId,
           productGapInfo.folderId,
           productGapInfo.zone,
+          sourceFolderId,
         );
         setProductGapInfo(null);
       } else {
         setFolderDropInfo(null);
-        if (onMoveProductToFolder) onMoveProductToFolder(productId, null, null);
+        if (onMoveProductToFolder)
+          onMoveProductToFolder(productId, null, null, sourceFolderId);
       }
     } else if (folderId && folderDropInfo?.targetId) {
       handleFolderDrop(e, folderDropInfo.targetId);
@@ -136,11 +146,16 @@ const CatalogMain = ({
   };
 
   // Gestion du drop produit sur dossier avec zone
-  const handleProductDropOnFolder = (productId, folderId, zone) => {
+  const handleProductDropOnFolder = (
+    productId,
+    folderId,
+    zone,
+    sourceFolderId = null,
+  ) => {
     setProductGapInfo(null);
     if (zone === "inside") {
       if (onMoveProductToFolder)
-        onMoveProductToFolder(productId, folderId, null);
+        onMoveProductToFolder(productId, folderId, null, sourceFolderId);
       return;
     }
     // zone === 'before' ou 'after' : placer le produit à côté du dossier
@@ -152,7 +167,7 @@ const CatalogMain = ({
     const newRootOrder =
       zone === "before" ? targetOrder - 0.5 : targetOrder + 0.5;
     if (onMoveProductToFolder)
-      onMoveProductToFolder(productId, null, newRootOrder);
+      onMoveProductToFolder(productId, null, newRootOrder, sourceFolderId);
   };
 
   // D&D réordonnement dossiers

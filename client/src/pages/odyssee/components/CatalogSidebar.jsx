@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useRef } from "react";
 
 import { darken } from "../utils/colorUtils";
 import {
@@ -10,6 +10,7 @@ import { getInitials } from "../utils/stringUtils";
 import IconDossierFull from "../assets/IconDossierFull";
 import SidebarCategoryItem from "./SidebarCategoryItem";
 import SidebarFolderItem from "./SidebarFolderItem";
+import { useSidebarIndicator } from "../hooks/useSidebarIndicator";
 
 const CatalogSidebar = ({
   sidebarItems,
@@ -26,12 +27,12 @@ const CatalogSidebar = ({
   onTooltipLeave,
 }) => {
   const sidebarRef = useRef(null);
-  const transitionPhaseRef = useRef("idle"); // "idle" | "entering" | "tracking" | "leaving"
-  const [indicatorY, setIndicatorY] = useState(null);
-  const [indicatorOpacity, setIndicatorOpacity] = useState(0);
-  const [indicatorColor, setIndicatorColor] = useState(null);
-  const [activeY, setActiveY] = useState(null);
-  const [activeColor, setActiveColor] = useState(null);
+
+  const indicator = useSidebarIndicator({
+    sidebarRef,
+    folders,
+    selectedId: selectedCategoryId,
+  });
 
   const {
     dragRef,
@@ -43,127 +44,12 @@ const CatalogSidebar = ({
     handleSidebarDrop,
   } = dnd;
 
-  // Positionner la barre active sur l'item sélectionné (chargement + changement de sélection)
-  useEffect(() => {
-    if (!sidebarRef.current || !selectedCategoryId) {
-      setActiveY(null);
-      setActiveColor(null);
-      return;
-    }
-    const folder = folders.find((f) =>
-      f.categoryIds?.includes(selectedCategoryId),
-    );
-
-    // Chercher d'abord la catégorie dans le DOM (dossier ouvert)
-    let el = sidebarRef.current.querySelector(
-      `[data-cat-id="${selectedCategoryId}"]`,
-    );
-
-    // Si non trouvée (dossier fermé), se rabattre sur l'icône du dossier parent
-    if (!el && folder) {
-      el = sidebarRef.current.querySelector(`[data-folder-id="${folder._id}"]`);
-    }
-
-    if (!el) return;
-    const y = el.offsetTop + el.offsetHeight / 2;
-    setActiveY(y);
-    setActiveColor(folder?.color ?? null);
-    // Repositionner la barre curseur si elle n'est pas visible
-    if (transitionPhaseRef.current === "idle") setIndicatorY(y);
-  }, [selectedCategoryId, folders]);
-
-  const handleMouseMove = useCallback(
-    (e) => {
-      if (!sidebarRef.current) return;
-      const mouseY = e.clientY;
-
-      // Trouver l'icône catégorie, dossier fermé (ou le bouton +) dont le centre Y est le plus proche du curseur
-      // Les dossiers ouverts sont exclus : leurs catégories nestées servent de snap points
-      const icons = sidebarRef.current.querySelectorAll(
-        "[data-cat-id], .catalog-sidebar__add, [data-folder-id]",
-      );
-      if (icons.length === 0) return;
-
-      let snapY = null;
-      let snapCatId = null;
-      let snapFolderId = null;
-      let minDist = Infinity;
-      for (const icon of icons) {
-        // Ignorer les icônes de dossiers ouverts (leurs catégories nestées sont dans le DOM)
-        if (icon.dataset.folderId) {
-          const f = folders.find((f) => f._id === icon.dataset.folderId);
-          if (f?.isOpen) continue;
-        }
-        const r = icon.getBoundingClientRect();
-        const centerY = r.top + r.height / 2;
-        const dist = Math.abs(mouseY - centerY);
-        if (dist < minDist) {
-          minDist = dist;
-          snapY = icon.offsetTop + icon.offsetHeight / 2;
-          snapCatId = icon.dataset.catId ?? null;
-          snapFolderId = icon.dataset.folderId ?? null;
-        }
-      }
-
-      if (snapY === null) return;
-
-      const folder = snapCatId
-        ? folders.find((f) => f.categoryIds?.includes(snapCatId))
-        : snapFolderId
-          ? folders.find((f) => f._id === snapFolderId)
-          : null;
-      setIndicatorColor(folder?.color ?? null);
-
-      if (transitionPhaseRef.current === "idle") {
-        // Transition "top" active : la barre part de indicatorY (= activeY) vers la catégorie
-        transitionPhaseRef.current = "entering";
-        setIndicatorOpacity(1);
-      }
-      setIndicatorY(snapY);
-    },
-    [folders],
-  );
-
-  const handleMouseLeave = useCallback(() => {
-    const phase = transitionPhaseRef.current;
-    if (phase === "idle") return;
-
-    transitionPhaseRef.current = "leaving";
-    setIndicatorColor(activeColor); // Retourner vers la couleur de la catégorie active
-    if (activeY !== null) {
-      setIndicatorY(activeY);
-    } else {
-      transitionPhaseRef.current = "idle";
-      setIndicatorOpacity(0);
-    }
-  }, [activeY, activeColor]);
-
-  const handleIndicatorTransitionEnd = useCallback((e) => {
-    if (e.propertyName !== "top") return;
-
-    if (transitionPhaseRef.current === "entering") {
-      transitionPhaseRef.current = "tracking";
-    } else if (transitionPhaseRef.current === "leaving") {
-      transitionPhaseRef.current = "idle";
-      setIndicatorOpacity(0);
-    }
-  }, []);
-
   const handleCategorySelect = useCallback(
     (catId) => {
-      if (sidebarRef.current) {
-        const el = sidebarRef.current.querySelector(`[data-cat-id="${catId}"]`);
-        if (el) {
-          const y = el.offsetTop + el.offsetHeight / 2;
-          setActiveY(y);
-          if (transitionPhaseRef.current === "idle") setIndicatorY(y);
-        }
-      }
-      const folder = folders.find((f) => f.categoryIds?.includes(catId));
-      setActiveColor(folder?.color ?? null);
+      indicator.updateSelection(catId);
       onCategorySelect(catId);
     },
-    [onCategorySelect, folders],
+    [indicator, onCategorySelect],
   );
 
   const renderGhost = () => {
@@ -222,26 +108,29 @@ const CatalogSidebar = ({
     <div
       ref={sidebarRef}
       className="catalog-sidebar"
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      onMouseMove={indicator.handleMouseMove}
+      onMouseLeave={indicator.handleMouseLeave}
       onDragOver={handleSidebarDragOver}
       onDrop={handleSidebarDrop}
     >
       <div
         className="catalog-sidebar__indicator"
         style={{
-          top: indicatorY ?? 0,
-          opacity: indicatorOpacity,
-          backgroundColor: indicatorColor ?? undefined,
+          top: indicator.indicatorY ?? 0,
+          opacity: indicator.indicatorOpacity,
+          backgroundColor: indicator.indicatorColor ?? undefined,
           transition:
             "top 0.2s ease, opacity 0.15s ease, background-color 0.2s ease",
         }}
-        onTransitionEnd={handleIndicatorTransitionEnd}
+        onTransitionEnd={indicator.handleIndicatorTransitionEnd}
       />
-      {activeY !== null && (
+      {indicator.activeY !== null && (
         <div
           className="catalog-sidebar__indicator catalog-sidebar__indicator--active"
-          style={{ top: activeY, backgroundColor: activeColor ?? undefined }}
+          style={{
+            top: indicator.activeY,
+            backgroundColor: indicator.activeColor ?? undefined,
+          }}
         />
       )}
       {sidebarItems.map((item, index) => {

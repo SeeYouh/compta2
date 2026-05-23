@@ -2,7 +2,9 @@
 
 .product-folder {
   margin-bottom: 0;
-  grid-column: 1 / -1;
+  width: fit-content;
+  min-width: 80px;
+  max-width: 291px;
   position: relative;
   overflow: visible;
 
@@ -153,8 +155,8 @@
   }
 
   &__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(55px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 5px;
     padding: 4px 2px;
 
@@ -275,11 +277,17 @@
 .catalog-content {
   flex: 1;
   padding: 8px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  align-items: start;
+  align-items: end;
   align-content: start;
+
+  // Compense le padding bas du dossier (body 8px + grid 4px)
+  // pour aligner les items normaux avec les items internes du dossier
+  > .catalog-card {
+    margin-bottom: 12px;
+  }
 
   &--drag-over {
     outline: 2px dashed var(--color-light);
