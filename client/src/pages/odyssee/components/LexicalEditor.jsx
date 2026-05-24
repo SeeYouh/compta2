@@ -26,7 +26,7 @@ import {
   QuoteNode,
 } from "@lexical/rich-text";
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html";
-import { $patchStyleText } from "@lexical/selection";
+import { $patchStyleText, $setBlocksType } from "@lexical/selection";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
@@ -227,14 +227,12 @@ function ToolbarPlugin() {
     editor.update(() => {
       const selection = $getSelection();
       if (!$isRangeSelection(selection)) return;
-      const anchorNode = selection.anchor.getNode();
-      const element = anchorNode.getTopLevelElementOrThrow();
       if (type === "paragraph") {
-        element.replace($createParagraphNode());
+        $setBlocksType(selection, () => $createParagraphNode());
       } else if (type === "quote") {
-        element.replace($createQuoteNode());
+        $setBlocksType(selection, () => $createQuoteNode());
       } else if (type.startsWith("h")) {
-        element.replace($createHeadingNode(type));
+        $setBlocksType(selection, () => $createHeadingNode(type));
       }
     });
   };
@@ -243,12 +241,10 @@ function ToolbarPlugin() {
     editor.update(() => {
       const selection = $getSelection();
       if (!$isRangeSelection(selection)) return;
-      const anchorNode = selection.anchor.getNode();
-      const element = anchorNode.getTopLevelElementOrThrow();
       if (blockType === "code") {
-        element.replace($createParagraphNode());
+        $setBlocksType(selection, () => $createParagraphNode());
       } else {
-        element.replace($createCodeNode());
+        $setBlocksType(selection, () => $createCodeNode());
       }
     });
   };

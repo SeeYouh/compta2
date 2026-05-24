@@ -1,14 +1,12 @@
-import {
-  useRef,
-  useState,
-} from 'react';
+import { useRef, useState } from "react";
 
-import { ArrayGraduation } from './utils/ArrayGraduation';
-import InTakeTimeAdvancedMode from './InTakeTimeAdvancedMode';
-import InTakeTimeNormalMode from './InTakeTimeNormalMode';
-import ProductService from '../services/productService';
-import Range14 from './Range14';
-import RangeDays from './RangeDays';
+import { ArrayGraduation } from "./utils/ArrayGraduation";
+import ColorPicker from "../../../components/ColorPicker";
+import InTakeTimeAdvancedMode from "./InTakeTimeAdvancedMode";
+import InTakeTimeNormalMode from "./InTakeTimeNormalMode";
+import ProductService from "../services/productService";
+import Range14 from "./Range14";
+import RangeDays from "./RangeDays";
 
 const PaperProduct = ({
   contentFilesData,
@@ -38,6 +36,7 @@ const PaperProduct = ({
   const [durationAfter, setDurationAfter] = useState("");
   const [nightDuration, setNightDuration] = useState(10);
   const [saveStatus, setSaveStatus] = useState(null);
+  const [color, setColor] = useState(contentFilesData.color || "#3b82f6");
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -96,6 +95,7 @@ const PaperProduct = ({
       }),
     );
     formData.append("categoryId", categoryId);
+    formData.append("color", color);
     if (folderId) formData.append("folderId", folderId);
     if (imageFile) formData.append("image", imageFile);
 
@@ -151,6 +151,7 @@ const PaperProduct = ({
             readOnly={readOnly}
           />
         </div>
+
         {!readOnly && (
           <input
             type="submit"
@@ -298,6 +299,17 @@ const PaperProduct = ({
               />
             )}
           </div>
+        </div>
+
+        <div className="bloc">
+          <ColorPicker
+            value={color}
+            onChange={(hex) => setColor(hex)}
+            onClose={() => {}}
+            contextKey={`catalog-product-${productId || "new"}`}
+            showHistory
+            showDefaultButtons={!!productId}
+          />
         </div>
       </div>
     </form>

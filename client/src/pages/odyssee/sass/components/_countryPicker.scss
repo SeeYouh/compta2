@@ -122,7 +122,7 @@
         align-items: center;
         justify-content: center;
         height: 100%;
-        padding: 10px 12px;
+        padding: 13px 12px 12px 12px;
         cursor: pointer;
         color: var(--color-lightness);
         white-space: nowrap;
@@ -134,7 +134,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 9px;
+    padding: 0 10px;
     background: transparent;
     border: none;
     border-left: 1px solid var(--color-dark);
@@ -155,7 +155,7 @@
   &__search {
     flex: 1;
     min-width: 0;
-    padding: 10px 12px;
+    padding: 11px 12px;
     border: none;
     border-radius: 0;
     background: transparent;
@@ -165,6 +165,7 @@
     &::placeholder {
       color: var(--color-lightness);
       opacity: 0.35;
+      font-size: 0.7rem;
     }
 
     &:focus {
