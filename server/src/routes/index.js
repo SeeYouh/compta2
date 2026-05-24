@@ -2,6 +2,7 @@ import express from "express";
 
 import accountsRoutes from "./accounts.js";
 import authRoutes from "./auth.js";
+import colorPreferencesRoutes from "./colorPreferences.js";
 import contactsRoutes from "./contacts.js";
 import { injectType } from "../middleware/injectType.js";
 import labelsRoutes from "./labels.js";
@@ -24,6 +25,7 @@ const router = express.Router();
 // Routes API
 router.use("/auth", authRoutes);
 router.use("/accounts", accountsRoutes);
+router.use("/color-preferences", colorPreferencesRoutes);
 router.use("/contacts", contactsRoutes);
 router.use("/labels", labelsRoutes);
 router.use("/organigramme", organigrammeRoutes);
