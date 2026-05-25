@@ -12,21 +12,18 @@
 
     // WebKit + Blink track
     &::-webkit-slider-runnable-track {
-      background: var(--color-darker);
       height: 6px;
       border-radius: 3px;
     }
 
     // Firefox track
     &::-moz-range-track {
-      background: var(--color-darker);
       height: 6px;
       border-radius: 3px;
     }
 
     // Firefox filled part (avant le thumb)
     &::-moz-range-progress {
-      background-color: var(--color-darker);
       height: 6px;
       border-radius: 3px;
     }
@@ -36,7 +33,6 @@
       appearance: none;
       width: 18px;
       height: 18px;
-      background: var(--color-darker);
       border: none;
       border-radius: 50%;
       margin-top: -6px; // pour centrer verticalement
@@ -47,7 +43,6 @@
     &::-moz-range-thumb {
       width: 18px;
       height: 18px;
-      background: var(--color-darker);
       border: none;
       border-radius: 50%;
       cursor: pointer;
@@ -61,7 +56,7 @@
 }
 
 // $track-style: (
-//   background: var(--color-darker),
+//   background: var(--ody-darker),
 //   height: 6px,
 //   border-radius: 3px,
 // );
@@ -76,7 +71,7 @@
 // $thumb-style: (
 //   width: 18px,
 //   height: 18px,
-//   background: var(--color-darker),
+//   background: var(--ody-darker),
 //   border: none,
 //   border-radius: 50%,
 //   cursor: pointer,

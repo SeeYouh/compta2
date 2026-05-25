@@ -1,12 +1,11 @@
-import { Fragment } from "react";
+import { Fragment } from 'react';
 
-import { darken } from "../utils/colorUtils";
+import { darken } from '../utils/colorUtils';
 import {
   DARKEN_BG,
   DARKEN_BORDER,
-  DEFAULT_FOLDER_COLOR,
-} from "../config/folderColors";
-import IconDossierFull from "../assets/IconDossierFull";
+} from '../config/folderColors';
+import IconDossierFull from '../assets/IconDossierFull';
 
 const SidebarFolderItem = ({
   folder,
@@ -32,7 +31,7 @@ const SidebarFolderItem = ({
     handleNestedDrop,
   } = dnd;
 
-  const folderColor = folder.color || DEFAULT_FOLDER_COLOR;
+  const folderColor = folder.color;
   const folderBorderColor = darken(folderColor, DARKEN_BORDER);
   const folderBgColor = darken(folderColor, DARKEN_BG);
 

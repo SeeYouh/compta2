@@ -1,16 +1,19 @@
-import { Fragment, useCallback, useRef } from "react";
+import {
+  Fragment,
+  useCallback,
+  useRef,
+} from 'react';
 
-import { darken } from "../utils/colorUtils";
+import { darken } from '../utils/colorUtils';
 import {
   DARKEN_BG,
   DARKEN_BORDER,
-  DEFAULT_FOLDER_COLOR,
-} from "../config/folderColors";
-import { getInitials } from "../utils/stringUtils";
-import IconDossierFull from "../assets/IconDossierFull";
-import SidebarCategoryItem from "./SidebarCategoryItem";
-import SidebarFolderItem from "./SidebarFolderItem";
-import { useSidebarIndicator } from "../hooks/useSidebarIndicator";
+} from '../config/folderColors';
+import { getInitials } from '../utils/stringUtils';
+import IconDossierFull from '../assets/IconDossierFull';
+import SidebarCategoryItem from './SidebarCategoryItem';
+import SidebarFolderItem from './SidebarFolderItem';
+import { useSidebarIndicator } from '../hooks/useSidebarIndicator';
 
 const CatalogSidebar = ({
   sidebarItems,
@@ -80,7 +83,7 @@ const CatalogSidebar = ({
     if (drag.type === "folder") {
       const folder = folders.find((f) => f._id === drag.id);
       if (!folder) return null;
-      const color = folder.color || DEFAULT_FOLDER_COLOR;
+      const color = folder.color;
       return (
         <div
           key="ghost"

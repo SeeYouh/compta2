@@ -8,6 +8,7 @@ import FolderContextMenu from './FolderContextMenu';
 import FolderSettingsModal from './FolderSettingsModal';
 import IconLibrary from '../assets/IconLibrary';
 import SidebarTooltip from './SidebarTooltip';
+import { useOdysseeColor } from '../contexts/OdysseeColorContext.jsx';
 
 const CatalogContent = ({ engine, labels }) => {
   const {
@@ -66,6 +67,8 @@ const CatalogContent = ({ engine, labels }) => {
     handleReorderItemFolders,
   } = engine;
 
+  const { colors } = useOdysseeColor();
+
   return (
     <>
       {isLoading ? (
@@ -80,8 +83,8 @@ const CatalogContent = ({ engine, labels }) => {
           onClick={() => setShowCategoryModal(true)}
         >
           <IconLibrary
-            colorBooks="var(--color-1)"
-            colorPlus="var(--color-lightness)"
+            colorBooks={colors.base}
+            colorPlus={colors.lightness}
             height={120}
           />
         </div>

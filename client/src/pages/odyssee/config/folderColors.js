@@ -21,6 +21,3 @@ export const FOLDER_PALETTE = [
 // DARKEN_BORDER → équivalent $color-dark : contour du groupe + couleur icône
 export const DARKEN_BG = 66;
 export const DARKEN_BORDER = 53;
-
-// Couleur par défaut à la création d'un dossier
-export const DEFAULT_FOLDER_COLOR = "#969696";

@@ -81,6 +81,7 @@ const Dashboard = () => {
     transformItemForEdit: (item) => ({
       ...item.contentFilesData,
       _id: item._id,
+      color: item.color,
     }),
     newItemTemplate: (folderId) => ({
       firstName: "",
@@ -138,6 +139,7 @@ const Dashboard = () => {
     transformItemForEdit: (item) => ({
       ...item.contentFilesData,
       _id: item._id,
+      color: item.color,
     }),
     newItemTemplate: (folderId) => ({
       productName: "",
@@ -278,6 +280,7 @@ const Dashboard = () => {
               categoryId={cataloguesEngine.selectedCategory}
               onProductCreated={cataloguesEngine.handleItemCreated}
               editMode={cataloguesEngine.editMode}
+              onActivate={() => cataloguesEngine.setEditMode(true)}
             />
           )}
       </div>

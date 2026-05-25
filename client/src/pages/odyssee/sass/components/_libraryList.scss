@@ -16,7 +16,7 @@
 // Sidebar gauche
 .catalog-sidebar {
   width: 68px;
-  background: var(--color-darkest);
+  background: var(--ody-darkest);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -41,7 +41,7 @@
   left: 0;
   width: 3px;
   height: 22px;
-  background: var(--color-lightness);
+  background: var(--ody-lightness);
   border-radius: 0 3px 3px 0;
   transform: translateY(-50%);
   pointer-events: none;
@@ -59,7 +59,7 @@
 .catalog-sidebar__icon {
   width: 32px;
   height: 32px;
-  background: var(--color-darker);
+  background: var(--ody-darker);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -68,7 +68,7 @@
   cursor: pointer;
   font-size: 10px;
   font-weight: 700;
-  color: var(--color-lightness);
+  color: var(--ody-lightness);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   padding: 2px;
@@ -78,7 +78,7 @@
 
   &:hover,
   &.active {
-    background: var(--color-dark);
+    background: var(--ody-dark);
   }
 
   img {
@@ -120,7 +120,7 @@
   }
 
   &.drop-target {
-    outline: 2px dashed var(--color-1);
+    outline: 2px dashed var(--ody-1);
   }
 }
 
@@ -149,7 +149,7 @@
 
 // Ghost — icône fantome pendant le drag
 .catalog-sidebar__icon--ghost {
-  border: 2px dashed var(--color-1);
+  border: 2px dashed var(--ody-1);
   background: transparent !important;
   cursor: default;
   opacity: 0.35;
@@ -173,11 +173,11 @@
 // Tooltip produit (position: fixed, rendu dans CatalogMain)
 .catalog-card-tooltip {
   position: fixed;
-  background: var(--color-darker);
-  border: 1px solid var(--color-dark);
+  background: var(--ody-darker);
+  border: 1px solid var(--ody-dark);
   border-radius: 6px;
   padding: 5px 10px 6px;
-  color: var(--color-lightness);
+  color: var(--ody-lightness);
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
@@ -193,7 +193,7 @@
     top: 50%;
     transform: translateY(-50%);
     border: 7px solid transparent;
-    border-right-color: var(--color-dark);
+    border-right-color: var(--ody-dark);
   }
 
   // Flèche gauche — remplissage
@@ -204,15 +204,15 @@
     top: 50%;
     transform: translateY(-50%);
     border: 6px solid transparent;
-    border-right-color: var(--color-darker);
+    border-right-color: var(--ody-darker);
   }
 }
 
 .sidebar-tooltip {
   position: fixed;
   left: 65px; // 60px sidebar + 5px espace (inclut la flèche)
-  background: var(--color-darker);
-  border: 1px solid var(--color-dark);
+  background: var(--ody-darker);
+  border: 1px solid var(--ody-dark);
   border-radius: 6px;
   padding: 4px 8px 5px;
   pointer-events: none;
@@ -228,7 +228,7 @@
     top: 50%;
     transform: translateY(-50%);
     border: 7px solid transparent;
-    border-right-color: var(--color-dark);
+    border-right-color: var(--ody-dark);
   }
 
   // Flèche gauche — remplissage (couleur fond)
@@ -239,11 +239,11 @@
     top: 50%;
     transform: translateY(-50%);
     border: 6px solid transparent;
-    border-right-color: var(--color-darker);
+    border-right-color: var(--ody-darker);
   }
 
   &__name {
-    color: var(--color-lightness);
+    color: var(--ody-lightness);
     font-size: 13px;
     font-weight: 600;
     white-space: nowrap;
@@ -255,7 +255,7 @@
     list-style: none;
 
     li {
-      color: var(--color-1);
+      color: var(--ody-1);
       font-size: 13px;
       line-height: 1.6;
       white-space: nowrap;
@@ -267,8 +267,8 @@
 
 .folder-ctx-menu {
   position: fixed;
-  background: var(--color-darker);
-  border: 1px solid var(--color-dark);
+  background: var(--ody-darker);
+  border: 1px solid var(--ody-dark);
   border-radius: 8px;
   padding: 4px 0;
   z-index: 600;
@@ -284,7 +284,7 @@
     background: none;
     border: none;
     border-radius: 5px;
-    color: var(--color-lightness);
+    color: var(--ody-lightness);
     font-size: 13px;
     text-align: left;
     padding: 10px 10px;
@@ -292,7 +292,7 @@
     transition: background 0.15s;
 
     &:hover {
-      background: var(--color-dark);
+      background: var(--ody-dark);
     }
   }
 }
@@ -301,8 +301,8 @@
 
 .ctx-menu {
   position: fixed;
-  background: var(--color-darker);
-  border: 1px solid var(--color-dark);
+  background: var(--ody-darker);
+  border: 1px solid var(--ody-dark);
   border-radius: 8px;
   padding: 4px 0;
   z-index: 600;
@@ -318,7 +318,7 @@
     background: none;
     border: none;
     border-radius: 5px;
-    color: var(--color-lightness);
+    color: var(--ody-lightness);
     font-size: 13px;
     text-align: left;
     padding: 10px 10px;
@@ -326,13 +326,13 @@
     transition: background 0.15s;
 
     &:hover {
-      background: var(--color-dark);
+      background: var(--ody-dark);
     }
   }
 
   &__separator {
     height: 1px;
-    background: var(--color-dark);
+    background: var(--ody-dark);
     margin: 4px 0;
   }
 
@@ -362,10 +362,10 @@
     }
 
     &--danger {
-      color: var(--color-lightness);
+      color: var(--ody-lightness);
 
       &:hover {
-        color: var(--color-danger);
+        color: var(--ody-danger);
       }
 
       svg {
@@ -389,8 +389,8 @@
 
 .folder-modal {
   position: relative;
-  background: var(--color-darker);
-  border: 1px solid var(--color-dark);
+  background: var(--ody-darker);
+  border: 1px solid var(--ody-dark);
   border-radius: 12px;
   padding: 28px 24px 24px;
   width: 340px;
@@ -402,26 +402,26 @@
     right: 12px;
     background: none;
     border: none;
-    color: var(--color-1);
+    color: var(--ody-1);
     font-size: 16px;
     cursor: pointer;
     line-height: 1;
 
     &:hover {
-      color: var(--color-lightness);
+      color: var(--ody-lightness);
     }
   }
 
   &__title {
     margin: 0 0 20px;
-    color: var(--color-lightness);
+    color: var(--ody-lightness);
     font-size: 15px;
     font-weight: 700;
   }
 
   &__label {
     display: block;
-    color: var(--color-1);
+    color: var(--ody-1);
     font-size: 12px;
     font-weight: 600;
     margin-bottom: 6px;
@@ -429,22 +429,22 @@
 
   &__input {
     width: 100%;
-    background: var(--color-darkest);
-    border: 1px solid var(--color-dark);
+    background: var(--ody-darkest);
+    border: 1px solid var(--ody-dark);
     border-radius: 6px;
-    color: var(--color-lightness);
+    color: var(--ody-lightness);
     font-size: 13px;
     padding: 8px 10px;
     margin-bottom: 20px;
     box-sizing: border-box;
 
     &::placeholder {
-      color: var(--color-dark);
+      color: var(--ody-dark);
     }
 
     &:focus {
       outline: none;
-      border-color: var(--color-1);
+      border-color: var(--ody-1);
     }
   }
 
@@ -477,7 +477,7 @@
   }
 
   &__swatch-check {
-    color: var(--color-lightness);
+    color: var(--ody-lightness);
     font-size: 14px;
     font-weight: 700;
     pointer-events: none;
@@ -485,10 +485,10 @@
 
   &__confirm {
     width: 100%;
-    background: var(--color-dark);
+    background: var(--ody-dark);
     border: none;
     border-radius: 8px;
-    color: var(--color-lightness);
+    color: var(--ody-lightness);
     font-size: 14px;
     font-weight: 700;
     padding: 12px;
@@ -496,7 +496,7 @@
     transition: background 0.2s;
 
     &:hover {
-      background: var(--color-1);
+      background: var(--ody-1);
     }
   }
 }
@@ -512,7 +512,7 @@
 
   &.active {
     height: 12px;
-    background: var(--color-1);
+    background: var(--ody-1);
   }
 }
 
@@ -536,13 +536,13 @@
 .catalog-sidebar__add {
   width: 32px;
   height: 32px;
-  background: var(--color-darker);
+  background: var(--ody-darker);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: var(--color-lightness);
+  color: var(--ody-lightness);
   transition: filter 0.2s;
   user-select: none;
   flex-shrink: 0;
@@ -569,7 +569,7 @@
 
 // Contenu de la modal
 .catalog-modal {
-  background: var(--color-lightness);
+  background: var(--ody-lightness);
   border-radius: 12px;
   padding: 30px;
   width: 400px;
@@ -577,7 +577,7 @@
 
   h3 {
     margin: 0 0 20px 0;
-    color: var(--color-darkest);
+    color: var(--ody-darkest);
     font-size: 16px;
   }
 }

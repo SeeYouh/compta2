@@ -8,8 +8,8 @@
 
 // ===== NAVBAR =====
 .navbar {
-  background: var(--color-darker);
-  color: var(--color-contrast-darker);
+  background: var(--ody-darker);
+  color: var(--ody-contrast-darker);
   padding: 0;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   position: sticky;
@@ -28,7 +28,7 @@
 
 .navbar-brand {
   .brand-link {
-    color: var(--color-contrast-darker);
+    color: var(--ody-contrast-darker);
     text-decoration: none;
     font-size: 1.8rem;
     font-weight: 700;
@@ -50,14 +50,14 @@
 
     .nav-item {
       .nav-link {
-        color: var(--color-contrast-darker);
+        color: var(--ody-contrast-darker);
         text-decoration: none;
         font-weight: 500;
         transition: color 0.3s ease;
         position: relative;
 
         &:hover {
-          color: var(--color-contrast-darker);
+          color: var(--ody-contrast-darker);
         }
 
         &:after {
@@ -67,7 +67,7 @@
           left: 0;
           width: 0;
           height: 2px;
-          background: var(--color-contrast-darker);
+          background: var(--ody-contrast-darker);
           transition: width 0.3s ease;
         }
 
@@ -81,8 +81,8 @@
 
 .navbar-auth {
   .auth-button {
-    background: var(--color-dark);
-    color: var(--color-contrast-darker);
+    background: var(--ody-dark);
+    color: var(--ody-contrast-darker);
     text-decoration: none;
     padding: 0.75rem 1.5rem;
     border-radius: 25px;
@@ -91,9 +91,9 @@
     border: 2px solid transparent;
 
     &:hover {
-      background: var(--color-light);
-      color: var(--color-contrast-light);
-      border-color: var(--color-light);
+      background: var(--ody-light);
+      color: var(--ody-contrast-light);
+      border-color: var(--ody-light);
     }
   }
 }
@@ -106,10 +106,10 @@
 .hero-section {
   background: linear-gradient(
     135deg,
-    var(--color-dark) 0%,
-    var(--color-darker) 100%
+    var(--ody-dark) 0%,
+    var(--ody-darker) 100%
   );
-  color: var(--color-contrast-darker);
+  color: var(--ody-contrast-darker);
   padding: 6rem 0;
   text-align: center;
 }
@@ -151,12 +151,12 @@
   display: inline-block;
 
   &.primary {
-    background: var(--color-lightness);
-    color: var(--color-contrast-lightness);
+    background: var(--ody-lightness);
+    color: var(--ody-contrast-lightness);
 
     &:hover {
-      background: var(--color-light);
-      color: var(--color-contrast-light);
+      background: var(--ody-light);
+      color: var(--ody-contrast-light);
       transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     }
@@ -164,12 +164,12 @@
 
   &.secondary {
     background: transparent;
-    color: var(--color-contrast-darker);
-    border: 2px solid var(--color-contrast-darker);
+    color: var(--ody-contrast-darker);
+    border: 2px solid var(--ody-contrast-darker);
 
     &:hover {
-      background: var(--color-lightness);
-      color: var(--color-contrast-lightness);
+      background: var(--ody-lightness);
+      color: var(--ody-contrast-lightness);
       transform: translateY(-2px);
     }
   }
@@ -177,7 +177,7 @@
 
 .features-preview {
   padding: 6rem 0;
-  background: var(--color-lightness);
+  background: var(--ody-lightness);
 }
 
 .container {
@@ -190,7 +190,7 @@
   text-align: center;
   font-size: 2.5rem;
   margin-bottom: 4rem;
-  color: var(--color-contrast-lightness);
+  color: var(--ody-contrast-lightness);
 }
 
 .features-grid {
@@ -200,7 +200,7 @@
 }
 
 .feature-card {
-  background: var(--color-lightness);
+  background: var(--ody-lightness);
   padding: 2.5rem;
   border-radius: 12px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
@@ -215,32 +215,32 @@
   }
 
   h3 {
-    color: var(--color-darker);
+    color: var(--ody-darker);
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
   }
 
   p {
-    color: var(--color-dark);
+    color: var(--ody-dark);
     line-height: 1.6;
   }
 }
 
 .about-section {
   padding: 6rem 0;
-  background: var(--color-lightness);
+  background: var(--ody-lightness);
 
   h2 {
     text-align: center;
     font-size: 2.5rem;
     margin-bottom: 3rem;
-    color: var(--color-contrast-lightness);
+    color: var(--ody-contrast-lightness);
   }
 
   p {
     font-size: 1.1rem;
     line-height: 1.8;
-    color: var(--color-dark);
+    color: var(--ody-dark);
     margin-bottom: 2rem;
     text-align: justify;
   }
@@ -248,8 +248,8 @@
 
 // ===== FOOTER =====
 .footer {
-  background: var(--color-darkest);
-  color: var(--color-contrast-darkest);
+  background: var(--ody-darkest);
+  color: var(--ody-contrast-darkest);
   padding: 4rem 0 2rem;
 }
 
@@ -270,7 +270,7 @@
   h3,
   h4 {
     margin-bottom: 1.5rem;
-    color: var(--color-contrast-darkest);
+    color: var(--ody-contrast-darkest);
   }
 
   h3 {
@@ -282,7 +282,7 @@
   }
 
   p {
-    color: var(--color-1);
+    color: var(--ody-1);
     line-height: 1.6;
   }
 
@@ -294,12 +294,12 @@
       margin-bottom: 0.8rem;
 
       a {
-        color: var(--color-1);
+        color: var(--ody-1);
         text-decoration: none;
         transition: color 0.3s ease;
 
         &:hover {
-          color: var(--color-contrast-darkest);
+          color: var(--ody-contrast-darkest);
         }
       }
     }
@@ -307,12 +307,12 @@
 }
 
 .footer-bottom {
-  border-top: 1px solid var(--color-darker);
+  border-top: 1px solid var(--ody-darker);
   padding-top: 2rem;
   text-align: center;
 
   p {
-    color: var(--color-1);
+    color: var(--ody-1);
     margin-bottom: 1rem;
 
     &:last-child {

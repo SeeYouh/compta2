@@ -13,8 +13,8 @@
   gap: 4px 8px;
   padding: 4px 8px;
   border-bottom: 2px solid
-    color-mix(in srgb, var(--color-darkest) 25%, var(--color-light));
-  background: var(--color-light);
+    color-mix(in srgb, var(--ody-darkest) 25%, var(--ody-light));
+  background: var(--ody-light);
 
   &__group {
     display: flex;
@@ -36,19 +36,19 @@
     background: transparent;
     cursor: pointer;
     font-size: 13px;
-    color: var(--color-darkest);
+    color: var(--ody-darkest);
     transition:
       background 0.1s,
       border-color 0.1s;
 
     &:hover {
-      background: color-mix(in srgb, var(--color-darkest) 12%, transparent);
+      background: color-mix(in srgb, var(--ody-darkest) 12%, transparent);
     }
 
     &--active {
-      background: color-mix(in srgb, var(--color-darkest) 20%, transparent);
-      border-color: color-mix(in srgb, var(--color-darkest) 40%, transparent);
-      color: var(--color-darkest);
+      background: color-mix(in srgb, var(--ody-darkest) 20%, transparent);
+      border-color: color-mix(in srgb, var(--ody-darkest) 40%, transparent);
+      color: var(--ody-darkest);
     }
   }
 
@@ -56,16 +56,16 @@
     width: auto;
     height: 26px;
     padding: 0 16px;
-    border: 1px solid color-mix(in srgb, var(--color-darkest) 35%, transparent);
+    border: 1px solid color-mix(in srgb, var(--ody-darkest) 35%, transparent);
     border-radius: 4px;
-    background: color-mix(in srgb, var(--color-darkest) 8%, var(--color-light));
-    color: var(--color-darkest);
+    background: color-mix(in srgb, var(--ody-darkest) 8%, var(--ody-light));
+    color: var(--ody-darkest);
     font-size: 12px;
     cursor: pointer;
 
     &:focus {
       outline: none;
-      border-color: var(--color-darkest);
+      border-color: var(--ody-darkest);
     }
 
     &--size {
@@ -85,17 +85,17 @@
     width: 26px;
     height: 26px;
     border-radius: 4px;
-    border: 1px solid color-mix(in srgb, var(--color-darkest) 35%, transparent);
+    border: 1px solid color-mix(in srgb, var(--ody-darkest) 35%, transparent);
     cursor: pointer;
     font-size: 12px;
     font-weight: 700;
     position: relative;
     overflow: hidden;
-    color: var(--color-darkest);
+    color: var(--ody-darkest);
     transition: background 0.1s;
 
     &:hover {
-      background: color-mix(in srgb, var(--color-darkest) 12%, transparent);
+      background: color-mix(in srgb, var(--ody-darkest) 12%, transparent);
     }
 
     &--bg {
@@ -164,7 +164,7 @@
 }
 .lex-code-inline {
   font-family: monospace;
-  background: color-mix(in srgb, var(--color-1) 10%, var(--color-darkest));
+  background: color-mix(in srgb, var(--ody-1) 10%, var(--ody-darkest));
   border-radius: 3px;
   padding: 1px 4px;
   font-size: 0.9em;
@@ -190,7 +190,7 @@
 }
 
 .lex-quote {
-  border-left: 3px solid var(--color-1);
+  border-left: 3px solid var(--ody-1);
   padding-left: 12px;
   margin: 8px 0;
   opacity: 0.8;
@@ -213,8 +213,8 @@
 // ─── Bloc de code ─────────────────────────────────────────────────────────────
 .lex-code-block {
   font-family: "Courier New", monospace;
-  background: color-mix(in srgb, var(--color-darkest) 6%, white);
-  border: 1px solid color-mix(in srgb, var(--color-darkest) 20%, transparent);
+  background: color-mix(in srgb, var(--ody-darkest) 6%, white);
+  border: 1px solid color-mix(in srgb, var(--ody-darkest) 20%, transparent);
   border-radius: 6px;
   padding: 12px 16px;
   font-size: 13px;
@@ -222,7 +222,7 @@
   margin: 8px 0;
   white-space: pre-wrap;
   tab-size: 2;
-  color: var(--color-darkest);
+  color: var(--ody-darkest);
   display: block;
 }
 
@@ -243,7 +243,7 @@
   .lex-paragraph::after {
     content: "¶";
     opacity: 0.3;
-    color: var(--color-1);
+    color: var(--ody-1);
     font-weight: normal;
     pointer-events: none;
   }

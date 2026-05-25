@@ -1,21 +1,155 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { ArrayGraduation } from "./utils/ArrayGraduation";
 import ColorPicker from "../../../components/ColorPicker";
+import { computeColorPalette } from "../utils/colorPalette.js";
+import IconSaveFalse from "../../../assets/Icon-Save-3-0_False.svg";
+import IconSaveTrue from "../../../assets/Icon-Save-3-0_True.svg";
 import InTakeTimeAdvancedMode from "./InTakeTimeAdvancedMode";
 import InTakeTimeNormalMode from "./InTakeTimeNormalMode";
 import ProductService from "../services/productService";
 import Range14 from "./Range14";
 import RangeDays from "./RangeDays";
+import { useOdysseeColor } from "../contexts/OdysseeColorContext.jsx";
+
+function buildProductStyles(c, id) {
+  return `
+    [data-product="${id}"] .paper-product-container-navBar {
+      background-color: ${c.base};
+    }
+    [data-product="${id}"] .paper-product__name-input,
+    [data-product="${id}"] .paper-product__alias-input {
+      border-bottom-color: color-mix(in srgb, ${c.lightness} 40%, transparent);
+      color: ${c.darkest};
+    }
+    [data-product="${id}"] .paper-product__name-input::placeholder,
+    [data-product="${id}"] .paper-product__alias-input::placeholder {
+      color: color-mix(in srgb, ${c.darkest} 45%, transparent);
+    }
+    [data-product="${id}"] .paper-product__name-input:focus,
+    [data-product="${id}"] .paper-product__alias-input:focus {
+      border-bottom-color: ${c.lightness};
+    }
+    [data-product="${id}"] .paper-product__alias-input {
+      color: color-mix(in srgb, ${c.darkest} 75%, transparent);
+    }
+    [data-product="${id}"] .paper-product-container-navBar input[type="submit"] {
+      background-color: ${c.darker};
+      color: ${c.lightness};
+      border-color: color-mix(in srgb, ${c.lightness} 35%, transparent);
+    }
+    [data-product="${id}"] .paper-product-container-navBar input[type="submit"]:hover {
+      background-color: ${c.darkest};
+    }
+    [data-product="${id}"] .paper-product__status--success {
+      background-color: ${c.dark};
+      color: ${c.lightness};
+      border-left-color: ${c.base};
+    }
+    [data-product="${id}"] .paper-product__status--error {
+      background-color: ${c.darkest};
+      color: ${c.dangerLight};
+      border-left-color: ${c.danger};
+    }
+    [data-product="${id}"] .paper-product__upload-label {
+      border-color: ${c.dark};
+      color: ${c.light};
+    }
+    [data-product="${id}"] .paper-product__upload-label:hover {
+      border-color: ${c.base};
+      color: ${c.lightness};
+    }
+    [data-product="${id}"] .paper-product__image-preview img {
+      border-color: ${c.dark};
+    }
+    [data-product="${id}"] .paper-product__image-remove {
+      background-color: ${c.darkest};
+      color: ${c.lightness};
+      border-color: ${c.dark};
+    }
+    [data-product="${id}"] .paper-product__image-remove:hover {
+      background-color: ${c.danger};
+    }
+    [data-product="${id}"] .paper-product-container {
+      color: ${c.darkest};
+    }
+    [data-product="${id}"] .inTakeTime-container h4 {
+      border-color: ${c.darkest};
+      background-color: ${c.darkest};
+      color: ${c.light};
+    }
+    [data-product="${id}"] .title-inTakeTime-container label {
+      border-color: ${c.darkest};
+    }
+    [data-product="${id}"] .title-inTakeTime-container input[type="checkbox"]:checked + label p:first-child {
+      background-color: ${c.base};
+      color: ${c.light};
+    }
+    [data-product="${id}"] .title-inTakeTime-container p:last-child {
+      background-color: ${c.base};
+      color: ${c.light};
+    }
+    [data-product="${id}"] .inTakeTime-moment label {
+      border-color: ${c.dark};
+    }
+    [data-product="${id}"] .inTakeTime-moment input[type="checkbox"]:checked + label {
+      background-color: ${c.base};
+      color: ${c.light};
+    }
+    [data-product="${id}"] .inTakeTime-container_moment__label::after {
+      background-color: ${c.darkest};
+    }
+    [data-product="${id}"] .inTakeTime-container_moment li input[type="radio"]:checked + label .inTakeTime-container_moment__label::after {
+      background-color: ${c.base};
+    }
+    [data-product="${id}"] .custom-range input[type="range"]::-webkit-slider-runnable-track {
+      background: ${c.darker};
+    }
+    [data-product="${id}"] .custom-range input[type="range"]::-moz-range-track {
+      background: ${c.darker};
+    }
+    [data-product="${id}"] .custom-range input[type="range"]::-moz-range-progress {
+      background-color: ${c.darker};
+    }
+    [data-product="${id}"] .custom-range input[type="range"]::-webkit-slider-thumb {
+      background: ${c.darker};
+    }
+    [data-product="${id}"] .custom-range input[type="range"]::-moz-range-thumb {
+      background: ${c.darker};
+    }
+    [data-product="${id}"] .inTakeTime-container_moment .custom-range input[type="range"]::-webkit-slider-runnable-track {
+      background: ${c.darker};
+    }
+    [data-product="${id}"] .inTakeTime-container_moment .custom-range input[type="range"]::-webkit-slider-thumb {
+      background: ${c.base};
+    }
+    [data-product="${id}"] .inTakeTime-container_moment .custom-range input[type="range"]::-moz-range-thumb {
+      background: ${c.darker};
+    }
+    [data-product="${id}"] .array-graduation_text label {
+      border-bottom-color: ${c.light};
+    }
+    [data-product="${id}"] .array-graduation_text label span {
+      background-color: ${c.light};
+      border-color: ${c.base};
+    }
+    [data-product="${id}"] .array-graduation input[type="radio"]:checked + label {
+      border-bottom-color: ${c.base};
+    }
+  `;
+}
 
 const PaperProduct = ({
   contentFilesData,
   categoryId,
   onProductCreated,
   editMode = false,
+  onActivate,
 }) => {
   const productId = contentFilesData._id || null;
   const folderId = contentFilesData.folderId || null;
+  const entityId = productId || "new-product";
+
   const [productName, setProductName] = useState(
     contentFilesData.productName || "",
   );
@@ -36,7 +170,16 @@ const PaperProduct = ({
   const [durationAfter, setDurationAfter] = useState("");
   const [nightDuration, setNightDuration] = useState(10);
   const [saveStatus, setSaveStatus] = useState(null);
-  const [color, setColor] = useState(contentFilesData.color || "#3b82f6");
+  const [color, setColor] = useState(contentFilesData.color || "");
+  const [previewColor, setPreviewColor] = useState(null);
+  const [showColorPicker, setShowColorPicker] = useState(false);
+
+  const { colors: themeColors } = useOdysseeColor();
+  const activeColor = previewColor || color;
+  const colors = useMemo(
+    () => (activeColor ? computeColorPalette(activeColor) : themeColors),
+    [activeColor, themeColors],
+  );
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -129,190 +272,222 @@ const PaperProduct = ({
   const readOnly = !!productId && !editMode;
 
   return (
-    <form className="paper-product" onSubmit={handleSubmit} method="POST">
-      <div className="paper-product-container-navBar">
-        <div className="paper-product-container-navBar_titleProduct">
-          <input
-            type="text"
-            className="paper-product__name-input"
-            value={productName}
-            onChange={(e) => setProductName(e.target.value)}
-            placeholder="Nom du produit"
-            maxLength={60}
-            readOnly={readOnly}
-          />
-          <input
-            type="text"
-            className="paper-product__alias-input"
-            value={aliasName}
-            onChange={(e) => setAliasName(e.target.value)}
-            placeholder="Alias"
-            maxLength={40}
-            readOnly={readOnly}
-          />
-        </div>
-
-        {!readOnly && (
-          <input
-            type="submit"
-            value={editMode ? "Mettre à jour" : "Enregistrer"}
-          />
-        )}
-      </div>
-
-      {saveStatus && (
-        <div
-          className={`paper-product__status paper-product__status--${saveStatus.type}`}
-        >
-          {saveStatus.message}
-        </div>
-      )}
-
-      <div className="paper-product-container">
-        <div className="bloc">
-          <div className="paper-product__upload-zone">
+    <>
+      <style>{buildProductStyles(colors, entityId)}</style>
+      <form
+        className="paper-product"
+        data-product={entityId}
+        onSubmit={handleSubmit}
+        method="POST"
+      >
+        <div className="paper-product-container-navBar">
+          <div className="paper-product-container-navBar_titleProduct">
             <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="paper-product__file-input"
-              onChange={handleImageChange}
+              type="text"
+              className="paper-product__name-input"
+              value={productName}
+              onChange={(e) => setProductName(e.target.value)}
+              placeholder="Nom du produit"
+              maxLength={60}
+              readOnly={readOnly}
             />
-            {imagePreview ? (
-              <div className="paper-product__image-preview">
-                <img src={imagePreview} alt="Aperçu" />
-                <button
-                  type="button"
-                  className="paper-product__image-remove"
-                  onClick={() => {
-                    setImagePreview(null);
-                    setImageFile(null);
-                    if (fileInputRef.current) fileInputRef.current.value = "";
-                  }}
-                >
-                  ✕
-                </button>
-              </div>
-            ) : (
+            <input
+              type="text"
+              className="paper-product__alias-input"
+              value={aliasName}
+              onChange={(e) => setAliasName(e.target.value)}
+              placeholder="Alias"
+              maxLength={40}
+              readOnly={readOnly}
+            />
+          </div>
+
+          <div className="paper-product__color-wrap">
+            {readOnly ? (
               <div
-                className="paper-product__upload-label"
-                onClick={() => fileInputRef.current?.click()}
+                className="paper-product__save-btn"
+                onClick={onActivate}
+                title="Modifier"
               >
-                + Ajouter une image
+                <img src={IconSaveFalse} alt="Activer" />
               </div>
-            )}
-            {imageError && (
-              <p className="paper-product__image-error">{imageError}</p>
-            )}
-          </div>
-
-          <ul className="paper-product-bloc-img">
-            {contentFilesData.img.map((item, index) => (
-              <li
-                className="paper-product-li_img"
-                key={"img" + item.alt + index}
-              >
-                <img src={item.adress} alt={item.alt} />
-              </li>
-            ))}
-          </ul>
-
-          <div>
-            <h3>Durée du traitement</h3>
-            <div className="custom-range">
-              <RangeDays value={duration} onChange={setDuration} />
-            </div>
-          </div>
-
-          <div>
-            <h3>Quantité à administrer</h3>
-            <div className="custom-range">
-              <Range14 value={quantity} onChange={setQuantity} />
-            </div>
-            <ul className="array-graduation">
-              {ArrayGraduation.map((category, index) => {
-                return (
-                  <li key={"grad" + category.abbreviatedGraduation + index}>
-                    <h4> {category.title} </h4>
-                    <ul>
-                      {category.categoryGraduation.map((item, index) => {
-                        return (
-                          <div key={"cat" + item.graduation + index}>
-                            <li className="array-graduation_text">
-                              <input
-                                className="input-dysplay-none"
-                                type="radio"
-                                name="graduation"
-                                id={item.abbreviatedGraduation}
-                              />
-                              <label htmlFor={item.abbreviatedGraduation}>
-                                {item.abbreviatedGraduation}
-                                <span> {item.graduation} </span>
-                              </label>
-                            </li>
-                          </div>
-                        );
-                      })}
-                    </ul>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        </div>
-
-        <div className="bloc">
-          <div className="inTakeTime-container">
-            <div className="title-inTakeTime-container">
-              <h3>Moment de prise</h3>
-              <div className="btn-advancedMode-toggle">
-                <p>Mode avancé</p>
-                <input
-                  className="input-dysplay-none"
-                  type="checkbox"
-                  name="toggleOnOff"
-                  id="toggleOnOff"
-                  checked={advancedMode}
-                  onChange={(e) => setAdvancedMode(e.target.checked)}
-                />
-                <label htmlFor="toggleOnOff">
-                  <p>On</p>
-                  <p>Off</p>
-                </label>
-              </div>
-            </div>
-
-            {advancedMode ? (
-              <InTakeTimeAdvancedMode />
             ) : (
-              <InTakeTimeNormalMode
-                checkedMoments={checkedMoments}
-                selectedTime={selectedTime}
-                durationBefore={durationBefore}
-                durationAfter={durationAfter}
-                onMomentChange={setCheckedMoments}
-                onTimeChange={handleTimeChange}
-                onBeforeChange={setDurationBefore}
-                onAfterChange={setDurationAfter}
-                nightDuration={nightDuration}
-                onNightDurationChange={setNightDuration}
-              />
+              <button
+                type="submit"
+                className="paper-product__save-btn"
+                title="Enregistrer"
+              >
+                <img src={IconSaveTrue} alt="Enregistrer" />
+              </button>
+            )}
+            <div
+              className="paper-product__color-btn"
+              style={{ background: colors.base }}
+              onClick={() => !readOnly && setShowColorPicker((v) => !v)}
+              title="Couleur du produit"
+            />
+            {showColorPicker && (
+              <div className="paper-product__color-picker-wrap">
+                <ColorPicker
+                  value={color || themeColors.base}
+                  onChange={(hex) => setColor(hex)}
+                  onPreview={(hex) => setPreviewColor(hex)}
+                  onClose={() => {
+                    setShowColorPicker(false);
+                    setPreviewColor(null);
+                  }}
+                  contextKey={`catalog-product-${productId || "new"}`}
+                  showHistory
+                  showDefaultButtons={!!productId}
+                />
+              </div>
             )}
           </div>
         </div>
 
-        <div className="bloc">
-          <ColorPicker
-            value={color}
-            onChange={(hex) => setColor(hex)}
-            onClose={() => {}}
-            contextKey={`catalog-product-${productId || "new"}`}
-            showHistory
-            showDefaultButtons={!!productId}
-          />
+        {saveStatus && (
+          <div
+            className={`paper-product__status paper-product__status--${saveStatus.type}`}
+          >
+            {saveStatus.message}
+          </div>
+        )}
+
+        <div className="paper-product-container" inert={readOnly || undefined}>
+          <div className="bloc">
+            <div className="paper-product__upload-zone">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="paper-product__file-input"
+                onChange={handleImageChange}
+              />
+              {imagePreview ? (
+                <div className="paper-product__image-preview">
+                  <img src={imagePreview} alt="Aperçu" />
+                  <button
+                    type="button"
+                    className="paper-product__image-remove"
+                    onClick={() => {
+                      setImagePreview(null);
+                      setImageFile(null);
+                      if (fileInputRef.current) fileInputRef.current.value = "";
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <div
+                  className="paper-product__upload-label"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  + Ajouter une image
+                </div>
+              )}
+              {imageError && (
+                <p className="paper-product__image-error">{imageError}</p>
+              )}
+            </div>
+
+            <ul className="paper-product-bloc-img">
+              {contentFilesData.img.map((item, index) => (
+                <li
+                  className="paper-product-li_img"
+                  key={"img" + item.alt + index}
+                >
+                  <img src={item.adress} alt={item.alt} />
+                </li>
+              ))}
+            </ul>
+
+            <div>
+              <h3>Durée du traitement</h3>
+              <div className="custom-range">
+                <RangeDays value={duration} onChange={setDuration} />
+              </div>
+            </div>
+
+            <div>
+              <h3>Quantité à administrer</h3>
+              <div className="custom-range">
+                <Range14 value={quantity} onChange={setQuantity} />
+              </div>
+              <ul className="array-graduation">
+                {ArrayGraduation.map((category, index) => {
+                  return (
+                    <li key={"grad" + category.abbreviatedGraduation + index}>
+                      <h4> {category.title} </h4>
+                      <ul>
+                        {category.categoryGraduation.map((item, index) => {
+                          return (
+                            <div key={"cat" + item.graduation + index}>
+                              <li className="array-graduation_text">
+                                <input
+                                  className="input-dysplay-none"
+                                  type="radio"
+                                  name="graduation"
+                                  id={item.abbreviatedGraduation}
+                                />
+                                <label htmlFor={item.abbreviatedGraduation}>
+                                  {item.abbreviatedGraduation}
+                                  <span> {item.graduation} </span>
+                                </label>
+                              </li>
+                            </div>
+                          );
+                        })}
+                      </ul>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
+
+          <div className="bloc">
+            <div className="inTakeTime-container">
+              <div className="title-inTakeTime-container">
+                <h3>Moment de prise</h3>
+                <div className="btn-advancedMode-toggle">
+                  <p>Mode avancé</p>
+                  <input
+                    className="input-dysplay-none"
+                    type="checkbox"
+                    name="toggleOnOff"
+                    id="toggleOnOff"
+                    checked={advancedMode}
+                    onChange={(e) => setAdvancedMode(e.target.checked)}
+                  />
+                  <label htmlFor="toggleOnOff">
+                    <p>On</p>
+                    <p>Off</p>
+                  </label>
+                </div>
+              </div>
+
+              {advancedMode ? (
+                <InTakeTimeAdvancedMode />
+              ) : (
+                <InTakeTimeNormalMode
+                  checkedMoments={checkedMoments}
+                  selectedTime={selectedTime}
+                  durationBefore={durationBefore}
+                  durationAfter={durationAfter}
+                  onMomentChange={setCheckedMoments}
+                  onTimeChange={handleTimeChange}
+                  onBeforeChange={setDurationBefore}
+                  onAfterChange={setDurationAfter}
+                  nightDuration={nightDuration}
+                  onNightDurationChange={setNightDuration}
+                />
+              )}
+            </div>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+    </>
   );
 };
 

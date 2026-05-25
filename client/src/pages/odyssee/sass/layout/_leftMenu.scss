@@ -1,6 +1,5 @@
 .left-menu {
   position: relative;
-  background-color: var(--color-darkest);
 }
 
 .left-menu-resizer {
@@ -13,7 +12,6 @@
   border-right: 4px solid transparent;
 
   &:hover {
-    border-right-color: var(--color-dark);
     transition: border-right-color 0.1s ease 1s;
   }
 }

@@ -1,6 +1,12 @@
-import { useRef, useState } from "react";
+import {
+  useRef,
+  useState,
+} from 'react';
 
-import { DEFAULT_FOLDER_COLOR } from "../config/folderColors";
+import { FOLDER_PALETTE } from '../config/folderColors';
+import {
+  useColorPreferences,
+} from '../../../components/hooks/useColorPreferences';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -49,6 +55,7 @@ export const useInfoSuppDnd = ({ infoSupp, setInfoSupp }) => {
   const [ghostIndex, setGhostIndex] = useState(null);
   const [nestedGhost, setNestedGhost] = useState(null); // { folderId, index }
   const [dropTarget, setDropTarget] = useState(null);
+  const { getDefault } = useColorPreferences();
 
   const resetDnd = () => {
     setGhostIndex(null);
@@ -176,7 +183,7 @@ export const useInfoSuppDnd = ({ infoSupp, setInfoSupp }) => {
           id: generateFolderId(),
           type: "folder",
           title: "Dossier",
-          color: DEFAULT_FOLDER_COLOR,
+          color: getDefault("odyssee-infosupp-folder") ?? FOLDER_PALETTE[0],
           isOpen: true,
           categoryIds: [drag.id, target.id],
         };

@@ -84,6 +84,10 @@ const ProductCard = ({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
+        style={{
+          outline: `${isSelected ? "3px" : "1px"} solid ${product.color}`,
+          outlineOffset: isSelected ? "-3px" : "-1px",
+        }}
       >
         <div className="catalog-card__image">
           {hasImage ? (

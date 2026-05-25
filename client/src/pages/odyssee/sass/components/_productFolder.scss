@@ -16,7 +16,7 @@
       top: 0;
       bottom: 0;
       width: 2px;
-      background: var(--color-1);
+      background: var(--ody-1);
       border-radius: 2px;
       z-index: 10;
     }
@@ -30,7 +30,7 @@
       top: 0;
       bottom: 0;
       width: 2px;
-      background: var(--color-1);
+      background: var(--ody-1);
       border-radius: 2px;
       z-index: 10;
     }
@@ -38,12 +38,12 @@
 
   &--product-over {
     .product-folder__header {
-      border-color: var(--folder-color, #969696);
+      border-color: var(--folder-color);
     }
 
     .product-folder__body {
-      border-color: var(--folder-color, #969696);
-      box-shadow: 0 0 0 1px var(--folder-color, #969696);
+      border-color: var(--folder-color);
+      box-shadow: 0 0 0 1px var(--folder-color);
     }
   }
 
@@ -55,7 +55,7 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: var(--color-1);
+      background: var(--ody-1);
       border-radius: 2px;
       z-index: 10;
     }
@@ -69,7 +69,7 @@
       left: 0;
       right: 0;
       height: 2px;
-      background: var(--color-1);
+      background: var(--ody-1);
       border-radius: 2px;
       z-index: 10;
     }
@@ -83,7 +83,7 @@
       top: 0;
       bottom: 0;
       width: 2px;
-      background: var(--color-1);
+      background: var(--ody-1);
       border-radius: 2px;
       z-index: 10;
     }
@@ -97,7 +97,7 @@
       top: 0;
       bottom: 0;
       width: 2px;
-      background: var(--color-1);
+      background: var(--ody-1);
       border-radius: 2px;
       z-index: 10;
     }
@@ -112,8 +112,8 @@
     padding: 7px 14px;
     cursor: grab;
     user-select: none;
-    background: var(--folder-bg-color, #{var(--color-darker)});
-    border: 1px solid var(--folder-border-color, #{var(--color-dark)});
+    background: var(--folder-bg-color);
+    border: 1px solid var(--folder-border-color);
     border-radius: 6px 6px 0 0;
     position: relative;
     z-index: 1;
@@ -134,7 +134,7 @@
   &__name {
     flex: 1;
     font-size: 13px;
-    color: var(--color-lightness);
+    color: var(--ody-lightness);
     font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
@@ -143,8 +143,8 @@
   }
 
   &__body {
-    background: var(--folder-bg-color, #{var(--color-darker)});
-    border: 1px solid var(--folder-border-color, #{var(--color-dark)});
+    background: var(--folder-bg-color);
+    border: 1px solid var(--folder-border-color);
     border-radius: 0 6px 6px 6px;
     padding: 8px;
     min-height: 40px;
@@ -230,11 +230,11 @@
 
 .product-folder__tooltip {
   position: fixed;
-  background: var(--color-darker);
-  border: 1px solid var(--color-dark);
+  background: var(--ody-darker);
+  border: 1px solid var(--ody-dark);
   border-radius: 6px;
   padding: 5px 10px 6px;
-  color: var(--color-lightness);
+  color: var(--ody-lightness);
   font-size: 13px;
   pointer-events: none;
   z-index: 500;
@@ -248,7 +248,7 @@
     top: 50%;
     transform: translateY(-50%);
     border: 7px solid transparent;
-    border-right-color: var(--color-dark);
+    border-right-color: var(--ody-dark);
   }
 
   &::after {
@@ -258,7 +258,7 @@
     top: 50%;
     transform: translateY(-50%);
     border: 6px solid transparent;
-    border-right-color: var(--color-darker);
+    border-right-color: var(--ody-darker);
   }
 
   ul {
@@ -268,7 +268,7 @@
 
     li {
       font-size: 12px;
-      color: var(--color-lightness);
+      color: var(--ody-lightness);
       padding: 1px 0;
     }
   }
@@ -290,7 +290,7 @@
   }
 
   &--drag-over {
-    outline: 2px dashed var(--color-light);
+    outline: 2px dashed var(--ody-light);
     outline-offset: -2px;
     border-radius: 8px;
   }

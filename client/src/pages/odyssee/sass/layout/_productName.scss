@@ -1,9 +1,12 @@
 @use "../utils/_variable" as *;
 
 .paper-product-container-navBar {
-  background-color: var(--color-1);
-  // color: var(--color-darkest);
   padding: 7px 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+
   .paper-product-container-navBar_titleProduct {
     display: flex;
     align-items: center;
@@ -13,42 +16,39 @@
     .paper-product__alias-input {
       background: transparent;
       border: none;
-      border-bottom: 1px solid
-        color-mix(in srgb, var(--color-lightness) 40%, transparent);
-      color: var(--color-darkest);
+      border-bottom: 1px solid;
       font-size: 1rem;
       padding: 7px 8px;
       outline: none;
       min-width: 120px;
 
       &::placeholder {
-        color: color-mix(in srgb, var(--color-darkest) 45%, transparent);
         font-style: italic;
-      }
-
-      &:focus {
-        border-bottom-color: var(--color-lightness);
       }
     }
 
     .paper-product__alias-input {
       font-size: 0.9rem;
-      color: color-mix(in srgb, var(--color-darkest) 75%, transparent);
     }
   }
 
-  input[type="submit"] {
-    background-color: var(--color-darker);
-    color: var(--color-lightness);
-    border: 1px solid
-      color-mix(in srgb, var(--color-lightness) 35%, transparent);
-    border-radius: 6px;
-    padding: 8px 20px;
+  .paper-product__save-btn {
+    width: 28px;
+    height: 28px;
     cursor: pointer;
-    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0;
+    margin-right: 12px;
+    flex-shrink: 0;
 
-    &:hover {
-      background-color: var(--color-darkest);
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
   }
 }
@@ -60,15 +60,11 @@
   font-size: 14px;
 
   &--success {
-    background-color: var(--color-dark);
-    color: var(--color-lightness);
-    border-left: 3px solid var(--color-1);
+    border-left: 3px solid;
   }
 
   &--error {
-    background-color: var(--color-darkest);
-    color: var(--color-danger-light);
-    border-left: 3px solid var(--color-danger);
+    border-left: 3px solid;
   }
 }
 
@@ -89,20 +85,14 @@
     justify-content: center;
     width: 100px;
     height: 100px;
-    border: 2px dashed var(--color-dark);
+    border: 2px dashed;
     border-radius: 8px;
-    color: var(--color-light);
     font-size: 0.85rem;
     cursor: pointer;
     text-align: center;
     transition:
       border-color 0.2s,
       color 0.2s;
-
-    &:hover {
-      border-color: var(--color-1);
-      color: var(--color-lightness);
-    }
   }
 
   .paper-product__image-preview {
@@ -114,16 +104,14 @@
       height: 100px;
       object-fit: cover;
       border-radius: 8px;
-      border: 2px solid var(--color-dark);
+      border: 2px solid;
     }
 
     .paper-product__image-remove {
       position: absolute;
       top: -6px;
       right: -6px;
-      background-color: var(--color-darkest);
-      color: var(--color-lightness);
-      border: 1px solid var(--color-dark);
+      border: 1px solid;
       border-radius: 50%;
       width: 20px;
       height: 20px;
@@ -133,22 +121,16 @@
       align-items: center;
       justify-content: center;
       padding: 0;
-
-      &:hover {
-        background-color: var(--color-danger);
-      }
     }
   }
 
   .paper-product__image-error {
-    color: var(--color-danger-light);
     font-size: 0.8rem;
     margin: 0;
   }
 }
-.paper-product-container {
-  color: var(--color-darkest);
 
+.paper-product-container {
   .paper-product-bloc-img {
     height: 440px;
 
@@ -163,28 +145,23 @@
 
   .inTakeTime-container {
     h4 {
-      border: 1px solid var(--color-darkest);
-      background-color: var(--color-darkest);
-      color: var(--color-light);
+      border: 1px solid;
     }
 
     .title-inTakeTime-container {
       label {
-        border: 1px solid var(--color-darkest);
+        border: 1px solid;
         border-radius: 10px;
       }
 
       input[type="checkbox"]:checked + label {
         & p:first-child {
-          background-color: var(--color-1);
-          color: var(--color-light);
           border-top-left-radius: 9px;
           border-bottom-left-radius: 9px;
         }
 
         & p:last-child {
           background-color: transparent;
-          color: var(--color-darkest);
         }
       }
 
@@ -197,8 +174,6 @@
       }
 
       p:last-child {
-        background-color: var(--color-1);
-        color: var(--color-light);
         border-top-right-radius: 9px;
         border-bottom-right-radius: 9px;
       }
@@ -206,12 +181,8 @@
 
     .inTakeTime-moment {
       label {
-        border: 2px solid var(--color-dark);
+        border: 2px solid;
         border-radius: 8px;
-      }
-      input[type="checkbox"]:checked + label {
-        background-color: var(--color-1);
-        color: var(--color-light);
       }
     }
   }
@@ -219,20 +190,6 @@
   .inTakeTime-container_moment {
     li {
       margin: 10px 0 10px 0;
-
-      input[type="radio"]:checked + label {
-        input[type="range"] {
-          @each $range in $variable-range-custom-selected {
-            &#{$range} {
-              background-color: var(--color-1);
-            }
-          }
-        }
-
-        .inTakeTime-container_moment__label::after {
-          background-color: var(--color-1);
-        }
-      }
     }
 
     &__label::after {
@@ -241,7 +198,6 @@
       position: relative;
       width: 200%;
       height: 6px;
-      background-color: var(--color-darkest);
       border-radius: 3px;
       bottom: -8px;
       left: 0;
@@ -250,7 +206,6 @@
 
     &__label {
       margin: 0 0 28px 5px;
-      // border: 1px solid black;
 
       &:hover {
         cursor: pointer;
@@ -258,7 +213,6 @@
     }
 
     .custom-range {
-      // border: 1px solid black;
       padding-left: 10px;
 
       label {
@@ -267,54 +221,45 @@
         width: 100px;
         height: 30px;
       }
+
       input[type="range"] {
         width: 150px;
         padding-top: 5px;
         z-index: 10;
-        // WebKit + Blink track
+
         &::-webkit-slider-runnable-track {
-          background: var(--color-darker);
           height: 6px;
           border-radius: 3px;
         }
 
-        // WebKit + Blink thumb
         &::-webkit-slider-thumb {
           appearance: none;
           width: 18px;
           height: 18px;
-          background: var(--color-1);
           border: none;
           border-radius: 50%;
-          margin-top: -6px; // pour centrer verticalement
+          margin-top: -6px;
           cursor: pointer;
         }
 
-        // Firefox track
         &::-moz-range-track {
-          background: var(--color-darker);
           height: 6px;
           border-radius: 3px;
         }
 
-        // Firefox filled part (avant le thumb)
         &::-moz-range-progress {
-          background-color: var(--color-darker);
           height: 6px;
           border-radius: 3px;
         }
 
-        // Firefox thumb
         &::-moz-range-thumb {
           width: 18px;
           height: 18px;
-          background: var(--color-darker);
           border: none;
           border-radius: 50%;
           cursor: pointer;
         }
 
-        // Pour éviter le style focus Firefox
         &::-moz-focus-outer {
           border: 0;
         }
@@ -331,16 +276,16 @@
     justify-content: center;
     margin: auto;
     position: relative;
+
     .array-graduation_text {
       max-width: 100px;
       height: auto;
       padding: 15px 5px 0 5px;
       margin: 5px;
-      // border: 1px solid black;
 
       label {
         padding-bottom: 10px;
-        border-bottom: 3px solid var(--color-light);
+        border-bottom: 3px solid;
         min-width: 35px;
         text-align: center;
 
@@ -350,13 +295,13 @@
           top: 0;
           right: 2%;
           z-index: 10;
-          background-color: var(--color-light);
           padding: 10px;
-          border: 2px solid var(--color-1);
+          border: 2px solid;
           border-radius: 5px;
           font-size: 0.8rem;
         }
       }
+
       &:hover {
         span {
           opacity: 100%;
@@ -364,9 +309,10 @@
         }
       }
     }
+
     input[type="radio"]:checked + label {
       transition: border 0.2s ease-in-out;
-      border-bottom: 3px solid var(--color-1);
+      border-bottom: 3px solid;
     }
   }
 }

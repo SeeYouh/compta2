@@ -7,9 +7,41 @@
   overflow-y: auto;
 }
 
+// ─── Bouton couleur (navbar) ─────────────────────────────────────────────────
+.passager-item__color-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.passager-item__color-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    transform 0.15s,
+    border-color 0.15s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+
+  &:hover {
+    transform: scale(1.15);
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+.passager-item__color-picker-wrap {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 100;
+}
+
 // ─── NavBar (même structure que .paper-product-container-navBar) ──────────────
 .passager-item__navbar {
-  background-color: var(--color-1);
   padding: 7px 20px;
   display: flex;
   flex-direction: row;
@@ -29,21 +61,17 @@
     width: auto;
     background: transparent;
     border: none;
-    border-bottom: 1px solid
-      color-mix(in srgb, var(--color-lightness) 40%, transparent);
-    color: var(--color-darkest);
+    border-bottom: 1px solid;
     font-size: 1rem;
     padding: 7px 8px;
     outline: none;
     min-width: 100px;
 
     &::placeholder {
-      color: color-mix(in srgb, var(--color-darkest) 45%, transparent);
       font-style: italic;
     }
 
     &:focus {
-      border-bottom-color: var(--color-lightness);
     }
 
     &--bold {
@@ -52,7 +80,6 @@
 
     &--alias {
       font-size: 0.9rem;
-      color: color-mix(in srgb, var(--color-darkest) 75%, transparent);
     }
 
     &--date {
@@ -62,10 +89,7 @@
   }
 
   input[type="submit"] {
-    background-color: var(--color-darker);
-    color: var(--color-lightness);
-    border: 1px solid
-      color-mix(in srgb, var(--color-lightness) 35%, transparent);
+    border: 1px solid;
     border-radius: 6px;
     padding: 8px 20px;
     cursor: pointer;
@@ -73,7 +97,6 @@
     flex-shrink: 0;
 
     &:hover:not(:disabled) {
-      background-color: var(--color-darkest);
     }
 
     &:disabled {
@@ -97,10 +120,9 @@
   width: 30px;
   height: 30px;
   border-radius: 6px;
-  border: 1px solid color-mix(in srgb, var(--color-darkest) 40%, transparent);
+  border: 1px solid;
   background: transparent;
   cursor: pointer;
-  color: var(--color-darkest);
   font-size: 11px;
   font-weight: 700;
   transition:
@@ -113,14 +135,9 @@
   }
 
   &:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--color-darkest) 12%, transparent);
   }
 
   &--active {
-    background: var(--color-darkest);
-    border-color: var(--color-darkest);
-    color: var(--color-light);
-
     img {
       filter: brightness(0) invert(1);
     }
@@ -138,7 +155,6 @@
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: flex-start;
-  color: var(--color-darkest);
   max-width: 940px;
   margin: 20px auto;
 
@@ -148,8 +164,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--color-darkest);
-    border-bottom: 1px solid var(--color-dark);
+    border-bottom: 1px solid;
     padding-bottom: 6px;
   }
 }
@@ -171,9 +186,8 @@
     justify-content: center;
     width: 100px;
     height: 100px;
-    border: 2px dashed var(--color-dark);
+    border: 2px dashed;
     border-radius: 50%;
-    color: var(--color-darkest);
     font-size: 0.85rem;
     cursor: pointer;
     text-align: center;
@@ -183,7 +197,6 @@
       opacity 0.2s;
 
     &:hover:not(:disabled) {
-      border-color: var(--color-1);
     }
 
     &:disabled {
@@ -236,7 +249,6 @@
 .passager-item__label {
   font-size: 11px;
   font-weight: 600;
-  color: var(--color-darker);
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
@@ -244,22 +256,18 @@
 .passager-item__input {
   width: 100%;
   padding: 5px 8px;
-  border: 1px solid var(--color-dark);
+  border: 1px solid;
   border-radius: 4px;
-  background: var(--color-lightness);
-  color: var(--color-darkest);
   font-size: 13px;
   box-sizing: border-box;
   transition: border-color 0.15s;
 
   &::placeholder {
-    color: var(--color-dark);
     font-style: italic;
   }
 
   &:focus {
     outline: none;
-    border-color: var(--color-1);
   }
 
   &[readonly] {
@@ -288,9 +296,8 @@
   width: 22px;
   height: 22px;
   border-radius: 4px;
-  border: 1px solid var(--color-danger);
+  border: 1px solid;
   background: transparent;
-  color: var(--color-danger);
   cursor: pointer;
   font-size: 14px;
   display: flex;
@@ -300,7 +307,6 @@
   transition: background 0.15s;
 
   &:hover {
-    background: color-mix(in srgb, var(--color-danger) 15%, transparent);
   }
 }
 
@@ -308,15 +314,13 @@
   margin-top: 4px;
   padding: 4px 10px;
   border-radius: 4px;
-  border: 1px solid var(--color-1);
+  border: 1px solid;
   background: transparent;
-  color: var(--color-1);
   font-size: 12px;
   cursor: pointer;
   transition: background 0.15s;
 
   &:hover {
-    background: color-mix(in srgb, var(--color-1) 10%, transparent);
   }
 }
 
@@ -326,14 +330,13 @@
   flex-direction: column;
   width: 80%;
   margin: 0 auto 20px;
-  color: var(--color-darkest);
 }
 
 .passager-item__is-header {
   display: flex;
   align-items: center;
   padding: 8px 10px 15px;
-  border-bottom: 2px solid var(--color-1);
+  border-bottom: 2px solid;
 }
 
 .passager-item__is-body {
@@ -344,7 +347,7 @@
 .passager-item__is-sidebar {
   width: 68px;
   flex-shrink: 0;
-  border-right: 2px solid var(--color-1);
+  border-right: 2px solid;
   margin-top: 20px;
   display: flex;
   flex-direction: column;
@@ -388,7 +391,6 @@
   font-size: 33px;
   font-weight: 400;
   letter-spacing: 0.4px;
-  color: var(--color-1);
 }
 
 .passager-item__is-add-btn {
@@ -396,7 +398,7 @@
   height: 32px;
   flex-shrink: 0;
   padding: 2px 2px 2px 3px;
-  border: 1.5px solid var(--color-1);
+  border: 1.5px solid;
   border-radius: 25%;
   margin-right: 5px;
   background: transparent;
@@ -407,7 +409,6 @@
   transition: background 0.15s;
 
   &:hover {
-    background: color-mix(in srgb, var(--color-1) 10%, transparent);
   }
 }
 
@@ -418,7 +419,7 @@
   overflow: hidden;
   position: relative;
   margin: 30px 50px 12px;
-  border: 2px solid var(--color-1);
+  border: 2px solid;
   border-radius: 8px;
   min-height: 460px;
 }
@@ -428,7 +429,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  border-bottom: 1px solid var(--color-dark);
+  border-bottom: 1px solid;
 }
 
 .passager-item__is-color-btn {
@@ -450,7 +451,6 @@
   flex: 1;
   font-weight: 500;
   font-size: 13px;
-  color: var(--color-darkest);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -461,7 +461,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-dark);
   font-size: 13px;
   font-style: italic;
 }

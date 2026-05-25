@@ -1,12 +1,17 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from 'react';
 
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
-import ConfirmationModal from "../../../../components/ConfirmationModal";
-import TrashCard from "../../components/TrashCard";
-import TrashService from "../../../../services/trashService";
+import ConfirmationModal from '../../../../components/ConfirmationModal';
+import TrashCard from '../../components/TrashCard';
+import TrashService from '../../../../services/trashService';
+import { useOdysseeColor } from '../../contexts/OdysseeColorContext.jsx';
 
 const Settings = () => {
+  const { colors } = useOdysseeColor();
   const [products, setProducts] = useState([]);
   const [folders, setFolders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -65,7 +70,7 @@ const Settings = () => {
         style={{
           marginTop: 16,
           marginBottom: 24,
-          color: "var(--color-lightness)",
+          color: colors.lightness,
           fontSize: 18,
         }}
       >

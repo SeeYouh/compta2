@@ -149,6 +149,7 @@ const FAMILY_SWATCHES = Object.fromEntries(
  * Props :
  *   value          {string}   Couleur initiale (hex). Contrôlée par le parent.
  *   onChange       {function} Appelé UNIQUEMENT au clic "Ok" avec la couleur hex choisie.
+ *   onPreview      {function} Appelé en temps réel à chaque changement (avant Ok) pour le live preview.
  *   onClose        {function} Appelé à la fermeture (Ok ou Annuler).
  *   cssVar         {string}   Nom de la CSS custom property à persister en DB (ex: "--color-primary").
  *   contextKey     {string}   Clé unique pour la couleur par défaut de ce contexte (ex: "app-primary").
@@ -159,6 +160,7 @@ const FAMILY_SWATCHES = Object.fromEntries(
 export default function ColorPicker({
   value = "#000000",
   onChange,
+  onPreview,
   onClose,
   cssVar,
   contextKey,
@@ -166,9 +168,9 @@ export default function ColorPicker({
   showHistory = true,
   showDefaultButtons = true,
 }) {
-  const [hue, setHue] = useState(0);
-  const [saturation, setSaturation] = useState(100);
-  const [brightness, setBrightness] = useState(100);
+  const [hue, setHue] = useState(() => HEX_REGEX.test(value) ? hexToHsv(value).h : 0);
+  const [saturation, setSaturation] = useState(() => HEX_REGEX.test(value) ? hexToHsv(value).s : 100);
+  const [brightness, setBrightness] = useState(() => HEX_REGEX.test(value) ? hexToHsv(value).v : 100);
   const [hexInput, setHexInput] = useState(value);
   const [activeFamily, setActiveFamily] = useState("red");
   const [history, setHistory] = useState([]);
@@ -228,6 +230,12 @@ export default function ColorPicker({
   }, [drawCanvas]);
 
   const currentHex = hsvToHex(hue, saturation, brightness);
+
+  // Notifie le parent en temps réel pour le live preview
+  useEffect(() => {
+    onPreview?.(currentHex);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentHex]);
 
   // ─── Drag canvas HSV ────────────────────────────────────────────────────────
 

@@ -1,5 +1,4 @@
-import { DEFAULT_FOLDER_COLOR } from "../config/folderColors";
-import NameColorModal from "./NameColorModal";
+import NameColorModal from './NameColorModal';
 
 const FolderSettingsModal = ({ folder, onSave, onCancel }) => (
   <NameColorModal
@@ -7,7 +6,8 @@ const FolderSettingsModal = ({ folder, onSave, onCancel }) => (
     nameLabel="Nom du dossier"
     namePlaceholder="Nom du dossier (optionnel)"
     initialName={folder.name || ""}
-    initialColor={folder.color || DEFAULT_FOLDER_COLOR}
+    initialColor={folder.color}
+    contextKey="odyssee-folder"
     onSave={onSave}
     onCancel={onCancel}
   />

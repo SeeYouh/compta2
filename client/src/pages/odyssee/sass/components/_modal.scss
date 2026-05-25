@@ -1,19 +1,19 @@
 .modal-content {
-  background: var(--color-darkest);
-  border: 1px solid var(--color-darker);
+  background: var(--ody-darkest);
+  border: 1px solid var(--ody-darker);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 
   .modal-header .modal-title {
-    color: var(--color-lightness);
+    color: var(--ody-lightness);
   }
 
   .modal-body .modal-message {
-    color: var(--color-light);
+    color: var(--ody-light);
 
     span {
       background-image: linear-gradient(
-        var(--color-danger),
-        var(--color-danger)
+        var(--ody-danger),
+        var(--ody-danger)
       );
       background-size: 0% 2px;
       background-position: left bottom;
@@ -28,12 +28,12 @@
   }
 
   .modal-body .modal-toggle {
-    color: var(--color-light);
+    color: var(--ody-light);
 
     &__label {
       flex: 0 0 auto;
       margin-left: auto;
-      color: var(--color-lightness);
+      color: var(--ody-lightness);
       font-weight: 600;
       position: relative;
 
@@ -44,7 +44,7 @@
         left: 0;
         width: 100%;
         height: 2px;
-        background: var(--color-danger);
+        background: var(--ody-danger);
         transform: scaleX(0);
         transform-origin: left;
         transition: transform 0.2s ease;
@@ -56,22 +56,22 @@
     }
 
     &__options {
-      border: 1px solid var(--color-dark);
+      border: 1px solid var(--ody-dark);
 
       &::before {
-        background: var(--color-dark);
+        background: var(--ody-dark);
       }
 
       &--checked::before {
-        background: var(--color-danger);
+        background: var(--ody-danger);
       }
     }
 
     &__opt {
-      color: var(--color-light);
+      color: var(--ody-light);
 
       &--active {
-        color: var(--color-lightness);
+        color: var(--ody-lightness);
       }
 
       &--danger {
@@ -82,35 +82,35 @@
 
   .modal-footer .btn {
     &.btn-secondary {
-      background: var(--color-darker);
-      color: var(--color-lightness);
-      border-color: var(--color-darker);
+      background: var(--ody-darker);
+      color: var(--ody-lightness);
+      border-color: var(--ody-darker);
 
       &:hover {
-        background: var(--color-dark);
+        background: var(--ody-dark);
       }
     }
 
     &.btn-danger {
-      background: var(--color-darker);
-      color: var(--color-lightness);
-      border: 1px solid var(--color-dark);
+      background: var(--ody-darker);
+      color: var(--ody-lightness);
+      border: 1px solid var(--ody-dark);
 
       &:hover:not(:disabled) {
-        background: var(--color-dark);
+        background: var(--ody-dark);
       }
     }
 
     &.btn-danger-soft {
-      background: var(--color-danger);
+      background: var(--ody-danger);
       color: white;
 
       &:hover:not(:disabled) {
-        background: var(--color-danger-light);
+        background: var(--ody-danger-light);
       }
 
       &:focus {
-        outline: 2px solid var(--color-danger);
+        outline: 2px solid var(--ody-danger);
         outline-offset: 2px;
       }
     }

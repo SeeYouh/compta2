@@ -1,14 +1,13 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-import { darken } from "../utils/colorUtils";
+import { darken } from '../utils/colorUtils';
 import {
   DARKEN_BG,
   DARKEN_BORDER,
-  DEFAULT_FOLDER_COLOR,
-} from "../config/folderColors";
-import IconDossierFull from "../assets/IconDossierFull";
-import ProductCard from "./ProductCard";
-import ProductFolderContextMenu from "./ProductFolderContextMenu";
+} from '../config/folderColors';
+import IconDossierFull from '../assets/IconDossierFull';
+import ProductCard from './ProductCard';
+import ProductFolderContextMenu from './ProductFolderContextMenu';
 
 const ProductFolder = ({
   folder,
@@ -97,7 +96,7 @@ const ProductFolder = ({
     }
   };
 
-  const color = folder.color || DEFAULT_FOLDER_COLOR;
+  const color = folder.color;
 
   const classNames = [
     "product-folder",
