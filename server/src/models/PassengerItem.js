@@ -17,7 +17,7 @@ const passengerItemSchema = new mongoose.Schema({
       name: { type: String, default: "" },
     },
     gender: { type: String, enum: ["F", "M", "NC"], default: "NC" },
-    birthDate: { type: Date, default: null },
+    birthDate: { type: String, default: null },
     avatar: { type: String, default: null },
     contact: {
       phone: { type: String, default: "" },
@@ -41,7 +41,7 @@ const passengerItemSchema = new mongoose.Schema({
         id: { type: String },
         type: { type: String, enum: ["block", "folder"], default: "block" },
         title: { type: String },
-        color: { type: String },
+        color: { type: String, default: "#969696" },
         content: { type: String },
         order: { type: Number },
         categoryIds: [{ type: String }],
@@ -73,6 +73,7 @@ const passengerItemSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  color: { type: String, default: "#969696" },
   deletedAt: {
     type: Date,
     default: null,

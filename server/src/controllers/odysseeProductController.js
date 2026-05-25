@@ -1,8 +1,8 @@
-import { fileURLToPath } from 'url';
-import path from 'path';
+import { fileURLToPath } from "url";
+import path from "path";
 
-import { OdysseeProduct } from '../models/OdysseeProduct.js';
-import { OdysseeProductFolder } from '../models/OdysseeProductFolder.js';
+import { OdysseeProduct } from "../models/OdysseeProduct.js";
+import { OdysseeProductFolder } from "../models/OdysseeProductFolder.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -57,6 +57,8 @@ export const createProduct = async (req, res) => {
       userId: req.userId,
       folderId: folderId || null,
     };
+
+    if (req.body.color) productData.color = req.body.color;
 
     if (req.file) {
       const imageUrl = `${req.protocol}://${req.get("host")}/odyssee-images/${req.file.filename}`;

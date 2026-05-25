@@ -1,5 +1,5 @@
-import { OdysseeProductFolder } from "../models/OdysseeProductFolder.js";
-import { PassengerItem } from "../models/PassengerItem.js";
+import { OdysseeProductFolder } from '../models/OdysseeProductFolder.js';
+import { PassengerItem } from '../models/PassengerItem.js';
 
 export const createItem = async (req, res) => {
   try {
@@ -62,6 +62,8 @@ export const createItem = async (req, res) => {
       userId: req.userId,
       folderId: folderId || null,
     };
+
+    if (req.body.color) itemData.color = req.body.color;
 
     if (req.file) {
       itemData.contentFilesData.avatar = `${req.protocol}://${req.get("host")}/odyssee-images/${req.file.filename}`;
@@ -224,6 +226,7 @@ export const updateItem = async (req, res) => {
 
       if (categoryId) updateData.categoryId = categoryId;
       if (folderId !== undefined) updateData.folderId = folderId || null;
+      if (req.body.color !== undefined) updateData.color = req.body.color;
 
       if (req.file) {
         updateData.contentFilesData.avatar = `${req.protocol}://${req.get("host")}/odyssee-images/${req.file.filename}`;

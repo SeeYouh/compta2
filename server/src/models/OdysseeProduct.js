@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
   name: {
@@ -84,6 +84,10 @@ const productSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true,
+  },
+  color: {
+    type: String,
+    default: "#969696",
   },
   deletedAt: {
     type: Date,
