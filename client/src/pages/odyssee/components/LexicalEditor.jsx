@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
@@ -43,6 +44,10 @@ import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+
+import ColorPicker from "../../../components/ColorPicker";
+import { getLexicalColorVars } from "../utils/colorPalette";
+import IconPicture from "../../../assets/IconPicture";
 
 // ─── ImageNode ────────────────────────────────────────────────────────────────
 
@@ -162,7 +167,13 @@ function ToolbarPlugin() {
   const [isBulletList, setIsBulletList] = useState(false);
   const [isOrderedList, setIsOrderedList] = useState(false);
   const [showFormatMarks, setShowFormatMarks] = useState(false);
+  const [textColor, setTextColor] = useState("#000000");
+  const [bgColor, setBgColor] = useState("#ffffff");
+  const [colorPicker, setColorPicker] = useState(null);
   const imageInputRef = useRef(null);
+  const colorPickerTypeRef = useRef(null);
+  const originalColorRef = useRef(null);
+  const confirmedRef = useRef(false);
 
   const updateToolbar = useCallback(() => {
     const selection = $getSelection();
@@ -301,6 +312,35 @@ function ToolbarPlugin() {
     }
   };
 
+  const openColorPicker = (type, e) => {
+    e.preventDefault();
+    const rect = e.currentTarget.getBoundingClientRect();
+    colorPickerTypeRef.current = type;
+    originalColorRef.current = type === "text" ? textColor : bgColor;
+    confirmedRef.current = false;
+    setColorPicker({ x: rect.left, y: rect.bottom + 6 });
+  };
+
+  const handleColorPreview = (hex) => {
+    if (colorPickerTypeRef.current === "text") applyTextColor(hex);
+    else applyBgColor(hex);
+  };
+
+  const handleColorConfirm = (hex) => {
+    confirmedRef.current = true;
+    if (colorPickerTypeRef.current === "text") setTextColor(hex);
+    else setBgColor(hex);
+  };
+
+  const handleColorClose = () => {
+    if (!confirmedRef.current) {
+      if (colorPickerTypeRef.current === "text")
+        applyTextColor(originalColorRef.current);
+      else applyBgColor(originalColorRef.current);
+    }
+    setColorPicker(null);
+  };
+
   const toggleFormatMarks = () => {
     const root = editor.getRootElement();
     if (root) {
@@ -343,249 +383,287 @@ function ToolbarPlugin() {
   );
 
   return (
-    <div className="lex-toolbar">
-      {/* Police & Taille */}
-      <div className="lex-toolbar__group">
-        <select
-          className="lex-toolbar__select"
-          defaultValue=""
-          onChange={(e) => applyFontFamily(e.target.value)}
-          title="Famille de police"
-        >
-          {FONT_FAMILIES.map(({ value, label }) => (
-            <option key={value} value={value} disabled={value === ""}>
-              {label}
-            </option>
-          ))}
-        </select>
-        <select
-          className="lex-toolbar__select lex-toolbar__select--size"
-          defaultValue=""
-          onChange={(e) => applyFontSize(e.target.value)}
-          title="Taille de police"
-        >
-          {FONT_SIZES.map(({ value, label }) => (
-            <option key={value} value={value} disabled={value === ""}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </div>
+    <>
+      <div className="lex-toolbar">
+        {/* Police & Taille */}
+        <div className="lex-toolbar__group">
+          <select
+            className="lex-toolbar__select"
+            defaultValue=""
+            onChange={(e) => applyFontFamily(e.target.value)}
+            title="Famille de police"
+          >
+            {FONT_FAMILIES.map(({ value, label }) => (
+              <option key={value} value={value} disabled={value === ""}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <select
+            className="lex-toolbar__select lex-toolbar__select--size"
+            defaultValue=""
+            onChange={(e) => applyFontSize(e.target.value)}
+            title="Taille de police"
+          >
+            {FONT_SIZES.map(({ value, label }) => (
+              <option key={value} value={value} disabled={value === ""}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      {/* Type de bloc */}
-      <div className="lex-toolbar__group">
-        <select
-          className="lex-toolbar__select"
-          value={
-            blockType === "list" || blockType === "code"
-              ? "paragraph"
-              : blockType
-          }
-          onChange={(e) => formatBlock(e.target.value)}
-          title="Type de bloc"
-        >
-          {BLOCK_TYPES.map(({ value, label }) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </div>
+        {/* Type de bloc */}
+        <div className="lex-toolbar__group">
+          <select
+            className="lex-toolbar__select"
+            value={
+              blockType === "list" || blockType === "code"
+                ? "paragraph"
+                : blockType
+            }
+            onChange={(e) => formatBlock(e.target.value)}
+            title="Type de bloc"
+          >
+            {BLOCK_TYPES.map(({ value, label }) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      {/* Formatage texte */}
-      <div className="lex-toolbar__group">
-        <Btn
-          active={isBold}
-          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")}
-          title="Gras"
-        >
-          <b>G</b>
-        </Btn>
-        <Btn
-          active={isItalic}
-          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")}
-          title="Italique"
-        >
-          <i>I</i>
-        </Btn>
-        <Btn
-          active={isUnderline}
-          onClick={() =>
-            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline")
-          }
-          title="Souligné"
-        >
-          <u>S</u>
-        </Btn>
-        <Btn
-          active={isStrikethrough}
-          onClick={() =>
-            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough")
-          }
-          title="Barré"
-        >
-          <s>B</s>
-        </Btn>
-        <label className="lex-toolbar__color-label" title="Couleur du texte">
-          A
+        {/* Formatage texte */}
+        <div className="lex-toolbar__group">
+          <Btn
+            active={isBold}
+            onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")}
+            title="Gras"
+          >
+            <b>G</b>
+          </Btn>
+          <Btn
+            active={isItalic}
+            onClick={() =>
+              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")
+            }
+            title="Italique"
+          >
+            <i>I</i>
+          </Btn>
+          <Btn
+            active={isUnderline}
+            onClick={() =>
+              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline")
+            }
+            title="Souligné"
+          >
+            <u>S</u>
+          </Btn>
+          <Btn
+            active={isStrikethrough}
+            onClick={() =>
+              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough")
+            }
+            title="Barré"
+          >
+            <s>B</s>
+          </Btn>
+          <button
+            type="button"
+            className="lex-toolbar__color-label"
+            title="Couleur du texte"
+            onMouseDown={(e) => openColorPicker("text", e)}
+          >
+            <span style={{ borderBottom: `2px solid ${textColor}` }}>A</span>
+          </button>
+          <button
+            type="button"
+            className="lex-toolbar__color-label lex-toolbar__color-label--bg"
+            title="Couleur de paragraphe"
+            onMouseDown={(e) => openColorPicker("bg", e)}
+          >
+            <span
+              style={{
+                color: bgColor === "#ffffff" ? "var(--lex-text)" : bgColor,
+              }}
+            >
+              ▬
+            </span>
+          </button>
+        </div>
+
+        {/* Listes & indentation */}
+        <div className="lex-toolbar__group">
+          <Btn
+            active={isOrderedList}
+            onClick={() => toggleList("ordered")}
+            title="Liste numérotée"
+          >
+            1. —
+          </Btn>
+          <Btn
+            active={isBulletList}
+            onClick={() => toggleList("bullet")}
+            title="Liste à puces"
+          >
+            • —
+          </Btn>
+          <Btn
+            onClick={() =>
+              editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined)
+            }
+            title="Désindenter"
+          >
+            ⇤
+          </Btn>
+          <Btn
+            onClick={() =>
+              editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined)
+            }
+            title="Indenter"
+          >
+            ⇥
+          </Btn>
+        </div>
+
+        {/* Exposant / Indice / Code / ¶ */}
+        <div className="lex-toolbar__group">
+          <Btn
+            active={isSuperscript}
+            onClick={() =>
+              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript")
+            }
+            title="Exposant"
+          >
+            x²
+          </Btn>
+          <Btn
+            active={isSubscript}
+            onClick={() =>
+              editor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript")
+            }
+            title="Indice"
+          >
+            x₂
+          </Btn>
+          <Btn
+            active={blockType === "code"}
+            onClick={formatCodeBlock}
+            title="Bloc de code"
+          >
+            &lt;/&gt;
+          </Btn>
+          <Btn
+            active={showFormatMarks}
+            onClick={toggleFormatMarks}
+            title="Afficher les marques de formatage"
+          >
+            ¶
+          </Btn>
+        </div>
+
+        {/* Alignement */}
+        <div className="lex-toolbar__group">
+          <Btn
+            onClick={() =>
+              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left")
+            }
+            title="Gauche"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <rect x="1" y="2" width="14" height="2" rx="1" />
+              <rect x="1" y="7" width="9" height="2" rx="1" />
+              <rect x="1" y="12" width="12" height="2" rx="1" />
+            </svg>
+          </Btn>
+          <Btn
+            onClick={() =>
+              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center")
+            }
+            title="Centré"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <rect x="1" y="2" width="14" height="2" rx="1" />
+              <rect x="4" y="7" width="8" height="2" rx="1" />
+              <rect x="2" y="12" width="12" height="2" rx="1" />
+            </svg>
+          </Btn>
+          <Btn
+            onClick={() =>
+              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right")
+            }
+            title="Droite"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <rect x="1" y="2" width="14" height="2" rx="1" />
+              <rect x="6" y="7" width="9" height="2" rx="1" />
+              <rect x="3" y="12" width="12" height="2" rx="1" />
+            </svg>
+          </Btn>
+          <Btn
+            onClick={() =>
+              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify")
+            }
+            title="Justifié"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <rect x="1" y="2" width="14" height="2" rx="1" />
+              <rect x="1" y="7" width="14" height="2" rx="1" />
+              <rect x="1" y="12" width="14" height="2" rx="1" />
+            </svg>
+          </Btn>
+        </div>
+
+        {/* Image */}
+        <div className="lex-toolbar__group">
+          <Btn
+            onClick={() => imageInputRef.current?.click()}
+            title="Insérer une image"
+          >
+            <IconPicture size={16} />
+          </Btn>
           <input
-            type="color"
-            className="lex-toolbar__color-input"
-            defaultValue="#000000"
-            onChange={(e) => applyTextColor(e.target.value)}
+            ref={imageInputRef}
+            type="file"
+            accept="image/*"
+            className="lex-toolbar__file-input"
+            onChange={handleImageChange}
           />
-        </label>
-        <label
-          className="lex-toolbar__color-label lex-toolbar__color-label--bg"
-          title="Couleur de paragraphe"
-        >
-          ▬
-          <input
-            type="color"
-            className="lex-toolbar__color-input"
-            defaultValue="#ffffff"
-            onChange={(e) => applyBgColor(e.target.value)}
-          />
-        </label>
+        </div>
+
+        {/* Undo / Redo */}
+        <div className="lex-toolbar__group">
+          <Btn
+            onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
+            title="Annuler"
+          >
+            ↩
+          </Btn>
+          <Btn
+            onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
+            title="Rétablir"
+          >
+            ↪
+          </Btn>
+        </div>
       </div>
 
-      {/* Listes & indentation */}
-      <div className="lex-toolbar__group">
-        <Btn
-          active={isOrderedList}
-          onClick={() => toggleList("ordered")}
-          title="Liste numérotée"
-        >
-          1. —
-        </Btn>
-        <Btn
-          active={isBulletList}
-          onClick={() => toggleList("bullet")}
-          title="Liste à puces"
-        >
-          • —
-        </Btn>
-        <Btn
-          onClick={() =>
-            editor.dispatchCommand(OUTDENT_CONTENT_COMMAND, undefined)
-          }
-          title="Désindenter"
-        >
-          ⇤
-        </Btn>
-        <Btn
-          onClick={() =>
-            editor.dispatchCommand(INDENT_CONTENT_COMMAND, undefined)
-          }
-          title="Indenter"
-        >
-          ⇥
-        </Btn>
-      </div>
-
-      {/* Exposant / Indice / Code / ¶ */}
-      <div className="lex-toolbar__group">
-        <Btn
-          active={isSuperscript}
-          onClick={() =>
-            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "superscript")
-          }
-          title="Exposant"
-        >
-          x²
-        </Btn>
-        <Btn
-          active={isSubscript}
-          onClick={() =>
-            editor.dispatchCommand(FORMAT_TEXT_COMMAND, "subscript")
-          }
-          title="Indice"
-        >
-          x₂
-        </Btn>
-        <Btn
-          active={blockType === "code"}
-          onClick={formatCodeBlock}
-          title="Bloc de code"
-        >
-          &lt;/&gt;
-        </Btn>
-        <Btn
-          active={showFormatMarks}
-          onClick={toggleFormatMarks}
-          title="Afficher les marques de formatage"
-        >
-          ¶
-        </Btn>
-      </div>
-
-      {/* Alignement */}
-      <div className="lex-toolbar__group">
-        <Btn
-          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left")}
-          title="Gauche"
-        >
-          ⬅
-        </Btn>
-        <Btn
-          onClick={() =>
-            editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center")
-          }
-          title="Centré"
-        >
-          ↔
-        </Btn>
-        <Btn
-          onClick={() =>
-            editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right")
-          }
-          title="Droite"
-        >
-          ➡
-        </Btn>
-        <Btn
-          onClick={() =>
-            editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify")
-          }
-          title="Justifié"
-        >
-          ☰
-        </Btn>
-      </div>
-
-      {/* Image */}
-      <div className="lex-toolbar__group">
-        <Btn
-          onClick={() => imageInputRef.current?.click()}
-          title="Insérer une image"
-        >
-          🖼
-        </Btn>
-        <input
-          ref={imageInputRef}
-          type="file"
-          accept="image/*"
-          className="lex-toolbar__file-input"
-          onChange={handleImageChange}
-        />
-      </div>
-
-      {/* Undo / Redo */}
-      <div className="lex-toolbar__group">
-        <Btn
-          onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
-          title="Annuler"
-        >
-          ↩
-        </Btn>
-        <Btn
-          onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
-          title="Rétablir"
-        >
-          ↪
-        </Btn>
-      </div>
-    </div>
+      {colorPicker &&
+        createPortal(
+          <ColorPicker
+            value={colorPickerTypeRef.current === "text" ? textColor : bgColor}
+            onChange={handleColorConfirm}
+            onPreview={handleColorPreview}
+            onClose={handleColorClose}
+            showDefaultButtons={false}
+            draggable
+            initialX={colorPicker.x}
+            initialY={colorPicker.y}
+          />,
+          document.querySelector(".odyssee-root"),
+        )}
+    </>
   );
 }
 
@@ -612,7 +690,8 @@ function LoadInitialContentPlugin({ content }) {
 
 // ─── LexicalEditor ───────────────────────────────────────────────────────────
 
-const LexicalEditor = ({ content, onChange }) => {
+const LexicalEditor = ({ content, onChange, blockColor }) => {
+  const toolbarVars = getLexicalColorVars(blockColor);
   const initialConfig = {
     namespace: "LexicalEditor",
     theme: lexicalTheme,
@@ -639,7 +718,7 @@ const LexicalEditor = ({ content, onChange }) => {
   );
 
   return (
-    <div className="lexical-editor">
+    <div className="lexical-editor" style={toolbarVars}>
       <LexicalComposer initialConfig={initialConfig}>
         <ToolbarPlugin />
         <div className="lexical-editor__body">

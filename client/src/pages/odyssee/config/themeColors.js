@@ -11,8 +11,8 @@ const DARKER = 66;
 const DARKEST = 73;
 
 // Couleurs sémantiques fixes (indépendantes de la couleur de base)
-export const COLOR_DANGER = "#c0392b";
-export const COLOR_DANGER_LIGHT = "#e57373";
+export const COLOR_DANGER = "#6c0a0a";
+export const COLOR_DANGER_LIGHT = "#6c0a0a";
 
 /**
  * Calcule toutes les CSS custom properties du thème à partir d'une couleur de base.

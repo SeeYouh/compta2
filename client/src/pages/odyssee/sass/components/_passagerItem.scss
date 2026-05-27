@@ -129,7 +129,7 @@
     background 0.15s,
     border-color 0.15s;
 
-  img {
+  svg {
     width: 16px;
     height: 16px;
   }
@@ -138,9 +138,6 @@
   }
 
   &--active {
-    img {
-      filter: brightness(0) invert(1);
-    }
   }
 
   &:disabled {

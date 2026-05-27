@@ -112,6 +112,7 @@ const Dashboard = () => {
     transformItemForEdit: (item) => ({
       ...item.contentFilesData,
       _id: item._id,
+      color: item.color,
     }),
     newItemTemplate: (folderId) => ({
       productName: "",
@@ -260,6 +261,7 @@ const Dashboard = () => {
               categoryId={passengersEngine.selectedCategory}
               onProductCreated={passengersEngine.handleItemCreated}
               editMode={passengersEngine.editMode}
+              onActivate={() => passengersEngine.setEditMode(true)}
             />
           )}
         {selectedCategoryLibrary === "Odyssée" &&
@@ -270,6 +272,7 @@ const Dashboard = () => {
               categoryId={odysseeEngine.selectedCategory}
               onProductCreated={odysseeEngine.handleItemCreated}
               editMode={odysseeEngine.editMode}
+              onActivate={() => odysseeEngine.setEditMode(true)}
             />
           )}
         {selectedCategoryLibrary === "Catalogues" &&

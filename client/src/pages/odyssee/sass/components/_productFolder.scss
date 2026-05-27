@@ -280,13 +280,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  align-items: end;
+  align-items: center;
   align-content: start;
 
   // Compense le padding bas du dossier (body 8px + grid 4px)
   // pour aligner les items normaux avec les items internes du dossier
   > .catalog-card {
-    margin-bottom: 12px;
+    margin: 0 12px 12px 0;
   }
 
   &--drag-over {

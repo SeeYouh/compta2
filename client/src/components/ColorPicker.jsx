@@ -86,28 +86,66 @@ function hslToHex(h, s, l) {
   const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
   const m = ln - c / 2;
   let r, g, b;
-  if (h < 60) { r = c; g = x; b = 0; }
-  else if (h < 120) { r = x; g = c; b = 0; }
-  else if (h < 180) { r = 0; g = c; b = x; }
-  else if (h < 240) { r = 0; g = x; b = c; }
-  else if (h < 300) { r = x; g = 0; b = c; }
-  else { r = c; g = 0; b = x; }
-  const toH = (n) => Math.round((n + m) * 255).toString(16).padStart(2, "0");
+  if (h < 60) {
+    r = c;
+    g = x;
+    b = 0;
+  } else if (h < 120) {
+    r = x;
+    g = c;
+    b = 0;
+  } else if (h < 180) {
+    r = 0;
+    g = c;
+    b = x;
+  } else if (h < 240) {
+    r = 0;
+    g = x;
+    b = c;
+  } else if (h < 300) {
+    r = x;
+    g = 0;
+    b = c;
+  } else {
+    r = c;
+    g = 0;
+    b = x;
+  }
+  const toH = (n) =>
+    Math.round((n + m) * 255)
+      .toString(16)
+      .padStart(2, "0");
   return `#${toH(r)}${toH(g)}${toH(b)}`;
 }
 
 const HEX_REGEX = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
 const HISTORY_SIZE = 30;
 
-function isLightColor(hex) {
+function parseHex(hex) {
   const full =
     hex.length === 4
       ? `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`
       : hex;
-  const r = parseInt(full.slice(1, 3), 16);
-  const g = parseInt(full.slice(3, 5), 16);
-  const b = parseInt(full.slice(5, 7), 16);
+  return [
+    parseInt(full.slice(1, 3), 16),
+    parseInt(full.slice(3, 5), 16),
+    parseInt(full.slice(5, 7), 16),
+  ];
+}
+
+function isLightColor(hex) {
+  const [r, g, b] = parseHex(hex);
   return 0.299 * r + 0.587 * g + 0.114 * b > 140;
+}
+
+function getAdaptedBorderColor(hex) {
+  const [r, g, b] = parseHex(hex);
+  if (isLightColor(hex)) {
+    const f = 0.6;
+    return `rgb(${Math.round(r * f)}, ${Math.round(g * f)}, ${Math.round(b * f)})`;
+  }
+  const f = 0.4;
+  return `rgb(${Math.round(r + (255 - r) * f)}, ${Math.round(g + (255 - g) * f)}, ${Math.round(b + (255 - b) * f)})`;
 }
 
 // ─── Familles de couleurs ──────────────────────────────────────────────────────
@@ -131,14 +169,16 @@ const FAMILY_SWATCHES = Object.fromEntries(
     const colors = [];
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
-        const h = (hueCenter - hueSpread / 2 + (c / (COLS - 1)) * hueSpread + 360) % 360;
+        const h =
+          (hueCenter - hueSpread / 2 + (c / (COLS - 1)) * hueSpread + 360) %
+          360;
         const s = Math.round(15 + (c / (COLS - 1)) * 80);
         const l = Math.round(95 - (r / (ROWS - 1)) * 82);
         colors.push(hslToHex(Math.round(h), s, l));
       }
     }
     return [key, colors];
-  })
+  }),
 );
 
 // ─── Composant ────────────────────────────────────────────────────────────────
@@ -167,14 +207,24 @@ export default function ColorPicker({
   defaultColor = "#000000",
   showHistory = true,
   showDefaultButtons = true,
+  draggable = false,
+  initialX = 0,
+  initialY = 0,
 }) {
-  const [hue, setHue] = useState(() => HEX_REGEX.test(value) ? hexToHsv(value).h : 0);
-  const [saturation, setSaturation] = useState(() => HEX_REGEX.test(value) ? hexToHsv(value).s : 100);
-  const [brightness, setBrightness] = useState(() => HEX_REGEX.test(value) ? hexToHsv(value).v : 100);
+  const [hue, setHue] = useState(() =>
+    HEX_REGEX.test(value) ? hexToHsv(value).h : 0,
+  );
+  const [saturation, setSaturation] = useState(() =>
+    HEX_REGEX.test(value) ? hexToHsv(value).s : 100,
+  );
+  const [brightness, setBrightness] = useState(() =>
+    HEX_REGEX.test(value) ? hexToHsv(value).v : 100,
+  );
   const [hexInput, setHexInput] = useState(value);
   const [activeFamily, setActiveFamily] = useState("red");
   const [history, setHistory] = useState([]);
   const [savedDefault, setSavedDefault] = useState(null);
+  const [pos, setPos] = useState({ x: initialX, y: initialY });
 
   const canvasRef = useRef(null);
   const hueSliderRef = useRef(null);
@@ -256,8 +306,26 @@ export default function ColorPicker({
   );
 
   const handleCanvasMouseDown = (e) => {
+    e.stopPropagation();
     handleCanvasDrag(e.clientX, e.clientY);
     const onMove = (ev) => handleCanvasDrag(ev.clientX, ev.clientY);
+    const onUp = () => {
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  };
+
+  // ─── Drag déplacement fenêtre ──────────────────────────────────────────────────
+
+  const handlePickerDragStart = (e) => {
+    if (!draggable || e.target.closest("button, input")) return;
+    e.preventDefault();
+    const offsetX = e.clientX - pos.x;
+    const offsetY = e.clientY - pos.y;
+    const onMove = (ev) =>
+      setPos({ x: ev.clientX - offsetX, y: ev.clientY - offsetY });
     const onUp = () => {
       document.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseup", onUp);
@@ -282,6 +350,7 @@ export default function ColorPicker({
   );
 
   const handleHueMouseDown = (e) => {
+    e.stopPropagation();
     handleHueDrag(e.clientX);
     const onMove = (ev) => handleHueDrag(ev.clientX);
     const onUp = () => {
@@ -358,7 +427,21 @@ export default function ColorPicker({
   const swatches = FAMILY_SWATCHES[activeFamily] ?? [];
 
   return (
-    <div className="color-picker">
+    <div
+      className={`color-picker${draggable ? " color-picker--draggable" : ""}`}
+      style={
+        draggable
+          ? {
+              position: "fixed",
+              left: pos.x,
+              top: pos.y,
+              zIndex: 9999,
+              "--picker-border-color": getAdaptedBorderColor(currentHex),
+            }
+          : { "--picker-border-color": getAdaptedBorderColor(currentHex) }
+      }
+      onMouseDown={handlePickerDragStart}
+    >
       {/* Zone haute : canvas HSV + colonne actions/historique */}
       <div className="color-picker__top">
         <div className="color-picker__canvas-wrap">
@@ -378,7 +461,11 @@ export default function ColorPicker({
         <div className="color-picker__right">
           <div className="color-picker__actions">
             <div className="color-picker__actions-row">
-              <button type="button" className="color-picker__btn" onClick={handleOk}>
+              <button
+                type="button"
+                className="color-picker__btn"
+                onClick={handleOk}
+              >
                 Ok
               </button>
               <button
@@ -445,7 +532,9 @@ export default function ColorPicker({
               spellCheck={false}
               style={{
                 background: currentHex,
-                color: isLightColor(currentHex) ? "var(--color-darker)" : "var(--color-lightness)",
+                color: isLightColor(currentHex)
+                  ? "var(--color-darker)"
+                  : "var(--color-lightness)",
               }}
             />
           </div>

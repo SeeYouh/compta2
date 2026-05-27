@@ -1,20 +1,166 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import { ArrayGraduation } from "./utils/ArrayGraduation";
+import ColorPicker from "../../../components/ColorPicker";
+import { computeColorPalette } from "../utils/colorPalette.js";
+import IconSaveFalse from "../../../assets/IconSaveFalse.jsx";
+import IconSaveTrue from "../../../assets/IconSaveTrue.jsx";
 import InTakeTimeAdvancedMode from "./InTakeTimeAdvancedMode";
 import InTakeTimeNormalMode from "./InTakeTimeNormalMode";
 import { odysseyItemService } from "../services/odysseyServices";
 import Range14 from "./Range14";
 import RangeDays from "./RangeDays";
+import { useOdysseeColor } from "../contexts/OdysseeColorContext.jsx";
+
+function buildOdysseeStyles(c, id) {
+  return `
+    [data-odyssee="${id}"] {
+      background-color: ${c.lightness};
+    }
+    [data-odyssee="${id}"] .paper-product-container-navBar {
+      background-color: ${c.base};
+    }
+    [data-odyssee="${id}"] .paper-product__name-input,
+    [data-odyssee="${id}"] .paper-product__alias-input {
+      border-bottom-color: color-mix(in srgb, ${c.contrastBase} 40%, transparent);
+      color: ${c.contrastBase};
+    }
+    [data-odyssee="${id}"] .paper-product__name-input::placeholder,
+    [data-odyssee="${id}"] .paper-product__alias-input::placeholder {
+      color: color-mix(in srgb, ${c.contrastBase} 45%, transparent);
+    }
+    [data-odyssee="${id}"] .paper-product__name-input:focus,
+    [data-odyssee="${id}"] .paper-product__alias-input:focus {
+      border-bottom-color: ${c.contrastBase};
+    }
+    [data-odyssee="${id}"] .paper-product__alias-input {
+      color: color-mix(in srgb, ${c.contrastBase} 75%, transparent);
+    }
+    [data-odyssee="${id}"] .paper-product__color-btn {
+      border-color: color-mix(in srgb, ${c.contrastBase} 30%, transparent);
+    }
+    [data-odyssee="${id}"] .paper-product__color-btn:hover {
+      border-color: color-mix(in srgb, ${c.contrastBase} 60%, transparent);
+    }
+    [data-odyssee="${id}"] .paper-product__status--success {
+      background-color: ${c.dark};
+      color: ${c.lightness};
+      border-left-color: ${c.base};
+    }
+    [data-odyssee="${id}"] .paper-product__status--error {
+      background-color: ${c.darkest};
+      color: ${c.dangerLight};
+      border-left-color: ${c.danger};
+    }
+    [data-odyssee="${id}"] .paper-product__upload-label {
+      border-color: ${c.dark};
+      color: ${c.light};
+    }
+    [data-odyssee="${id}"] .paper-product__upload-label:hover {
+      border-color: ${c.base};
+      color: ${c.lightness};
+    }
+    [data-odyssee="${id}"] .paper-product__image-preview img {
+      border-color: ${c.dark};
+    }
+    [data-odyssee="${id}"] .paper-product__image-remove {
+      background-color: ${c.darkest};
+      color: ${c.lightness};
+      border-color: ${c.dark};
+    }
+    [data-odyssee="${id}"] .paper-product__image-remove:hover {
+      background-color: ${c.danger};
+    }
+    [data-odyssee="${id}"] .paper-product-container {
+      color: ${c.darkest};
+    }
+    [data-odyssee="${id}"] .inTakeTime-container h4 {
+      border-color: ${c.darkest};
+      background-color: ${c.darkest};
+      color: ${c.light};
+    }
+    [data-odyssee="${id}"] .title-inTakeTime-container label {
+      border-color: ${c.darkest};
+    }
+    [data-odyssee="${id}"] .title-inTakeTime-container input[type="checkbox"]:checked + label p:first-child {
+      background-color: ${c.base};
+      color: ${c.light};
+    }
+    [data-odyssee="${id}"] .title-inTakeTime-container p:last-child {
+      background-color: ${c.base};
+      color: ${c.light};
+    }
+    [data-odyssee="${id}"] .inTakeTime-moment label {
+      border-color: ${c.dark};
+    }
+    [data-odyssee="${id}"] .inTakeTime-moment input[type="checkbox"]:checked + label {
+      background-color: ${c.base};
+      color: ${c.light};
+    }
+    [data-odyssee="${id}"] .inTakeTime-container_moment__label::after {
+      background-color: ${c.darkest};
+    }
+    [data-odyssee="${id}"] .inTakeTime-container_moment li input[type="radio"]:checked + label .inTakeTime-container_moment__label::after {
+      background-color: ${c.base};
+    }
+    [data-odyssee="${id}"] .custom-range input[type="range"]::-webkit-slider-runnable-track {
+      background: ${c.darker};
+    }
+    [data-odyssee="${id}"] .custom-range input[type="range"]::-moz-range-track {
+      background: ${c.darker};
+    }
+    [data-odyssee="${id}"] .custom-range input[type="range"]::-moz-range-progress {
+      background-color: ${c.darker};
+    }
+    [data-odyssee="${id}"] .custom-range input[type="range"]::-webkit-slider-thumb {
+      background: ${c.darker};
+    }
+    [data-odyssee="${id}"] .custom-range input[type="range"]::-moz-range-thumb {
+      background: ${c.darker};
+    }
+    [data-odyssee="${id}"] .inTakeTime-container_moment .custom-range input[type="range"]::-webkit-slider-runnable-track {
+      background: ${c.darker};
+    }
+    [data-odyssee="${id}"] .inTakeTime-container_moment .custom-range input[type="range"]::-webkit-slider-thumb {
+      background: ${c.base};
+    }
+    [data-odyssee="${id}"] .inTakeTime-container_moment .custom-range input[type="range"]::-moz-range-thumb {
+      background: ${c.darker};
+    }
+    [data-odyssee="${id}"] .array-graduation_text label {
+      border-bottom-color: ${c.light};
+    }
+    [data-odyssee="${id}"] .array-graduation_text label span {
+      background-color: ${c.light};
+      border-color: ${c.base};
+    }
+    [data-odyssee="${id}"] .array-graduation input[type="radio"]:checked + label {
+      border-bottom-color: ${c.base};
+    }
+  `;
+}
 
 const OdysseeItem = ({
   contentFilesData,
   categoryId,
   onProductCreated,
   editMode = false,
+  onActivate,
 }) => {
   const productId = contentFilesData._id || null;
   const folderId = contentFilesData.folderId || null;
+  const entityId = productId || "new-odyssee";
+
+  const [color, setColor] = useState(contentFilesData.color || "");
+  const [previewColor, setPreviewColor] = useState(null);
+  const [showColorPicker, setShowColorPicker] = useState(false);
+
+  const { colors: themeColors } = useOdysseeColor();
+  const activeColor = previewColor || color;
+  const colors = useMemo(
+    () => (activeColor ? computeColorPalette(activeColor) : themeColors),
+    [activeColor, themeColors],
+  );
   const [productName, setProductName] = useState(
     contentFilesData.productName || "",
   );
@@ -93,6 +239,7 @@ const OdysseeItem = ({
       }),
     );
     formData.append("categoryId", categoryId);
+    formData.append("color", color);
     if (folderId) formData.append("folderId", folderId);
     if (imageFile) formData.append("image", imageFile);
 
@@ -126,7 +273,13 @@ const OdysseeItem = ({
   const readOnly = !!productId && !editMode;
 
   return (
-    <form className="paper-product" onSubmit={handleSubmit} method="POST">
+    <form
+      className="paper-product"
+      data-odyssee={entityId}
+      onSubmit={handleSubmit}
+      method="POST"
+    >
+      <style>{buildOdysseeStyles(colors, entityId)}</style>
       <div className="paper-product-container-navBar">
         <div className="paper-product-container-navBar_titleProduct">
           <input
@@ -148,12 +301,44 @@ const OdysseeItem = ({
             readOnly={readOnly}
           />
         </div>
-        {!readOnly && (
-          <input
-            type="submit"
-            value={editMode ? "Mettre à jour" : "Enregistrer"}
+        <div className="paper-product__color-wrap">
+          <div className="paper-product__save-wrap">
+            {readOnly ? (
+              <div className="paper-product__save-btn" onClick={onActivate}>
+                <IconSaveFalse color={colors.contrastBase} />
+              </div>
+            ) : (
+              <button type="submit" className="paper-product__save-btn">
+                <IconSaveTrue color={colors.contrastBase} />
+              </button>
+            )}
+            <span className="save-tooltip">
+              {readOnly ? "Activer l'édition" : "Enregistrer l'odyssée"}
+            </span>
+          </div>
+          <div
+            className="paper-product__color-btn"
+            style={{ background: colors.base }}
+            onClick={() => !readOnly && setShowColorPicker((v) => !v)}
+            title="Couleur du voyage"
           />
-        )}
+          {showColorPicker && (
+            <div className="paper-product__color-picker-wrap">
+              <ColorPicker
+                value={color || themeColors.base}
+                onChange={(hex) => setColor(hex)}
+                onPreview={(hex) => setPreviewColor(hex)}
+                onClose={() => {
+                  setShowColorPicker(false);
+                  setPreviewColor(null);
+                }}
+                contextKey={`odyssee-item-${productId || "new"}`}
+                showHistory
+                showDefaultButtons={!!productId}
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       {saveStatus && (

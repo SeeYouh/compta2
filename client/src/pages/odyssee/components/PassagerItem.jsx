@@ -7,8 +7,10 @@ import CountryPicker from "./CountryPicker";
 import { FOLDER_PALETTE } from "../config/folderColors";
 import { getInitials } from "../utils/stringUtils";
 import IconAddPaper from "../../../assets/IconAddPaper";
-import IconGenreF from "../../../assets/Icon-GenreF.svg";
-import IconGenreM from "../../../assets/Icon-GenreM.svg";
+import IconGenreF from "../../../assets/IconGenreF.jsx";
+import IconGenreM from "../../../assets/IconGenreM.jsx";
+import IconSaveFalse from "../../../assets/IconSaveFalse.jsx";
+import IconSaveTrue from "../../../assets/IconSaveTrue.jsx";
 import LexicalEditor from "./LexicalEditor";
 import { lighten } from "../utils/colorUtils";
 import NameColorModal from "./NameColorModal";
@@ -22,41 +24,45 @@ import { useSidebarIndicator } from "../hooks/useSidebarIndicator";
 
 function buildPassagerStyles(c, id) {
   return `
+    [data-passager="${id}"] .passager-item {
+      background-color: ${c.lightness};
+    }
     [data-passager="${id}"] .passager-item__navbar {
       background-color: ${c.base};
     }
     [data-passager="${id}"] .passager-item__nav-input {
-      border-bottom-color: color-mix(in srgb, ${c.lightness} 40%, transparent);
-      color: ${c.darkest};
+      border-bottom-color: color-mix(in srgb, ${c.contrastBase} 40%, transparent);
+      color: ${c.contrastBase};
     }
     [data-passager="${id}"] .passager-item__nav-input::placeholder {
-      color: color-mix(in srgb, ${c.darkest} 45%, transparent);
+      color: color-mix(in srgb, ${c.contrastBase} 45%, transparent);
     }
     [data-passager="${id}"] .passager-item__nav-input:focus {
-      border-bottom-color: ${c.lightness};
+      border-bottom-color: ${c.contrastBase};
     }
     [data-passager="${id}"] .passager-item__nav-input--alias {
-      color: color-mix(in srgb, ${c.darkest} 75%, transparent);
+      color: color-mix(in srgb, ${c.contrastBase} 75%, transparent);
     }
-    [data-passager="${id}"] .passager-item__navbar input[type="submit"] {
-      background-color: ${c.darker};
-      color: ${c.lightness};
-      border-color: color-mix(in srgb, ${c.lightness} 35%, transparent);
-    }
-    [data-passager="${id}"] .passager-item__navbar input[type="submit"]:hover:not(:disabled) {
-      background-color: ${c.darkest};
+    [data-passager="${id}"] .passager-item__nav-input--date {
+      color-scheme: ${c.contrastBase === "#ffffff" ? "dark" : "light"};
     }
     [data-passager="${id}"] .passager-item__gender-btn {
-      border-color: color-mix(in srgb, ${c.darkest} 40%, transparent);
-      color: ${c.darkest};
+      border-color: color-mix(in srgb, ${c.contrastBase} 40%, transparent);
+      color: ${c.contrastBase};
     }
     [data-passager="${id}"] .passager-item__gender-btn:hover:not(:disabled) {
-      background: color-mix(in srgb, ${c.darkest} 12%, transparent);
+      background: color-mix(in srgb, ${c.contrastBase} 12%, transparent);
     }
     [data-passager="${id}"] .passager-item__gender-btn--active {
-      background: ${c.darkest};
-      border-color: ${c.darkest};
-      color: ${c.light};
+      background: ${c.contrastBase};
+      border-color: ${c.contrastBase};
+      color: ${c.base};
+    }
+    [data-passager="${id}"] .passager-item__color-btn {
+      border-color: color-mix(in srgb, ${c.contrastBase} 30%, transparent);
+    }
+    [data-passager="${id}"] .passager-item__color-btn:hover {
+      border-color: color-mix(in srgb, ${c.contrastBase} 60%, transparent);
     }
     [data-passager="${id}"] .passager-item__container {
       color: ${c.darkest};
@@ -158,6 +164,7 @@ const PassagerItem = ({
   categoryId,
   onProductCreated,
   editMode = false,
+  onActivate,
 }) => {
   const productId = contentFilesData._id || null;
   const folderId = contentFilesData.folderId || null;
@@ -683,7 +690,7 @@ const PassagerItem = ({
                 disabled={readOnly}
                 title="Féminin"
               >
-                <img src={IconGenreF} alt="Féminin" />
+                <IconGenreF />
               </button>
               <button
                 type="button"
@@ -695,7 +702,7 @@ const PassagerItem = ({
                 disabled={readOnly}
                 title="Masculin"
               >
-                <img src={IconGenreM} alt="Masculin" />
+                <IconGenreM />
               </button>
               <button
                 type="button"
@@ -723,15 +730,25 @@ const PassagerItem = ({
             />
           </div>
 
-          {!readOnly && (
-            <input
-              type="submit"
-              value={productId && editMode ? "Mettre à jour" : "Enregistrer"}
-              disabled={!isDirty}
-            />
-          )}
-
           <div className="passager-item__color-wrap">
+            <div className="paper-product__save-wrap">
+              {readOnly ? (
+                <div className="paper-product__save-btn" onClick={onActivate}>
+                  <IconSaveFalse color={colors.contrastBase} />
+                </div>
+              ) : (
+                <button
+                  type="submit"
+                  className="paper-product__save-btn"
+                  disabled={!isDirty}
+                >
+                  <IconSaveTrue color={colors.contrastBase} />
+                </button>
+              )}
+              <span className="save-tooltip">
+                {readOnly ? "Activer l'édition" : "Enregistrer le passager"}
+              </span>
+            </div>
             <div
               className="passager-item__color-btn"
               style={{ background: colors.base }}
@@ -1120,6 +1137,7 @@ const PassagerItem = ({
                     className="passager-item__is-editor-header"
                     style={{
                       background: lighten(activeBlock.color, 69),
+                      borderColor: activeBlock.color,
                     }}
                   >
                     <span className="passager-item__is-block-title">
@@ -1211,6 +1229,7 @@ const PassagerItem = ({
                   <LexicalEditor
                     key={activeBlock.id}
                     content={activeBlock.content}
+                    blockColor={activeBlock.color}
                     onChange={(html) =>
                       setInfoSuppBlocks((prev) => ({
                         ...prev,

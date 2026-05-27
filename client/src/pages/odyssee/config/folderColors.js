@@ -3,11 +3,11 @@
 // Chaque entrée est un code hexadécimal sans transparence.
 export const FOLDER_PALETTE = [
   "#969696", // gris (défaut — $color-1 du projet)
-  "#e74c3c", // rouge
+  "#6c0a0a", // rouge
   "#e67e22", // orange
   "#f1c40f", // jaune
-  "#2ecc71", // vert clair
-  "#27ae60", // vert foncé
+  "#0a6c0c", // vert clair
+  "#0a6c0c", // vert foncé
   "#1abc9c", // turquoise
   "#3498db", // bleu
   "#2980b9", // bleu foncé

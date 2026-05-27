@@ -3,8 +3,8 @@ import { useMemo, useRef, useState } from "react";
 import { ArrayGraduation } from "./utils/ArrayGraduation";
 import ColorPicker from "../../../components/ColorPicker";
 import { computeColorPalette } from "../utils/colorPalette.js";
-import IconSaveFalse from "../../../assets/Icon-Save-3-0_False.svg";
-import IconSaveTrue from "../../../assets/Icon-Save-3-0_True.svg";
+import IconSaveFalse from "../../../assets/IconSaveFalse.jsx";
+import IconSaveTrue from "../../../assets/IconSaveTrue.jsx";
 import InTakeTimeAdvancedMode from "./InTakeTimeAdvancedMode";
 import InTakeTimeNormalMode from "./InTakeTimeNormalMode";
 import ProductService from "../services/productService";
@@ -14,32 +14,33 @@ import { useOdysseeColor } from "../contexts/OdysseeColorContext.jsx";
 
 function buildProductStyles(c, id) {
   return `
+    [data-product="${id}"] .paper-product {
+      background-color: ${c.lightness};
+    }
     [data-product="${id}"] .paper-product-container-navBar {
       background-color: ${c.base};
     }
     [data-product="${id}"] .paper-product__name-input,
     [data-product="${id}"] .paper-product__alias-input {
-      border-bottom-color: color-mix(in srgb, ${c.lightness} 40%, transparent);
-      color: ${c.darkest};
+      border-bottom-color: color-mix(in srgb, ${c.contrastBase} 40%, transparent);
+      color: ${c.contrastBase};
     }
     [data-product="${id}"] .paper-product__name-input::placeholder,
     [data-product="${id}"] .paper-product__alias-input::placeholder {
-      color: color-mix(in srgb, ${c.darkest} 45%, transparent);
+      color: color-mix(in srgb, ${c.contrastBase} 45%, transparent);
     }
     [data-product="${id}"] .paper-product__name-input:focus,
     [data-product="${id}"] .paper-product__alias-input:focus {
-      border-bottom-color: ${c.lightness};
+      border-bottom-color: ${c.contrastBase};
     }
     [data-product="${id}"] .paper-product__alias-input {
-      color: color-mix(in srgb, ${c.darkest} 75%, transparent);
+      color: color-mix(in srgb, ${c.contrastBase} 75%, transparent);
     }
-    [data-product="${id}"] .paper-product-container-navBar input[type="submit"] {
-      background-color: ${c.darker};
-      color: ${c.lightness};
-      border-color: color-mix(in srgb, ${c.lightness} 35%, transparent);
+    [data-product="${id}"] .paper-product__color-btn {
+      border-color: color-mix(in srgb, ${c.contrastBase} 30%, transparent);
     }
-    [data-product="${id}"] .paper-product-container-navBar input[type="submit"]:hover {
-      background-color: ${c.darkest};
+    [data-product="${id}"] .paper-product__color-btn:hover {
+      border-color: color-mix(in srgb, ${c.contrastBase} 60%, transparent);
     }
     [data-product="${id}"] .paper-product__status--success {
       background-color: ${c.dark};
@@ -303,23 +304,20 @@ const PaperProduct = ({
           </div>
 
           <div className="paper-product__color-wrap">
-            {readOnly ? (
-              <div
-                className="paper-product__save-btn"
-                onClick={onActivate}
-                title="Modifier"
-              >
-                <img src={IconSaveFalse} alt="Activer" />
-              </div>
-            ) : (
-              <button
-                type="submit"
-                className="paper-product__save-btn"
-                title="Enregistrer"
-              >
-                <img src={IconSaveTrue} alt="Enregistrer" />
-              </button>
-            )}
+            <div className="paper-product__save-wrap">
+              {readOnly ? (
+                <div className="paper-product__save-btn" onClick={onActivate}>
+                  <IconSaveFalse color={colors.contrastBase} />
+                </div>
+              ) : (
+                <button type="submit" className="paper-product__save-btn">
+                  <IconSaveTrue color={colors.contrastBase} />
+                </button>
+              )}
+              <span className="save-tooltip">
+                {readOnly ? "Activer l'édition" : "Enregistrer l'article"}
+              </span>
+            </div>
             <div
               className="paper-product__color-btn"
               style={{ background: colors.base }}

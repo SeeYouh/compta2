@@ -13,7 +13,7 @@ const Dashboard = () => {
   const [width, setWidth] = useState(400);
   const [availableHeight, setAvailableHeight] = useState(null);
   const [selectedCategoryLibrary, setSelectedCategoryLibrary] = useState(
-    categoryLibrary[2].name
+    categoryLibrary[2].name,
   );
   const [selectedFileData, setSelectedFileData] = useState(null);
   const [user, setUser] = useState(null);
@@ -24,12 +24,12 @@ const Dashboard = () => {
 
   const checkCategorySelected = (radioId) => {
     setSelectedCategoryLibrary((selected) =>
-      selected === radioId ? categorySelected : radioId
+      selected === radioId ? categorySelected : radioId,
     );
   };
 
   const selectedLibrary = categoryLibrary.find(
-    (item) => item.name === selectedCategoryLibrary
+    (item) => item.name === selectedCategoryLibrary,
   );
 
   const onMouseEnter = () => {
@@ -208,7 +208,7 @@ const Dashboard = () => {
                       display: "block",
                       width: "100%",
                       padding: "12px 16px",
-                      color: "#dc3545",
+                      color: "#6c0a0a",
                       backgroundColor: "transparent",
                       border: "none",
                       textAlign: "left",

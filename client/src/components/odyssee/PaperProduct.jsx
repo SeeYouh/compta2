@@ -89,8 +89,8 @@ const PaperProduct = ({ contentFilesData, folder = "dossier1", onSaved }) => {
                 fontSize: "0.85rem",
                 color:
                   feedback.type === "success"
-                    ? "var(--color-success, #22c55e)"
-                    : "var(--color-error, #ef4444)",
+                    ? "var(--color-success, #0a6c0c)"
+                    : "var(--color-error, #6c0a0a)",
               }}
             >
               {feedback.message}

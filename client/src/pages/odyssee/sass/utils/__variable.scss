@@ -1,3 +1,9 @@
+// ─── Couleurs sémantiques Odyssée ─────────────────────────────────────────────
+// Rouge unique : toute autre valeur rouge DOIT être remplacée par $ody-danger.
+// Vert unique  : toute autre valeur verte DOIT être remplacée par $ody-success.
+$ody-danger: #6c0a0a;
+$ody-success: #0a6c0c;
+
 .input-dysplay-none {
   display: none;
 }
