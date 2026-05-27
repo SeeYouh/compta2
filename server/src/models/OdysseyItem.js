@@ -67,6 +67,10 @@ const odysseyItemSchema = new mongoose.Schema({
     ref: "OdysseeCategory",
     required: true,
   },
+  color: {
+    type: String,
+    default: "",
+  },
   folderId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "OdysseeProductFolder",

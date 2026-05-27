@@ -17,6 +17,7 @@ export const createItem = async (req, res) => {
       intakeTime,
       categoryId,
       folderId,
+      color,
     } = req.body;
 
     if (!categoryId) {
@@ -54,6 +55,7 @@ export const createItem = async (req, res) => {
         },
       },
       categoryId,
+      color: color || "",
       userId: req.userId,
       folderId: folderId || null,
     };
