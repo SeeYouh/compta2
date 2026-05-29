@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { useNavigate } from "react-router-dom";
-
 import AccountTabs from "../components/AccountTabs";
 import { APP_LABELS, TABLE_HEADERS } from "../components/utils";
 import AppShell from "../components/AppShell";
@@ -39,7 +37,6 @@ import { useTransactions } from "../components/hooks/useTransactions";
 import YearTabs from "../components/filters/YearTabs";
 
 const App = () => {
-  const navigate = useNavigate();
   const {
     transactions: rawTransactions,
     add,
@@ -251,39 +248,7 @@ const App = () => {
 
   return (
     <AppShell
-      headerRight={
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <SynapseUserMenu />
-          <button
-            onClick={() => navigate("/")}
-            aria-label="Retour aux applications"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "36px",
-              height: "36px",
-              borderRadius: "50%",
-              border: "none",
-              background: "rgba(220,53,69,0.12)",
-              color: "#dc3545",
-              cursor: "pointer",
-              fontSize: "1.25rem",
-              lineHeight: 1,
-              flexShrink: 0,
-              transition: "background 0.2s",
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.background = "rgba(220,53,69,0.25)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.background = "rgba(220,53,69,0.12)")
-            }
-          >
-            ✕
-          </button>
-        </div>
-      }
+      headerRight={<SynapseUserMenu />}
       accountTabs={<AccountTabs />}
       lastUpdateText={lastUpdateText}
     >

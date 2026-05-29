@@ -1,11 +1,22 @@
 @use "../utils/_variable" as *;
 
 .paper-product-container-navBar {
-  padding: 7px 20px;
+  padding: 7px 20px 15px 20px;
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 12px;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    right: 0;
+    width: 88%;
+    height: 2px;
+    background: var(--color-dark);
+  }
 
   .paper-product-container-navBar_titleProduct {
     display: flex;

@@ -82,30 +82,6 @@
   }
 }
 
-.toolbar-close {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  z-index: 200;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(248, 113, 113, 0.12);
-  color: $danger;
-  cursor: pointer;
-  font-size: 1.15rem;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background $transition-fast;
-
-  &:hover {
-    background: rgba(248, 113, 113, 0.28);
-  }
-}
-
 .toolbar {
   position: fixed;
   bottom: 20px;
@@ -161,5 +137,75 @@
     &--error {
       color: $danger;
     }
+    &--active {
+      background: $surface-hover;
+      color: $text;
+    }
+  }
+
+  &__menu-wrapper {
+    position: relative;
+  }
+
+  &__menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    min-width: 120px;
+    margin: 0;
+    padding: 4px 0;
+    background: $surface;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    box-shadow: $shadow-menu;
+    user-select: none;
+    z-index: 300;
+  }
+
+  &__menu-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2px;
+    padding: 4px 6px;
+  }
+
+  &__menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: $radius-sm;
+    color: $text-muted;
+    cursor: pointer;
+    transition:
+      background $transition-quick,
+      color $transition-quick;
+
+    &:hover {
+      background: $surface-hover;
+      color: $text;
+    }
+
+    &--danger {
+      color: $danger;
+
+      &:hover {
+        background: $danger-bg;
+        color: $danger;
+      }
+    }
+  }
+
+  &__menu-separator {
+    height: 1px;
+    background: $border;
+    margin: 0;
   }
 }

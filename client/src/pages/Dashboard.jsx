@@ -57,7 +57,8 @@ const apps = [
     id: "odyssee",
     path: "/odyssee",
     label: "Odyssée",
-    description: "Gérez vos produits pharmaceutiques",
+    description:
+      "Créez, gérez et organisez vos documents et modèles de documents",
     icon: (
       <svg
         width="48"

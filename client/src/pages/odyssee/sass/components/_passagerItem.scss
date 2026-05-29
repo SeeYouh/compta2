@@ -43,10 +43,22 @@
 // ─── NavBar (même structure que .paper-product-container-navBar) ──────────────
 .passager-item__navbar {
   padding: 7px 20px;
+  padding-bottom: 5px;
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 12px;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 80%;
+    height: 3px;
+    background: var(--color-dark);
+  }
 
   &-fields {
     display: flex;
