@@ -6,6 +6,10 @@
   background: var(--ody-darker);
   display: flex;
   flex-direction: column;
+
+  &--compact {
+    padding: 15px 0px 0px 0px;
+  }
 }
 
 // Paramètres catégorie (modal overlay)
@@ -86,6 +90,90 @@
     line-height: 1.2;
     word-break: normal;
     overflow-wrap: break-word;
+  }
+
+  &--compact {
+    margin: 0 -8px 6px;
+    padding: 0 8px 6px;
+    justify-content: center;
+  }
+}
+
+// Icône de catégorie en mode compact (comme catalog-sidebar__icon)
+.catalog-main__cat-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--ody-dark);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ody-lightness);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  overflow: hidden;
+  user-select: none;
+
+  img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+// Tooltip du nom de catégorie en compact
+.catalog-main__cat-tooltip {
+  position: fixed;
+  background: var(--ody-darker);
+  border: 1px solid var(--ody-dark);
+  border-radius: 6px;
+  padding: 4px 10px 5px;
+  color: var(--ody-lightness);
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 500;
+  transform: translateY(-50%);
+  white-space: nowrap;
+
+  &::before {
+    content: "";
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-right-color: var(--ody-dark);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: calc(100% - 1px);
+    top: 50%;
+    transform: translateY(-50%);
+    border: 5px solid transparent;
+    border-right-color: var(--ody-darker);
+  }
+}
+
+// Bouton + inline en bas de la liste compact
+.catalog-main__add--inline {
+  width: 32px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--ody-dark);
+  color: var(--ody-lightness);
+  opacity: 0.5;
+  transition: opacity 0.15s;
+
+  &:hover {
+    opacity: 1;
+    background: var(--ody-dark);
   }
 }
 

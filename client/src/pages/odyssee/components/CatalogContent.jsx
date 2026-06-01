@@ -1,16 +1,16 @@
-import CatalogMain from './CatalogMain';
-import CatalogSidebar from './CatalogSidebar';
-import CategoryContextMenu from './CategoryContextMenu';
-import CategoryForm from './CategoryForm';
-import CategorySettings from './CategorySettings';
-import ConfirmationModal from '../../../components/ConfirmationModal';
-import FolderContextMenu from './FolderContextMenu';
-import FolderSettingsModal from './FolderSettingsModal';
-import IconLibrary from '../assets/IconLibrary';
-import SidebarTooltip from './SidebarTooltip';
-import { useOdysseeColor } from '../contexts/OdysseeColorContext.jsx';
+import CatalogMain from "./CatalogMain";
+import CatalogSidebar from "./CatalogSidebar";
+import CategoryContextMenu from "./CategoryContextMenu";
+import CategoryForm from "./CategoryForm";
+import CategorySettings from "./CategorySettings";
+import ConfirmationModal from "../../../components/ConfirmationModal";
+import FolderContextMenu from "./FolderContextMenu";
+import FolderSettingsModal from "./FolderSettingsModal";
+import IconLibrary from "../assets/IconLibrary";
+import SidebarTooltip from "./SidebarTooltip";
+import { useOdysseeColor } from "../contexts/OdysseeColorContext.jsx";
 
-const CatalogContent = ({ engine, labels }) => {
+const CatalogContent = ({ engine, labels, isCompact }) => {
   const {
     isLoading,
     categories,
@@ -144,6 +144,7 @@ const CatalogContent = ({ engine, labels }) => {
             onToggleFolder={toggleProductFolder}
             allFoldersClosed={allProductFoldersClosed}
             onToggleAllFolders={toggleAllProductFolders}
+            isCompact={isCompact}
           />
         </div>
       )}

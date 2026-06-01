@@ -44,11 +44,11 @@
       display: none;
     }
 
-    &:hover {
-    }
+    // &:hover {
+    // }
 
-    &:has(input[type="radio"]:checked) {
-    }
+    // &:has(input[type="radio"]:checked) {
+    // }
 
     input[type="radio"] {
       display: none;
@@ -58,8 +58,8 @@
       cursor: pointer;
     }
 
-    input[type="radio"]:checked + label {
-    }
+    // input[type="radio"]:checked + label {
+    // }
   }
 
   // Odyssée actif → cache les deux séparateurs
@@ -68,6 +68,65 @@
     li:last-child::before {
       display: none;
     }
+  }
+
+  &--compact {
+    display: flex;
+
+    li {
+      flex: 1;
+      overflow: hidden;
+      width: auto !important;
+
+      // label {
+      //   overflow: hidden;
+      // }
+    }
+
+    .tab-icon {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+
+      svg {
+        height: 17px;
+        width: auto;
+        display: block;
+      }
+    }
+  }
+}
+
+.library-tab-tooltip {
+  position: fixed;
+  background: var(--ody-darker);
+  border: 1px solid var(--ody-dark);
+  border-radius: 6px;
+  padding: 4px 10px 5px;
+  color: var(--ody-lightness);
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 500;
+  white-space: nowrap;
+
+  &::before {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: var(--arrow-offset, 50%);
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-bottom-color: var(--ody-dark);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: calc(100% - 1px);
+    left: var(--arrow-offset, 50%);
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-bottom-color: var(--ody-darker);
   }
 }
 
@@ -111,11 +170,10 @@
   }
 }
 
-.loading-message {
-}
+// .loading-message {
+// }
 
 .error-message {
-
   button {
     margin-top: 1rem;
     padding: 0.5rem 1rem;
@@ -124,8 +182,8 @@
     cursor: pointer;
     font-size: 1rem;
 
-    &:hover {
-    }
+    // &:hover {
+    // }
   }
 }
 

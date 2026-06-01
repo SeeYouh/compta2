@@ -15,6 +15,7 @@ const ProductCard = ({
   onDragStart,
   onDragOver,
   onDrop,
+  isCompact,
 }) => {
   const [imgError, setImgError] = useState(false);
   const [contextMenu, setContextMenu] = useState(null);
@@ -74,7 +75,7 @@ const ProductCard = ({
   return (
     <>
       <div
-        className={`catalog-card${isSelected ? " catalog-card--selected" : ""}${isDragOver ? " catalog-card--drag-over" : ""}`}
+        className={`catalog-card${isSelected ? " catalog-card--selected" : ""}${isDragOver ? " catalog-card--drag-over" : ""}${isCompact ? " catalog-card--compact" : ""}`}
         onClick={onClick}
         onContextMenu={handleContextMenu}
         onMouseEnter={(e) => onHover?.(e, displayName)}
@@ -97,7 +98,7 @@ const ProductCard = ({
               onError={() => setImgError(true)}
             />
           ) : (
-            <IconPicture size={40} />
+            <IconPicture size={isCompact ? 24 : 40} />
           )}
         </div>
       </div>

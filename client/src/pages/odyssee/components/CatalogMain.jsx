@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import EmptyLibraryMessage from "./EmptyLibraryMessage";
+import { getInitials } from "../utils/stringUtils";
 import ProductCard from "./ProductCard";
 import ProductFolder from "./ProductFolder";
 
@@ -34,9 +35,11 @@ const CatalogMain = ({
   onToggleFolder,
   allFoldersClosed,
   onToggleAllFolders,
+  isCompact,
 }) => {
   const allProducts = selectedCat?.products || [];
   const [productTooltip, setProductTooltip] = useState(null);
+  const [headerTooltip, setHeaderTooltip] = useState(null);
   const [folderDropInfo, setFolderDropInfo] = useState(null);
   const [productGapInfo, setProductGapInfo] = useState(null); // { folderId, zone } pour les gaps entre éléments
   const [addMenuPos, setAddMenuPos] = useState(null);
@@ -235,69 +238,104 @@ const CatalogMain = ({
 
   return (
     <div
-      className="catalog-main"
+      className={`catalog-main${isCompact ? " catalog-main--compact" : ""}`}
       onContextMenu={(e) => {
         if (!selectedCat || !onCategoryContextMenu) return;
         e.preventDefault();
         onCategoryContextMenu(e, selectedCat._id);
       }}
     >
-      <div className="catalog-main__header">
-        <h4 style={{ fontSize: getTitleFontSize(selectedCat?.name) }}>
-          {selectedCat ? selectedCat.name : "Sélectionnez une librairie"}
-        </h4>
-        <div className="catalog-main__meta">
-          {selectedCat && (
-            <div className="catalog-main__add-wrapper" ref={addMenuRef}>
+      <div
+        className={`catalog-main__header${isCompact ? " catalog-main__header--compact" : ""}`}
+      >
+        {isCompact ? (
+          <>
+            <div
+              className="catalog-main__cat-icon"
+              onMouseEnter={(e) => {
+                if (!selectedCat) return;
+                const rect = e.currentTarget.getBoundingClientRect();
+                setHeaderTooltip({
+                  x: rect.right + 8,
+                  y: rect.top + rect.height / 2,
+                });
+              }}
+              onMouseLeave={() => setHeaderTooltip(null)}
+            >
+              {selectedCat?.image ? (
+                <img src={selectedCat.image} alt={selectedCat.name} />
+              ) : selectedCat ? (
+                getInitials(selectedCat.name)
+              ) : null}
+            </div>
+            {headerTooltip && selectedCat && (
               <div
-                className="catalog-main__add"
-                onClick={(e) => {
-                  if (addMenuPos) {
-                    setAddMenuPos(null);
-                    return;
-                  }
-                  const rect = e.currentTarget.getBoundingClientRect();
-                  setAddMenuPos({ x: rect.right + 6, y: rect.top });
-                }}
+                className="catalog-main__cat-tooltip"
+                style={{ left: headerTooltip.x, top: headerTooltip.y }}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 2.56 2.56"
-                  width="22"
-                  height="22"
-                  fill="currentColor"
-                >
-                  <path d="M1.39,0s.09.01.14.02c1.04.21,1.39,1.54.58,2.23C1.41,2.87.26,2.51.04,1.6c-.02-.06-.02-.13-.04-.19,0-.08,0-.16,0-.24C.05.56.56.05,1.17,0h.23ZM1.36.61h-.17v.58h-.57v.17h.57v.58h.17v-.58h.59v-.17h-.59v-.58Z" />
-                </svg>
+                {selectedCat.name}
               </div>
-              {addMenuPos && (
-                <div
-                  className="ctx-menu"
-                  style={{ left: addMenuPos.x, top: addMenuPos.y }}
-                >
+            )}
+          </>
+        ) : (
+          <>
+            <h4 style={{ fontSize: getTitleFontSize(selectedCat?.name) }}>
+              {selectedCat ? selectedCat.name : "Sélectionnez une librairie"}
+            </h4>
+            <div className="catalog-main__meta">
+              {selectedCat && (
+                <div className="catalog-main__add-wrapper" ref={addMenuRef}>
                   <div
-                    className="ctx-menu__item"
-                    onClick={() => {
-                      onCreateFolder();
-                      setAddMenuPos(null);
+                    className="catalog-main__add"
+                    onClick={(e) => {
+                      if (addMenuPos) {
+                        setAddMenuPos(null);
+                        return;
+                      }
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      setAddMenuPos({ x: rect.right + 6, y: rect.top });
                     }}
                   >
-                    Créer un dossier
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 2.56 2.56"
+                      width="22"
+                      height="22"
+                      fill="currentColor"
+                    >
+                      <path d="M1.39,0s.09.01.14.02c1.04.21,1.39,1.54.58,2.23C1.41,2.87.26,2.51.04,1.6c-.02-.06-.02-.13-.04-.19,0-.08,0-.16,0-.24C.05.56.56.05,1.17,0h.23ZM1.36.61h-.17v.58h-.57v.17h.57v.58h.17v-.58h.59v-.17h-.59v-.58Z" />
+                    </svg>
                   </div>
-                  <div
-                    className="ctx-menu__item"
-                    onClick={() => {
-                      onAdd();
-                      setAddMenuPos(null);
-                    }}
-                  >
-                    Créer un {createLabel}
-                  </div>
+                  {addMenuPos && (
+                    <div
+                      className="ctx-menu"
+                      style={{ left: addMenuPos.x, top: addMenuPos.y }}
+                    >
+                      <div
+                        className="ctx-menu__item"
+                        onClick={() => {
+                          onCreateFolder();
+                          setAddMenuPos(null);
+                        }}
+                      >
+                        Créer un dossier
+                      </div>
+                      <div
+                        className="ctx-menu__item"
+                        onClick={() => {
+                          onAdd();
+                          setAddMenuPos(null);
+                        }}
+                      >
+                        Créer un {createLabel}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
 
       {isEmpty ? (
@@ -306,7 +344,7 @@ const CatalogMain = ({
         ) : null
       ) : (
         <div
-          className="catalog-content"
+          className={`catalog-content${isCompact ? " catalog-content--compact" : ""}`}
           onDragOver={(e) => {
             const types = Array.from(e.dataTransfer.types);
             if (types.includes("folderid")) e.preventDefault();
@@ -378,6 +416,7 @@ const CatalogMain = ({
                 onToggle={() => onToggleFolder?.(item._id)}
                 allFoldersClosed={allFoldersClosed}
                 onToggleAllFolders={onToggleAllFolders}
+                isCompact={isCompact}
               />
             ) : (
               <ProductCard
@@ -398,8 +437,62 @@ const CatalogMain = ({
                   }
                 }}
                 onDrop={(e) => handleProductDropOnProduct(e, item._id)}
+                isCompact={isCompact}
               />
             ),
+          )}
+          {isCompact && selectedCat && (
+            <div
+              className="catalog-main__add-wrapper catalog-main__add-wrapper--inline"
+              ref={addMenuRef}
+            >
+              <div
+                className="catalog-main__add catalog-main__add--inline"
+                onClick={(e) => {
+                  if (addMenuPos) {
+                    setAddMenuPos(null);
+                    return;
+                  }
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  setAddMenuPos({ x: rect.right + 6, y: rect.top });
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 2.56 2.56"
+                  width="18"
+                  height="18"
+                  fill="currentColor"
+                >
+                  <path d="M1.39,0s.09.01.14.02c1.04.21,1.39,1.54.58,2.23C1.41,2.87.26,2.51.04,1.6c-.02-.06-.02-.13-.04-.19,0-.08,0-.16,0-.24C.05.56.56.05,1.17,0h.23ZM1.36.61h-.17v.58h-.57v.17h.57v.58h.17v-.58h.59v-.17h-.59v-.58Z" />
+                </svg>
+              </div>
+              {addMenuPos && (
+                <div
+                  className="ctx-menu"
+                  style={{ left: addMenuPos.x, top: addMenuPos.y }}
+                >
+                  <div
+                    className="ctx-menu__item"
+                    onClick={() => {
+                      onCreateFolder();
+                      setAddMenuPos(null);
+                    }}
+                  >
+                    Créer un dossier
+                  </div>
+                  <div
+                    className="ctx-menu__item"
+                    onClick={() => {
+                      onAdd();
+                      setAddMenuPos(null);
+                    }}
+                  >
+                    Créer un {createLabel}
+                  </div>
+                </div>
+              )}
+            </div>
           )}
         </div>
       )}

@@ -1,13 +1,10 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import { darken } from '../utils/colorUtils';
-import {
-  DARKEN_BG,
-  DARKEN_BORDER,
-} from '../config/folderColors';
-import IconDossierFull from '../assets/IconDossierFull';
-import ProductCard from './ProductCard';
-import ProductFolderContextMenu from './ProductFolderContextMenu';
+import { darken } from "../utils/colorUtils";
+import { DARKEN_BG, DARKEN_BORDER } from "../config/folderColors";
+import IconDossierFull from "../assets/IconDossierFull";
+import ProductCard from "./ProductCard";
+import ProductFolderContextMenu from "./ProductFolderContextMenu";
 
 const ProductFolder = ({
   folder,
@@ -33,6 +30,7 @@ const ProductFolder = ({
   allFoldersClosed,
   onToggleAllFolders,
   productGapZone,
+  isCompact,
 }) => {
   const [contextMenu, setContextMenu] = useState(null);
   const [productDropZone, setProductDropZone] = useState(null); // 'before' | 'inside' | 'after' | null
@@ -101,6 +99,7 @@ const ProductFolder = ({
   const classNames = [
     "product-folder",
     !isOpen && "product-folder--closed",
+    isCompact && "product-folder--compact",
     productDropZone === "inside" && "product-folder--product-over",
     productDropZone === "before" && "product-folder--product-before",
     productDropZone === "after" && "product-folder--product-after",
@@ -177,6 +176,7 @@ const ProductFolder = ({
                       onHover={onHover}
                       onHoverLeave={onHoverLeave}
                       draggable
+                      isCompact={isCompact}
                       onDragStart={(e) => {
                         e.stopPropagation();
                         e.dataTransfer.setData("productId", product._id);

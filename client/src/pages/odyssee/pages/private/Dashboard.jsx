@@ -7,6 +7,10 @@ import CategoryForm from "../../components/CategoryForm";
 import { categoryLibrary } from "../../utils/variable";
 import FolderService from "../../services/folderService";
 import Gear from "../../assets/gear";
+import IconCompactMenu from "../../assets/IconCompactMenu";
+import IconLibrary from "../../assets/IconLibrary";
+import IconOdyssee from "../../assets/IconOdyssee";
+import IconPassager from "../../assets/IconPassager";
 import OdysseeCategoryService from "../../../../services/odysseeCategoryService";
 import OdysseeItem from "../../components/OdysseeItem";
 import OdysseeProductService from "../../../../services/odysseeProductService";
@@ -31,17 +35,48 @@ import ProductService from "../../services/productService";
 import SynapseUserMenu from "../../../../components/SynapseUserMenu";
 import useCatalogEngine from "../../hooks/useCatalogEngine";
 
+const getTabIcon = (name) => {
+  switch (name) {
+    case "Passagers":
+      return <IconPassager size={16} />;
+    case "Odyssée":
+      return <IconOdyssee size={16} />;
+    case "Catalogues":
+      return (
+        <IconLibrary
+          colorBooks="currentColor"
+          colorPlus="currentColor"
+          height={16}
+        />
+      );
+    default:
+      return null;
+  }
+};
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [width, setWidth] = useState(() => {
     const saved = localStorage.getItem("odyssee-sidebar-width");
     return saved ? parseInt(saved, 10) : 400;
   });
+  const [isCompact, setIsCompact] = useState(
+    () => localStorage.getItem("odyssee-compact-mode") === "true",
+  );
+  const [tabTooltip, setTabTooltip] = useState(null);
   const [selectedCategoryLibrary, setSelectedCategoryLibrary] = useState(
     () =>
       localStorage.getItem("odyssee-selected-library") ??
       categoryLibrary[2].name,
   );
+
+  const toggleCompact = () => {
+    setIsCompact((prev) => {
+      const next = !prev;
+      localStorage.setItem("odyssee-compact-mode", String(next));
+      return next;
+    });
+  };
 
   const checkCategorySelected = (radioId) => {
     setSelectedCategoryLibrary((selected) => {
@@ -174,6 +209,12 @@ const Dashboard = () => {
   return (
     <div className="odyssee-root" style={{ position: "relative" }}>
       <nav className="odyssee-navbar">
+        <button
+          className="odyssee-navbar__compact-toggle"
+          onClick={toggleCompact}
+        >
+          <IconCompactMenu isCompact={isCompact} size={20} />
+        </button>
         <div className="odyssee-navbar__actions">
           <Link
             to="/odyssee/settings"
@@ -198,7 +239,7 @@ const Dashboard = () => {
         </div>
       </nav>
       <div className="odyssee-body">
-        <div className="left-menu" style={{ width }}>
+        <div className="left-menu" style={{ width: isCompact ? 136 : width }}>
           <div
             className="left-menu-resizer"
             onMouseDown={(e) => {
@@ -226,13 +267,38 @@ const Dashboard = () => {
             }}
           />
           <section className="catalog-wrapper">
-            <ul className="library-navBar">
+            <ul
+              className={`library-navBar${isCompact ? " library-navBar--compact" : ""}`}
+            >
               {categoryLibrary.map((item, index) => {
-                const itemWidth = width * (item.width / 100);
+                const itemWidth = isCompact
+                  ? undefined
+                  : width * (item.width / 100);
                 return (
                   <li
                     key={"cat" + item.name + index}
-                    style={{ width: `${itemWidth}px` }}
+                    style={
+                      itemWidth !== undefined
+                        ? { width: `${itemWidth}px` }
+                        : undefined
+                    }
+                    onMouseEnter={
+                      isCompact
+                        ? (e) => {
+                            const rect =
+                              e.currentTarget.getBoundingClientRect();
+                            setTabTooltip({
+                              label: item.name,
+                              x: rect.left,
+                              arrowOffset: rect.width / 2,
+                              y: rect.bottom + 6,
+                            });
+                          }
+                        : undefined
+                    }
+                    onMouseLeave={
+                      isCompact ? () => setTabTooltip(null) : undefined
+                    }
                   >
                     <input
                       type="radio"
@@ -241,15 +307,36 @@ const Dashboard = () => {
                       checked={item.name === selectedCategoryLibrary}
                       onChange={() => checkCategorySelected(item.name)}
                     />
-                    <label htmlFor={item.name}>{item.name}</label>
+                    <label htmlFor={item.name}>
+                      {isCompact ? (
+                        <span className="tab-icon">
+                          {getTabIcon(item.name)}
+                        </span>
+                      ) : (
+                        <span className="tab-label">{item.name}</span>
+                      )}
+                    </label>
                   </li>
                 );
               })}
             </ul>
+            {tabTooltip && (
+              <div
+                className="library-tab-tooltip"
+                style={{
+                  left: tabTooltip.x,
+                  top: tabTooltip.y,
+                  "--arrow-offset": `${tabTooltip.arrowOffset}px`,
+                }}
+              >
+                {tabTooltip.label}
+              </div>
+            )}
             <CatalogContent
               engine={currentEngine}
               CategoryFormComponent={CategoryForm}
               labels={currentCat?.labels}
+              isCompact={isCompact}
             />
           </section>
         </div>
