@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
 import { Account } from "../models/Account.js";
+import { DEFAULT_THEMES } from "../config/defaultThemes.js";
 import { getUserAccounts } from "../middleware/permissions.js";
 import { Theme } from "../models/Theme.js";
 import { Transaction } from "../models/Transaction.js";
@@ -130,14 +131,9 @@ export const getTemplateAccount = async (req, res) => {
       return res.status(404).json({ error: "Compte template introuvable" });
     }
 
-    // Récupérer les thèmes du template
-    const templateThemes = await Theme.find({
-      accountId: templateAccount.id,
-    });
-
     res.json({
       account: templateAccount,
-      themes: templateThemes,
+      themes: DEFAULT_THEMES,
     });
   } catch (error) {
     console.error("Erreur getTemplateAccount:", error);
@@ -160,36 +156,22 @@ export const createAccount = async (req, res) => {
       return res.status(400).json({ error: "Le nom du compte est requis" });
     }
 
-    // Vérifier que le template existe
-    const templateAccount = await Account.findOne({ isTemplate: true });
-    if (!templateAccount) {
-      return res.status(500).json({
-        error:
-          "Compte template introuvable. Exécutez le script de migration d'abord.",
-      });
-    }
-
     // Créer le nouveau compte
     const newAccount = await Account.create({
       id: `account-${uuidv4()}`,
       name: name.trim(),
       isTemplate: false,
-      userId: req.userId, // Associer au propriétaire
+      userId: req.userId,
       sharedWith: [],
     });
 
-    // Récupérer les thèmes du template
-    const templateThemes = await Theme.find({
-      accountId: templateAccount.id,
-    }).lean();
-
-    // Dupliquer les thèmes pour le nouveau compte (copie indépendante)
-    const newThemes = templateThemes.map((theme) => ({
-      id: theme.id, // Garder le même ID (isolé par accountId)
+    // Copier les thèmes par défaut pour le nouveau compte
+    const newThemes = DEFAULT_THEMES.map((theme) => ({
+      id: theme.id,
       accountId: newAccount.id,
       name: theme.name,
       slug: theme.slug,
-      subThemes: theme.subThemes || {},
+      subThemes: new Map(Object.entries(theme.subThemes)),
     }));
 
     await Theme.insertMany(newThemes);
