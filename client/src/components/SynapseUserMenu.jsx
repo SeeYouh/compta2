@@ -38,6 +38,11 @@ export default function SynapseUserMenu() {
     setIsOpen(false);
   };
 
+  const handleNavigateToImport = () => {
+    navigate("/import");
+    setIsOpen(false);
+  };
+
   const handleNavigateToGlobalSettings = () => {
     navigate("/settings");
     setIsOpen(false);
@@ -76,6 +81,12 @@ export default function SynapseUserMenu() {
             onClick={handleNavigateToContacts}
           >
             Contacts & invitations
+          </button>
+          <button
+            className={styles.menuButton}
+            onClick={handleNavigateToImport}
+          >
+            Importer un CSV
           </button>
           <hr className={styles.divider} />
           <div className={styles.actionBar}>

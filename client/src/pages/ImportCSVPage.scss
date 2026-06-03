@@ -1,0 +1,317 @@
+// Import CSV Wizard
+// Utilise les variables CSS du système de thème du projet.
+
+.import-csv {
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+// ---------------------------------------------------------------------------
+// Indicateur d'étapes
+// ---------------------------------------------------------------------------
+
+.import-csv__steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.import-csv__step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text-dim);
+  font-size: 0.875rem;
+
+  &--active {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  &--done {
+    color: var(--color-success);
+  }
+
+  // Séparateur entre étapes
+  &:not(:last-child)::after {
+    content: "→";
+    margin: 0 0.75rem;
+    color: var(--color-text-dim);
+  }
+}
+
+.import-csv__step-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+// ---------------------------------------------------------------------------
+// Panel de contenu
+// ---------------------------------------------------------------------------
+
+.import-csv__panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.import-csv__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-text);
+}
+
+.import-csv__subtitle {
+  margin: 0;
+  color: var(--color-text-dim);
+  font-size: 0.9rem;
+}
+
+// ---------------------------------------------------------------------------
+// Zone de dépôt (drag & drop)
+// ---------------------------------------------------------------------------
+
+.import-csv__dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 3rem 2rem;
+  border: 2px dashed var(--color-border);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  text-align: center;
+  color: var(--color-text-dim);
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+
+  &:hover,
+  &:focus-visible,
+  &--over {
+    border-color: var(--color-primary);
+    background: var(--color-primary-alpha-10);
+    outline: none;
+  }
+}
+
+.import-csv__dropzone-icon {
+  font-size: 2rem;
+}
+
+.import-csv__filename {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-top: 0.25rem;
+}
+
+.import-csv__file-input {
+  display: none;
+}
+
+// ---------------------------------------------------------------------------
+// Mapping
+// ---------------------------------------------------------------------------
+
+.import-csv__mapping {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.import-csv__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.import-csv__label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.import-csv__required {
+  color: var(--color-danger);
+  margin-left: 0.2rem;
+}
+
+.import-csv__select {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.4rem;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  option {
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-primary);
+  }
+}
+
+.import-csv__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  cursor: pointer;
+  grid-column: 1 / -1;
+  margin-top: 0.25rem;
+}
+
+// ---------------------------------------------------------------------------
+// Aperçu brut
+// ---------------------------------------------------------------------------
+
+.import-csv__preview-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+// ---------------------------------------------------------------------------
+// Tableau (aperçu + review)
+// ---------------------------------------------------------------------------
+
+.import-csv__table-wrapper {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+}
+
+.import-csv__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+
+  th,
+  td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
+  }
+
+  th {
+    background: var(--color-subSurface);
+    font-weight: 600;
+    color: var(--color-text-dim);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr:hover {
+    background: var(--color-surface-hover);
+  }
+}
+
+.import-csv__table--review {
+  .import-csv__col-designation {
+    min-width: 200px;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .import-csv__col-amount {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .import-csv__col-theme,
+  .import-csv__col-payment {
+    min-width: 180px;
+  }
+
+  .import-csv__col-check {
+    width: 2rem;
+    text-align: center;
+  }
+}
+
+// Lignes exclues / doublons
+.import-csv__row--excluded {
+  opacity: 0.4;
+}
+
+.import-csv__row--duplicate {
+  background: color-mix(in srgb, var(--color-danger) 6%, transparent);
+}
+
+.import-csv__excluded-label {
+  color: var(--color-text-dim);
+}
+
+// ---------------------------------------------------------------------------
+// Actions (boutons)
+// ---------------------------------------------------------------------------
+
+.import-csv__actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+}
+
+// ---------------------------------------------------------------------------
+// Error / Success
+// ---------------------------------------------------------------------------
+
+.import-csv__error {
+  color: var(--color-danger);
+  font-size: 0.9rem;
+  padding: 0.6rem 0.9rem;
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+  border-radius: 0.4rem;
+  margin: 0;
+}
+
+.import-csv__loader {
+  align-self: center;
+}
+
+.import-csv__success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.import-csv__success-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}

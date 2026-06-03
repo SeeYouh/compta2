@@ -12,6 +12,7 @@ import App from "./pages/App";
 import ContactsPage from "./pages/ContactsPage";
 import Dashboard from "./pages/Dashboard";
 import ForgotPassword from "./pages/ForgotPassword";
+import ImportCSVPage from "./pages/ImportCSVPage";
 import { LabelsProvider } from "./contexts/LabelsContext";
 import LabelsSettings from "./pages/LabelsSettings";
 import Login from "./pages/Login";
@@ -122,6 +123,20 @@ createRoot(document.getElementById("root")).render(
               <AccountsProvider>
                 <ContactsPage />
               </AccountsProvider>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/import"
+          element={
+            <ProtectedRoute>
+              <LabelsProvider>
+                <AccountsProvider>
+                  <ThemesProvider>
+                    <ImportCSVPage />
+                  </ThemesProvider>
+                </AccountsProvider>
+              </LabelsProvider>
             </ProtectedRoute>
           }
         />
