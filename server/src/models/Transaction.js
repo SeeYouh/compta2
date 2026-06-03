@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+import { synapseConn } from "../config/database.js";
+
 const TransactionSchema = new mongoose.Schema(
   {
     id: {
@@ -58,7 +60,7 @@ const TransactionSchema = new mongoose.Schema(
   },
   {
     timestamps: false,
-  }
+  },
 );
 
 // Index pour améliorer les performances des requêtes
@@ -77,4 +79,4 @@ TransactionSchema.set("toJSON", {
   },
 });
 
-export const Transaction = mongoose.model("Transaction", TransactionSchema);
+export const Transaction = synapseConn.model("Transaction", TransactionSchema);

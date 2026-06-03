@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
+import { synapseConn } from "../config/database.js";
+
 /**
  * Rôles prédéfinis pour le partage de compte.
  * Lecteur  : consultation uniquement
@@ -86,7 +88,7 @@ AccountInvitationSchema.index({ accountId: 1 });
 AccountInvitationSchema.index({ invitedEmail: 1 });
 AccountInvitationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 }); // TTL auto-cleanup
 
-export const AccountInvitation = mongoose.model(
+export const AccountInvitation = synapseConn.model(
   "AccountInvitation",
   AccountInvitationSchema,
 );

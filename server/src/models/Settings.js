@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+import { synapseConn } from "../config/database.js";
+
 const SettingsSchema = new mongoose.Schema(
   {
     id: {
@@ -32,6 +34,6 @@ const SettingsSchema = new mongoose.Schema(
 // Index composé pour éviter les doublons par utilisateur et id
 SettingsSchema.index({ userId: 1, id: 1 }, { unique: true });
 
-const Settings = mongoose.model("Settings", SettingsSchema);
+const Settings = synapseConn.model("Settings", SettingsSchema);
 
 export default Settings;

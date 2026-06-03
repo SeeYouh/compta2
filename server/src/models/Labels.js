@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
+import { synapseConn } from "../config/database.js";
+
 const LabelsSchema = new mongoose.Schema(
   {
     id: {
@@ -78,7 +80,10 @@ const LabelsSchema = new mongoose.Schema(
     ariaEdit: { type: String, default: "Modifier" },
     ariaDelete: { type: String, default: "Supprimer" },
     ariaEnableTransaction: { type: String, default: "Activer le mouvement" },
-    ariaDisableTransaction: { type: String, default: "Désactiver le mouvement" },
+    ariaDisableTransaction: {
+      type: String,
+      default: "Désactiver le mouvement",
+    },
 
     // Graphiques
     chartComparison: { type: String, default: "Comparaison" },
@@ -149,7 +154,10 @@ const LabelsSchema = new mongoose.Schema(
     },
 
     // Validation du formulaire
-    validationDateRequired: { type: String, default: "La date est obligatoire." },
+    validationDateRequired: {
+      type: String,
+      default: "La date est obligatoire.",
+    },
     validationThemeRequired: {
       type: String,
       default: "Le thème et le sous-thème sont obligatoires.",
@@ -276,7 +284,8 @@ const LabelsSchema = new mongoose.Schema(
     authResetSubmitLoading: { type: String, default: "Réinitialisation..." },
     authResetSuccess: {
       type: String,
-      default: "Mot de passe réinitialisé avec succès ! Redirection en cours...",
+      default:
+        "Mot de passe réinitialisé avec succès ! Redirection en cours...",
     },
     authResetRememberPassword: {
       type: String,
@@ -313,12 +322,12 @@ const LabelsSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Index composé pour éviter les doublons par utilisateur
 LabelsSchema.index({ userId: 1 }, { unique: true });
 
-const Labels = mongoose.model("Labels", LabelsSchema);
+const Labels = synapseConn.model("Labels", LabelsSchema);
 
 export default Labels;

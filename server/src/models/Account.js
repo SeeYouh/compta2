@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
+import { synapseConn } from "../config/database.js";
+
 const AccountSchema = new mongoose.Schema(
   {
     id: {
@@ -54,7 +56,7 @@ const AccountSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Index pour recherche rapide
@@ -71,4 +73,4 @@ AccountSchema.set("toJSON", {
   },
 });
 
-export const Account = mongoose.model("Account", AccountSchema);
+export const Account = synapseConn.model("Account", AccountSchema);

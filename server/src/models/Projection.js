@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
+import { synapseConn } from "../config/database.js";
+
 /**
  * Un pattern récurrent détecté par l'algo.
  * Une entrée = une récurrence unique (ex: "Samsic Intérim" chaque mois).
@@ -107,4 +109,4 @@ ProjectionSchema.set("toJSON", {
   },
 });
 
-export const Projection = mongoose.model("Projection", ProjectionSchema);
+export const Projection = synapseConn.model("Projection", ProjectionSchema);

@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
+import { synapseConn } from "../config/database.js";
+
 const ContactSchema = new mongoose.Schema(
   {
     id: {
@@ -41,4 +43,4 @@ ContactSchema.set("toJSON", {
   },
 });
 
-export const Contact = mongoose.model("Contact", ContactSchema);
+export const Contact = synapseConn.model("Contact", ContactSchema);

@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
+import { synapseConn } from "../config/database.js";
+
 /**
  * Une occurrence unique d'une projection (ex: Samsic Intérim du 05/05/2026).
  * Ces occurrences s'affichent dans la liste des mouvements côté front
@@ -70,7 +72,7 @@ ProjectionOccurrenceSchema.set("toJSON", {
   },
 });
 
-export const ProjectionOccurrence = mongoose.model(
+export const ProjectionOccurrence = synapseConn.model(
   "ProjectionOccurrence",
   ProjectionOccurrenceSchema,
 );

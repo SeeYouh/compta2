@@ -2,6 +2,8 @@ import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
+import { usersConn } from "../config/database.js";
+
 const UserSchema = new mongoose.Schema(
   {
     id: {
@@ -55,7 +57,7 @@ const UserSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Hash du mot de passe avant sauvegarde
@@ -86,4 +88,4 @@ UserSchema.set("toJSON", {
   },
 });
 
-export const User = mongoose.model("User", UserSchema);
+export const User = usersConn.model("User", UserSchema);

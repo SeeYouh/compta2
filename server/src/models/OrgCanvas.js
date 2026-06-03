@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
+import { trameConn } from "../config/database.js";
+
 const NodeDataSchema = new mongoose.Schema(
   {
     label: { type: String, default: "Nouveau nœud" },
@@ -89,4 +91,4 @@ OrgCanvasSchema.set("toJSON", {
   },
 });
 
-export const OrgCanvas = mongoose.model("OrgCanvas", OrgCanvasSchema);
+export const OrgCanvas = trameConn.model("OrgCanvas", OrgCanvasSchema);

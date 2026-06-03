@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 
+import { synapseConn } from "../config/database.js";
+
 const SubThemeSchema = new mongoose.Schema(
   {
     id: {
@@ -85,4 +87,4 @@ ThemeSchema.set("toJSON", {
   },
 });
 
-export const Theme = mongoose.model("Theme", ThemeSchema);
+export const Theme = synapseConn.model("Theme", ThemeSchema);
