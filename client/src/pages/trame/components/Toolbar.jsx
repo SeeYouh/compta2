@@ -1,15 +1,25 @@
-import "../styles/Toolbar.scss";
+import '../styles/Toolbar.scss';
 
-import { useCallback, useState } from "react";
+import {
+  useCallback,
+  useRef,
+  useState,
+} from 'react';
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
-import { useReactFlow } from "@xyflow/react";
+import { useReactFlow } from '@xyflow/react';
+
+import IconMaison from '../../../assets/IconMaison';
+import { useClickOutside } from '../../../components/hooks/useClickOutside';
 
 export default function Toolbar({ onAddNode, onSave }) {
   const navigate = useNavigate();
   const { zoomIn, zoomOut, fitView } = useReactFlow();
   const [status, setStatus] = useState("idle");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+  useClickOutside(menuRef, () => setMenuOpen(false));
 
   const handleSave = useCallback(async () => {
     if (status === "saving") return;
@@ -25,16 +35,14 @@ export default function Toolbar({ onAddNode, onSave }) {
     }
   }, [onSave, status]);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
+
   return (
     <>
-      <button
-        className="toolbar-close"
-        onClick={() => navigate("/")}
-        aria-label="Retour aux applications"
-        title="Retour aux applications"
-      >
-        ✕
-      </button>
       {status !== "idle" && (
         <div className={`save-toast save-toast--${status}`}>
           {status === "saving" && (
@@ -189,6 +197,56 @@ export default function Toolbar({ onAddNode, onSave }) {
             </svg>
           )}
         </button>
+        <div className="toolbar__separator" />
+        <div className="toolbar__more" ref={menuRef}>
+          <button
+            className="toolbar__btn"
+            onClick={() => setMenuOpen((v) => !v)}
+            title="Plus d'options"
+            aria-expanded={menuOpen}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="3" r="1.25" fill="currentColor" />
+              <circle cx="8" cy="8" r="1.25" fill="currentColor" />
+              <circle cx="8" cy="13" r="1.25" fill="currentColor" />
+            </svg>
+          </button>
+          {menuOpen && (
+            <div className="toolbar__more-menu">
+              <div className="toolbar__more-separator" />
+              <div className="toolbar__more-actions">
+                <button
+                  className="toolbar__more-btn"
+                  onClick={() => navigate("/")}
+                  aria-label="Accueil"
+                  title="Accueil"
+                >
+                  <IconMaison />
+                </button>
+                <button
+                  className="toolbar__more-btn toolbar__more-btn--danger"
+                  onClick={handleLogout}
+                  aria-label="Déconnexion"
+                  title="Déconnexion"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </>
   );

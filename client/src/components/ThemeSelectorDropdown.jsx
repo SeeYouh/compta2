@@ -1,7 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, {
+  useRef,
+  useState,
+} from 'react';
 
-import { useClickOutside } from "./hooks/useClickOutside";
-import { useThemes } from "../contexts/useThemes";
+import { useClickOutside } from './hooks/useClickOutside';
+import { useThemes } from '../contexts/useThemes';
 
 const ThemeSelectorDropdown = ({ value, onChange }) => {
   // value attendu : { theme: themeId, subTheme: subThemeId }

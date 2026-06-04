@@ -87,6 +87,16 @@
   }
 }
 
+.actionBarRight {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+
+  // Couleurs bicolores de l'icône maison
+  --icon-maison-body: var(--color-text-dim);
+  --icon-maison-roof: var(--color-text);
+}
+
 .iconBtn {
   display: flex;
   align-items: center;
