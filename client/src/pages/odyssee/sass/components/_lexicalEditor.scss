@@ -172,7 +172,7 @@
 }
 .lex-code-inline {
   font-family: monospace;
-  background: color-mix(in srgb, var(--ody-1) 10%, var(--ody-darkest));
+  background: color-mix(in srgb, var(--ody-base) 10%, var(--ody-darkest));
   border-radius: 3px;
   padding: 1px 4px;
   font-size: 0.9em;
@@ -198,7 +198,7 @@
 }
 
 .lex-quote {
-  border-left: 3px solid var(--ody-1);
+  border-left: 3px solid var(--ody-base);
   padding-left: 12px;
   margin: 8px 0;
   opacity: 0.8;
@@ -251,7 +251,7 @@
   .lex-paragraph::after {
     content: "¶";
     opacity: 0.3;
-    color: var(--ody-1);
+    color: var(--ody-base);
     font-weight: normal;
     pointer-events: none;
   }

@@ -20,7 +20,7 @@
     transition: border-color 0.15s;
 
     &:hover {
-      border-color: var(--ody-1);
+      border-color: var(--ody-base);
     }
   }
 
@@ -242,12 +242,12 @@
       border-color 0.1s;
 
     &:hover {
-      background: color-mix(in srgb, var(--ody-1) 12%, transparent);
+      background: color-mix(in srgb, var(--ody-base) 12%, transparent);
     }
 
     &--selected {
-      border-color: var(--ody-1);
-      background: color-mix(in srgb, var(--ody-1) 20%, var(--ody-darkest));
+      border-color: var(--ody-base);
+      background: color-mix(in srgb, var(--ody-base) 20%, var(--ody-darkest));
     }
 
     .country-picker__flag {

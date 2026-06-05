@@ -63,7 +63,7 @@
 
   &:focus {
     outline: none;
-    border-color: var(--ody-1);
+    border-color: var(--ody-base);
     box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
   }
 }
@@ -251,7 +251,7 @@
 .user-id {
   font-family: "Courier New", monospace;
   font-size: 0.8rem;
-  color: var(--ody-1);
+  color: var(--ody-base);
 }
 
 .pagination {
@@ -283,7 +283,7 @@
   }
 
   &:disabled {
-    background: var(--ody-1);
+    background: var(--ody-base);
     cursor: not-allowed;
     transform: none;
     box-shadow: none;

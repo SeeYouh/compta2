@@ -1,6 +1,9 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import { computeColorPalette, DEFAULT_COLOR } from "../utils/colorPalette.js";
+import { useColorPreferences } from "../../../components/hooks/useColorPreferences.js";
+
+export const ODYSSEE_THEME_KEY = "odyssee-theme";
 
 const OdysseeColorContext = createContext(null);
 
@@ -13,7 +16,7 @@ export function buildOdysseeGlobalStyles(c) {
   return `
     /* ─── Variables CSS scoped à .odyssee-root ─── */
     .odyssee-root {
-      --ody-1: ${c.base};
+      --ody-base: ${c.base};
       --ody-lightness: ${c.lightness};
       --ody-light: ${c.light};
       --ody-dark: ${c.dark};
@@ -27,14 +30,6 @@ export function buildOdysseeGlobalStyles(c) {
       --ody-contrast-dark: ${c.contrastDark};
       --ody-contrast-darker: ${c.contrastDarker};
       --ody-contrast-darkest: ${c.contrastDarkest};
-
-      /* ─── Aliases --color-xxx pour compatibilité composants génériques ─── */
-      --color-1: var(--ody-1);
-      --color-lightness: var(--ody-lightness);
-      --color-light: var(--ody-light);
-      --color-dark: var(--ody-dark);
-      --color-darker: var(--ody-darker);
-      --color-darkest: var(--ody-darkest);
     }
 
     /* ─── Body ─── */
@@ -87,6 +82,14 @@ export function OdysseeColorProvider({
   children,
 }) {
   const [baseColor, setBaseColor] = useState(initialColor);
+  const { getDefault } = useColorPreferences();
+
+  // Applique la couleur sauvegardée dès que les préférences sont chargées
+  useEffect(() => {
+    const saved = getDefault(ODYSSEE_THEME_KEY);
+    if (saved) setBaseColor(saved);
+  }, [getDefault]);
+
   const colors = useMemo(() => computeColorPalette(baseColor), [baseColor]);
   const globalStyles = useMemo(
     () => buildOdysseeGlobalStyles(colors),

@@ -282,7 +282,7 @@
   }
 
   p {
-    color: var(--ody-1);
+    color: var(--ody-base);
     line-height: 1.6;
   }
 
@@ -294,7 +294,7 @@
       margin-bottom: 0.8rem;
 
       a {
-        color: var(--ody-1);
+        color: var(--ody-base);
         text-decoration: none;
         transition: color 0.3s ease;
 
@@ -312,7 +312,7 @@
   text-align: center;
 
   p {
-    color: var(--ody-1);
+    color: var(--ody-base);
     margin-bottom: 1rem;
 
     &:last-child {

@@ -1,14 +1,11 @@
-import {
-  useEffect,
-  useState,
-} from 'react';
+import { useEffect, useState } from "react";
 
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
-import ConfirmationModal from '../../../../components/ConfirmationModal';
-import TrashCard from '../../components/TrashCard';
-import TrashService from '../../../../services/trashService';
-import { useOdysseeColor } from '../../contexts/OdysseeColorContext.jsx';
+import ConfirmationModal from "../../../../components/ConfirmationModal";
+import TrashCard from "../../components/TrashCard";
+import TrashService from "../../../../services/trashService";
+import { useOdysseeColor } from "../../contexts/OdysseeColorContext.jsx";
 
 const Settings = () => {
   const { colors } = useOdysseeColor();
@@ -62,7 +59,10 @@ const Settings = () => {
   const isEmpty = products.length === 0 && folders.length === 0;
 
   return (
-    <div style={{ padding: "24px" }}>
+    <div
+      className="odyssee-root"
+      style={{ padding: "24px", minHeight: "100vh" }}
+    >
       <Link to="/odyssee" style={{ fontSize: 13, opacity: 0.6 }}>
         ← Retour
       </Link>

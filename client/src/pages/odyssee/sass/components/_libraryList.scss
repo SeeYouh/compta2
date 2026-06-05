@@ -120,7 +120,7 @@
   }
 
   &.drop-target {
-    outline: 2px dashed var(--ody-1);
+    outline: 2px dashed var(--ody-base);
   }
 }
 
@@ -149,7 +149,7 @@
 
 // Ghost — icône fantome pendant le drag
 .catalog-sidebar__icon--ghost {
-  border: 2px dashed var(--ody-1);
+  border: 2px dashed var(--ody-base);
   background: transparent !important;
   cursor: default;
   opacity: 0.35;
@@ -255,7 +255,7 @@
     list-style: none;
 
     li {
-      color: var(--ody-1);
+      color: var(--ody-base);
       font-size: 13px;
       line-height: 1.6;
       white-space: nowrap;
@@ -403,7 +403,7 @@
     right: 12px;
     background: none;
     border: none;
-    color: var(--ody-1);
+    color: var(--ody-base);
     font-size: 16px;
     cursor: pointer;
     line-height: 1;
@@ -422,7 +422,7 @@
 
   &__label {
     display: block;
-    color: var(--ody-1);
+    color: var(--ody-base);
     font-size: 12px;
     font-weight: 600;
     margin-bottom: 6px;
@@ -445,7 +445,7 @@
 
     &:focus {
       outline: none;
-      border-color: var(--ody-1);
+      border-color: var(--ody-base);
     }
   }
 
@@ -497,7 +497,7 @@
     transition: background 0.2s;
 
     &:hover {
-      background: var(--ody-1);
+      background: var(--ody-base);
     }
   }
 }
@@ -513,7 +513,7 @@
 
   &.active {
     height: 12px;
-    background: var(--ody-1);
+    background: var(--ody-base);
   }
 }
 
