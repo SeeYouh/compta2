@@ -31,6 +31,7 @@ export default function OrgChart() {
     addNodeLocal,
     addEdgeLocal,
     removeEdgeLocal,
+    removeNodeLocal,
     updateNodePosition,
   } = useStore();
 
@@ -209,6 +210,26 @@ export default function OrgChart() {
     [activeCanvasId, updateNodePosition],
   );
 
+  const handleNodesChange = useCallback(
+    (changes) => {
+      onNodesChange(changes);
+      changes
+        .filter((c) => c.type === "remove")
+        .forEach((c) => removeNodeLocal(activeCanvasId, c.id));
+    },
+    [activeCanvasId, onNodesChange, removeNodeLocal],
+  );
+
+  const handleEdgesChange = useCallback(
+    (changes) => {
+      onEdgesChange(changes);
+      changes
+        .filter((c) => c.type === "remove")
+        .forEach((c) => removeEdgeLocal(activeCanvasId, c.id));
+    },
+    [activeCanvasId, onEdgesChange, removeEdgeLocal],
+  );
+
   const onPaneClick = useCallback(() => {
     closeContextMenu();
   }, [closeContextMenu]);
@@ -221,8 +242,8 @@ export default function OrgChart() {
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
+        onNodesChange={handleNodesChange}
+        onEdgesChange={handleEdgesChange}
         onConnect={onConnect}
         onEdgeClick={onEdgeClick}
         onNodeDragStop={onNodeDragStop}

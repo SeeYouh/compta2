@@ -1,0 +1,286 @@
+// Zone principale des produits
+.catalog-main {
+  flex: 1;
+  padding: 20px;
+  overflow: auto;
+  background: var(--ody-darker);
+  display: flex;
+  flex-direction: column;
+
+  &--compact {
+    padding: 15px 0px 0px 0px;
+  }
+}
+
+// Paramètres catégorie (modal overlay)
+.category-settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 700;
+}
+
+.category-settings {
+  background: var(--ody-darker);
+  border: 1px solid var(--ody-dark);
+  border-radius: 12px;
+  width: 420px;
+  max-width: 90vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--ody-dark);
+
+    h4 {
+      margin: 0;
+      color: var(--ody-lightness);
+      font-size: 15px;
+      font-weight: 600;
+    }
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    color: var(--ody-1);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition:
+      background 0.15s,
+      color 0.15s;
+
+    &:hover {
+      background: var(--ody-dark);
+      color: var(--ody-lightness);
+    }
+  }
+
+  &__body {
+    flex: 1;
+    padding: 20px;
+    overflow: auto;
+  }
+}
+
+// En-tête (titre + compteur + bouton +)
+.catalog-main__header {
+  margin: 0 -20px 12px;
+  padding: 0 20px 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 3px solid var(--ody-dark);
+
+  h4 {
+    margin: 0;
+    color: var(--ody-lightness);
+    font-weight: 600;
+    line-height: 1.2;
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  &--compact {
+    margin: 0 -8px 6px;
+    padding: 0 8px 6px;
+    justify-content: center;
+  }
+}
+
+// Icône de catégorie en mode compact (comme catalog-sidebar__icon)
+.catalog-main__cat-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--ody-dark);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ody-lightness);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  overflow: hidden;
+  user-select: none;
+
+  img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+// Tooltip du nom de catégorie en compact
+.catalog-main__cat-tooltip {
+  position: fixed;
+  background: var(--ody-darker);
+  border: 1px solid var(--ody-dark);
+  border-radius: 6px;
+  padding: 4px 10px 5px;
+  color: var(--ody-lightness);
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 500;
+  transform: translateY(-50%);
+  white-space: nowrap;
+
+  &::before {
+    content: "";
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-right-color: var(--ody-dark);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: calc(100% - 1px);
+    top: 50%;
+    transform: translateY(-50%);
+    border: 5px solid transparent;
+    border-right-color: var(--ody-darker);
+  }
+}
+
+// Bouton + inline en bas de la liste compact
+.catalog-main__add--inline {
+  width: 32px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--ody-dark);
+  color: var(--ody-lightness);
+  opacity: 0.5;
+  transition: opacity 0.15s;
+
+  &:hover {
+    opacity: 1;
+    background: var(--ody-dark);
+  }
+}
+
+.catalog-main__meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+// Bouton + pour nouveau produit/dossier
+.catalog-main__add-wrapper {
+  position: relative;
+}
+
+.catalog-main__add {
+  width: 36px;
+  height: 36px;
+  background: var(--ody-darker);
+  border-radius: 25%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--ody-lightness);
+  transition: background 0.15s;
+  user-select: none;
+
+  &:hover {
+    background: var(--ody-dark);
+  }
+}
+
+// État vide
+.catalog-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: var(--ody-dark);
+  text-align: center;
+
+  &__icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  &__title {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  &__hint {
+    font-size: 14px;
+  }
+}
+
+// Grille de produits
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 8px;
+  justify-items: center;
+
+  &:hover .catalog-card {
+    opacity: 0.5;
+  }
+
+  &:hover .catalog-card:hover,
+  &:hover .catalog-card--selected {
+    opacity: 1;
+  }
+
+  &:has(.catalog-card--selected) .catalog-card:not(.catalog-card--selected) {
+    opacity: 0.5;
+  }
+}
+
+// Carte produit
+.catalog-card {
+  width: 64px;
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  transition: opacity 0.2s ease;
+
+  &--drag-over {
+    outline: 2px dashed var(--ody-lightness);
+    outline-offset: -2px;
+    opacity: 0.8;
+  }
+
+  &__image {
+    width: 100%;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 12px;
+    padding: 10px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+  }
+}

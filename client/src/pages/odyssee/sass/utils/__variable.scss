@@ -1,0 +1,41 @@
+// ─── Couleurs sémantiques Odyssée ─────────────────────────────────────────────
+// Rouge unique : toute autre valeur rouge DOIT être remplacée par $ody-danger.
+// Vert unique  : toute autre valeur verte DOIT être remplacée par $ody-success.
+$ody-danger: #6c0a0a;
+$ody-success: #0a6c0c;
+
+.input-dysplay-none {
+  display: none;
+}
+
+$variable-range-custom: (
+  "",
+  "::-webkit-slider-thumb",
+  "::-webkit-slider-runnable-track",
+  "::-moz-focus-outer",
+  "::-moz-range-progress",
+  "::-moz-range-thumb",
+  "::-moz-range-track",
+  "::-ms-thumb",
+  "::-ms-track"
+);
+
+$variable-range-custom-selected: (
+  "::-webkit-slider-thumb",
+  "::-webkit-slider-runnable-track",
+  "::-moz-focus-outer",
+  "::-moz-range-progress",
+  "::-moz-range-thumb",
+  "::-moz-range-track",
+  "::-ms-thumb",
+  "::-ms-track"
+);
+
+$range-parts: (
+  "::-webkit-slider-runnable-track": track,
+  "::-moz-range-track": track,
+  "::-moz-range-progress": progress,
+  "::-webkit-slider-thumb": thumb,
+  "::-moz-range-thumb": thumb,
+  "::-moz-focus-outer": focus,
+);

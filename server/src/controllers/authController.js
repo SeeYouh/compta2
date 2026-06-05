@@ -111,9 +111,13 @@ export const login = async (req, res) => {
     }
 
     // Générer le token JWT
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-    });
+    const token = jwt.sign(
+      { userId: user.id, role: user.role || "user" },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: process.env.JWT_EXPIRES_IN,
+      },
+    );
 
     res.json({
       user: user.toJSON(),
@@ -178,9 +182,13 @@ export const verifyEmail = async (req, res) => {
     await user.save();
 
     // Générer le token JWT pour connexion automatique
-    const jwtToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-    });
+    const jwtToken = jwt.sign(
+      { userId: user.id, role: user.role || "user" },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: process.env.JWT_EXPIRES_IN,
+      },
+    );
 
     res.json({
       message: "Email vérifié avec succès ! Vous êtes maintenant connecté.",
@@ -446,5 +454,108 @@ export const resetPassword = async (req, res) => {
     res.status(500).json({
       error: "Erreur serveur lors de la réinitialisation du mot de passe",
     });
+  }
+};
+
+/**
+ * GET /api/auth/users
+ * Récupère la liste des utilisateurs (admin uniquement)
+ */
+export const getUsers = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
+
+    const query = search
+      ? {
+          $or: [
+            { email: { $regex: search, $options: "i" } },
+            { name: { $regex: search, $options: "i" } },
+          ],
+        }
+      : {};
+
+    const total = await User.countDocuments(query);
+    const users = await User.find(query)
+      .select(
+        "-password -verificationToken -verificationTokenExpires -resetPasswordToken -passwordResetToken -passwordResetTokenExpires",
+      )
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    res.json({
+      users: users.map((u) => u.toJSON()),
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    console.error("Erreur getUsers:", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
+const MAX_FREQUENT_COUNTRIES = 12;
+
+export const getFrequentCountries = async (req, res) => {
+  try {
+    const user = await User.findOne({ id: req.userId }).select(
+      "frequentCountries",
+    );
+    if (!user)
+      return res.status(404).json({ error: "Utilisateur introuvable" });
+    res.json({ success: true, countries: user.frequentCountries || [] });
+  } catch (error) {
+    console.error("Erreur getFrequentCountries:", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
+export const addFrequentCountry = async (req, res) => {
+  try {
+    const { code } = req.body;
+    if (!code || typeof code !== "string" || code.length > 3) {
+      return res.status(400).json({ error: "Code pays invalide" });
+    }
+    const user = await User.findOne({ id: req.userId });
+    if (!user)
+      return res.status(404).json({ error: "Utilisateur introuvable" });
+
+    const current = user.frequentCountries || [];
+    const without = current.filter((c) => c !== code);
+    user.frequentCountries = [code, ...without].slice(
+      0,
+      MAX_FREQUENT_COUNTRIES,
+    );
+    await user.save();
+
+    res.json({ success: true, countries: user.frequentCountries });
+  } catch (error) {
+    console.error("Erreur addFrequentCountry:", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
+export const removeFrequentCountry = async (req, res) => {
+  try {
+    const { code } = req.params;
+    const user = await User.findOne({ id: req.userId });
+    if (!user)
+      return res.status(404).json({ error: "Utilisateur introuvable" });
+
+    user.frequentCountries = (user.frequentCountries || []).filter(
+      (c) => c !== code,
+    );
+    await user.save();
+
+    res.json({ success: true, countries: user.frequentCountries });
+  } catch (error) {
+    console.error("Erreur removeFrequentCountry:", error);
+    res.status(500).json({ error: "Erreur serveur" });
   }
 };

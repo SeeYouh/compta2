@@ -12,42 +12,52 @@ export function useAuth() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    checkAuth();
-  }, []);
+    let cancelled = false;
 
-  const checkAuth = async () => {
-    const token = localStorage.getItem("token");
+    const checkAuth = async () => {
+      const token = localStorage.getItem("token");
 
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await fetch(`${API_URL}/api/auth/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-        localStorage.setItem("user", JSON.stringify(userData));
-      } else {
-        // Token invalide ou expiré
-        logout();
+      if (!token) {
+        if (!cancelled) setLoading(false);
+        return;
       }
-    } catch (error) {
-      console.error(
-        "Erreur lors de la vérification de l'authentification:",
-        error
-      );
-      logout();
-    } finally {
-      setLoading(false);
-    }
-  };
+
+      try {
+        const response = await fetch(`${API_URL}/api/auth/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (cancelled) return;
+
+        if (response.ok) {
+          const userData = await response.json();
+          if (!cancelled) {
+            setUser(userData);
+            localStorage.setItem("user", JSON.stringify(userData));
+          }
+        } else {
+          // Token invalide ou expiré
+          if (!cancelled) logout();
+        }
+      } catch (error) {
+        // Erreur réseau (extension, offline) — on ne déconnecte pas
+        console.error(
+          "Erreur lors de la vérification de l'authentification:",
+          error,
+        );
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    checkAuth();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const logout = () => {
     localStorage.removeItem("token");

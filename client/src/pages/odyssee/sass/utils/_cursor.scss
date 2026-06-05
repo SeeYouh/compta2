@@ -1,0 +1,7 @@
+@use "../utils/_variable" as *;
+
+@each $pseudo in $variable-range-custom {
+  input[type="range"].range-disabled#{$pseudo} {
+    cursor: default;
+  }
+}

@@ -42,6 +42,11 @@
   overflow: hidden;
 }
 
+.dropdownLeft {
+  right: auto;
+  left: 0;
+}
+
 .userInfo {
   padding: 1rem;
 }
@@ -90,11 +95,7 @@
 .actionBarRight {
   display: flex;
   align-items: center;
-  gap: 0.125rem;
-
-  // Couleurs bicolores de l'icône maison
-  --icon-maison-body: var(--color-text-dim);
-  --icon-maison-roof: var(--color-text);
+  gap: 0.25rem;
 }
 
 .iconBtn {
@@ -134,6 +135,9 @@
 }
 
 .menuButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   width: 100%;
   padding: 0.75rem 1rem;
   background: transparent;
@@ -143,6 +147,12 @@
   color: var(--color-text);
   cursor: pointer;
   transition: background-color 0.2s ease;
+
+  svg {
+    width: 0.9rem;
+    height: 0.9rem;
+    flex-shrink: 0;
+  }
 
   &:hover {
     background: var(--color-hover);

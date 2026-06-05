@@ -1,0 +1,57 @@
+import mongoose from "mongoose";
+
+import { odysseeConn } from "../config/database.js";
+
+const categorySchema = new mongoose.Schema({
+  userId: {
+    type: String,
+    required: true,
+  },
+  type: {
+    type: String,
+    enum: ["catalog", "passengers", "odyssey"],
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  description: {
+    type: String,
+    trim: true,
+  },
+  image: {
+    type: String,
+    default: null,
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
+  deletedAt: {
+    type: Date,
+    default: null,
+  },
+});
+
+// Unicité du nom par utilisateur et type
+categorySchema.index({ userId: 1, type: 1, name: 1 }, { unique: true });
+
+categorySchema.pre("save", function (next) {
+  this.updatedAt = Date.now();
+  next();
+});
+
+export const OdysseeCategory = odysseeConn.model(
+  "OdysseeCategory",
+  categorySchema,
+);

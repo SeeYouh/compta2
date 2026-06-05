@@ -1,194 +1,326 @@
+// ─── ColorPicker — composant générique HSV ────────────────────────────────────
+// Largeur totale ≈ 416px (canvas 240 + gap 8 + colonne droite 168)
+
+$cp-canvas-w: 240px;
+$cp-canvas-h: 160px;
+$cp-right-w: 210px;
+$cp-gap: 8px;
+$cp-history-cols: 6;
+$cp-swatch-size: 36px;
+$cp-cursor-size: 20px;
+$hi-cursor-size: 28px;
+$hue-cursor-size: 30px;
+$hue-hex-size: 48px;
+
 .color-picker {
-  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--color-darker);
+  border: 1px solid var(--picker-border-color);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  user-select: none;
 
-  &__trigger {
+  &--draggable {
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  // ─── Zone haute (canvas + colonne droite) ────────────────────────────────
+
+  &__top {
     display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    background: var(--color-surface);
-    border: none;
-    border-radius: 0.375rem;
-    padding: 0.375rem 0.625rem;
-    cursor: pointer;
-    font-size: 1.125rem;
-    color: var(--color-text);
+    gap: $cp-gap;
   }
 
-  &__panel {
-    position: absolute;
-    top: calc(100% + 1.5rem);
-    right: 0;
-    background: var(--color-subSurface);
-    border: 1px solid var(--color-border);
-    border-radius: 0.5rem;
-    padding: 1rem;
-    width: 320px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    animation: slideDown 0.2s ease-out;
+  // ─── Canvas HSV ──────────────────────────────────────────────────────────
 
-    @media (max-width: 768px) {
-      right: auto;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-  }
-
-  &__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--color-border);
-
-    h3 {
-      margin: 0;
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--color-text);
-    }
-  }
-
-  &__reset {
-    padding: 0.25rem 0.625rem;
-    font-size: 0.875rem;
-    background: var(--color-surface-hover);
-    border: 1px solid var(--color-border);
-    border-radius: 0.25rem;
-    color: var(--color-text);
-    cursor: pointer;
-    transition: all 0.2s;
-
-    &:hover {
-      background: var(--color-accent);
-      color: white;
-      border-color: var(--color-accent);
-    }
-  }
-
-  &__presets {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-
-  &__preset {
-    width: 100%;
-    aspect-ratio: 1;
-    border: 2px solid var(--color-border);
-    border-radius: 0.375rem;
-    cursor: pointer;
-    transition: all 0.2s;
+  &__canvas-wrap {
     position: relative;
+    width: $cp-canvas-w;
+    height: $cp-canvas-h;
+    cursor: crosshair;
+    flex-shrink: 0;
+  }
+
+  &__canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+  }
+
+  &__canvas-cursor {
+    position: absolute;
+    width: $cp-cursor-size;
+    height: $cp-cursor-size;
+    border-radius: 50%;
+    border: 2px solid var(--color-lightness);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  // ─── Colonne droite (boutons + historique) ───────────────────────────────
+
+  &__right {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: $cp-right-w;
+    flex-shrink: 0;
+    margin: auto 0;
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__actions-row {
+    display: flex;
+    gap: 4px;
+
+    .color-picker__btn {
+      flex: 1;
+    }
+  }
+
+  &__btn {
+    // width: 100%;
+    padding: 5px 8px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--color-text);
+    background: var(--color-darker);
+    border: 2px solid var(--color-1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition:
+      opacity 0.15s,
+      background 0.15s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 5px 5px 15px 5px;
 
     &:hover {
-      transform: scale(1.1);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      background: var(--color-dark);
+      opacity: 1;
     }
 
-    &.active {
-      border-color: var(--color-text);
-      border-width: 3px;
+    &--secondary {
+      background: var(--color-darker);
+      border: 2px solid var(--color-1);
+      color: var(--color-text);
+      margin: 0 25px 8px 25px;
 
-      &::after {
-        content: "✓";
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: white;
-        font-weight: bold;
-        font-size: 1.125rem;
-        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+      &:hover {
+        background: var(--color-dark);
+        opacity: 1;
       }
     }
   }
 
-  &__custom {
-    margin-bottom: 0.75rem;
+  // ─── Zone milieu (slider+hex | historique) ────────────────────────────────
 
-    label {
-      display: block;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--color-text);
-      margin-bottom: 0.5rem;
+  &__mid {
+    display: flex;
+    gap: $cp-gap;
+    align-items: stretch;
+    margin: -2px 0 10px 0;
+  }
+
+  &__controls {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    width: $cp-canvas-w;
+    flex-shrink: 0;
+    padding: 0 15px;
+  }
+
+  // ─── Historique (30 slots en grille 6×5) ─────────────────────────────────
+
+  &__history {
+    display: grid;
+    grid-template-columns: repeat($cp-history-cols, 1fr);
+    gap: 3px;
+    flex-shrink: 0;
+  }
+
+  &__history-slot {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    width: $hi-cursor-size;
+    height: $hi-cursor-size;
+    border: 3px solid var(--color-light);
+    background: var(--color-darker);
+    cursor: default;
+    margin: 3px;
+    transition:
+      transform 0.1s,
+      border-color 0.1s;
+
+    &--filled {
+      cursor: pointer;
+      border-color: transparent;
+
+      &:hover {
+        transform: scale(1.15);
+        border-color: var(--color-lightness);
+      }
     }
   }
 
-  &__input-wrapper {
+  // ─── Slider teinte ────────────────────────────────────────────────────────
+
+  &__hue-wrap {
+    padding: 4px 0 10px 0;
+  }
+
+  &__hue-slider {
+    position: relative;
+    height: 18px;
+    border-radius: 27px;
+    cursor: pointer;
+    background: linear-gradient(
+      to right,
+      #f00 0%,
+      #ff0 17%,
+      #0f0 33%,
+      #0ff 50%,
+      #00f 67%,
+      #f0f 83%,
+      #f00 100%
+    );
+  }
+
+  &__hue-cursor {
+    position: absolute;
+    top: 50%;
+    width: $hue-cursor-size;
+    height: $hue-cursor-size;
+    border-radius: 50%;
+    border: 2px solid var(--color-lightness);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  // ─── Aperçu + input hex ──────────────────────────────────────────────────
+
+  &__preview-row {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-
-    input[type="color"] {
-      width: 60px;
-      height: 40px;
-      border: 2px solid var(--color-border);
-      border-radius: 0.375rem;
-      cursor: pointer;
-      background: var(--color-surface);
-
-      &::-webkit-color-swatch-wrapper {
-        padding: 2px;
-      }
-
-      &::-webkit-color-swatch {
-        border: none;
-        border-radius: 0.25rem;
-      }
-
-      &::-moz-color-swatch {
-        border: none;
-        border-radius: 0.25rem;
-      }
-    }
+    gap: 8px;
+    padding-top: 10px;
   }
 
-  &__hex {
-    font-family: "Consolas", "Monaco", monospace;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--color-text);
-    padding: 0.5rem 0.75rem;
-    background: var(--color-surface-hover);
+  &__preview {
+    width: $hue-hex-size;
+    height: $hue-hex-size;
+    border-radius: 4px;
     border: 1px solid var(--color-border);
-    border-radius: 0.25rem;
-    flex: 1;
-    cursor: text;
-    transition: all 0.2s;
+    flex-shrink: 0;
+  }
 
-    &:hover {
-      border-color: var(--color-accent);
-    }
+  &__hex-input {
+    flex: 1;
+    height: $hue-hex-size;
+    padding: 0 15px;
+    font-size: 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 25px;
+    text-align: center;
+    cursor: text;
+    transition:
+      border-color 0.15s,
+      background 0.15s,
+      color 0.15s;
 
     &:focus {
       outline: none;
-      border-color: var(--color-accent);
-      box-shadow: 0 0 0 3px var(--color-primary-alpha-10);
+      border-color: var(--color-primary);
     }
   }
 
-  &__note {
-    margin: 0;
-    padding: 0.625rem;
-    background: var(--color-primary-alpha-10);
-    border-radius: 0.375rem;
-    font-size: 0.75rem;
-    color: var(--color-text-dim);
-    text-align: center;
-  }
-}
+  // ─── Zone basse (familles + palette) ─────────────────────────────────────
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
+  &__bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  &__families {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  &__family-btn {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    padding: 0;
+    margin: 5px 10px;
+    cursor: pointer;
+    transform-origin: bottom center;
+    transition:
+      transform 0.2s,
+      border-color 0.15s;
+
+    &:hover {
+      transform: scale(1.55);
+    }
+
+    &--active {
+      transform: scale(1.55);
+      border-color: var(--color-lightness);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  // ─── Grille de couleurs de la famille active ──────────────────────────────
+
+  &__swatches {
+    display: grid;
+    gap: 2px;
+  }
+
+  &__swatch {
+    width: $cp-swatch-size;
+    height: $cp-swatch-size;
+    border-radius: 50%;
+    border: 2px solid var(--color-light);
+    padding: 0;
+    margin: 3px 3px 6px 3px;
+    cursor: pointer;
+    transform-origin: bottom center;
+    transition: transform 0.55s ease;
+
+    &:hover {
+      transform: scale(1.55);
+      border: 2px solid var(--color-lightness);
+      z-index: 1;
+      position: relative;
+      transition: transform 0.1s ease;
+    }
+
+    &--active {
+      transform: scale(1.55);
+      border: 2px solid var(--color-lightness);
+      z-index: 1;
+      position: relative;
+    }
   }
 }

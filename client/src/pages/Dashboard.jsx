@@ -14,8 +14,8 @@ const apps = [
     description: "Gérez vos comptes, transactions et budgets",
     icon: (
       <svg
-        width="32"
-        height="32"
+        width="48"
+        height="48"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -36,8 +36,8 @@ const apps = [
     description: "Créez et visualisez vos organigrammes",
     icon: (
       <svg
-        width="32"
-        height="32"
+        width="48"
+        height="48"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -50,6 +50,27 @@ const apps = [
         <rect x="9" y="18" width="6" height="4" rx="1" />
         <rect x="16" y="18" width="6" height="4" rx="1" />
         <path d="M12 6v4M12 10H5v4M12 10h7v4" />
+      </svg>
+    ),
+  },
+  {
+    id: "odyssee",
+    path: "/odyssee",
+    label: "Odyssée",
+    description:
+      "Créez, gérez et organisez vos documents et modèles de documents",
+    icon: (
+      <svg
+        width="48"
+        height="48"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18" />
       </svg>
     ),
   },
@@ -84,19 +105,6 @@ export default function Dashboard() {
                 <h2 className="dashboard-card__label">{app.label}</h2>
                 <p className="dashboard-card__description">{app.description}</p>
               </div>
-              <svg
-                className="dashboard-card__arrow"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
             </button>
           ))}
         </div>

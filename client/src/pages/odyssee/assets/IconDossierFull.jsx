@@ -1,0 +1,20 @@
+const IconDossierFull = ({ color = "currentColor", size = 24, ...props }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 2711.17 2238.18"
+      width={size}
+      height={size}
+      aria-hidden="true"
+      focusable="false"
+      {...props}
+    >
+      <path
+        fill={color}
+        d="M217.59.67L790.88,0c12.48,0,23.57,5.16,32.93,13.06l204.95,202.98,1459.5-.04c122.15,6.88,216.04,100.78,222.92,223v1578.17c-5.79,115.92-97.03,211.8-212.91,221.01H210.92c-115.07-10.73-205.1-105.49-210.92-221.01L.1,221.11C7.28,102.38,98.81,9.13,217.59.67Z"
+      />
+    </svg>
+  );
+};
+
+export default IconDossierFull;

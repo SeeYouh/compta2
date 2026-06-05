@@ -1,0 +1,21 @@
+.editable-navbar-wrapper {
+  .hover-zone {
+    display: inline-block;
+
+    .nav-bar-minitools {
+      padding: 4px;
+      gap: 4px;
+      z-index: 100;
+
+      button {
+        background: none;
+        border: none;
+        cursor: pointer;
+      }
+    }
+
+    &:hover .nav-bar {
+      display: flex;
+    }
+  }
+}

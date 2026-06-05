@@ -1,0 +1,258 @@
+.lexical-editor {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+// ─── Toolbar ──────────────────────────────────────────────────────────────────
+.lex-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 4px 8px;
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 2.5%;
+    width: 95%;
+    height: 2px;
+    background: var(--lex-border);
+  }
+
+  &__group {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 2px;
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--lex-text);
+    transition:
+      background 0.1s,
+      border-color 0.1s;
+
+    &:hover {
+      background: var(--lex-hover);
+    }
+
+    &--active {
+      background: var(--lex-active-bg);
+      border-color: var(--lex-active-border);
+      color: var(--lex-text);
+    }
+  }
+
+  &__select {
+    width: auto;
+    height: 26px;
+    padding: 0 16px;
+    border: 1px solid var(--lex-select-border);
+    border-radius: 4px;
+    background: var(--lex-select-bg);
+    color: var(--lex-text);
+    font-size: 12px;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: var(--lex-text);
+    }
+
+    &--size {
+      width: 60px;
+      padding: 0 6px;
+    }
+  }
+
+  &__file-input {
+    display: none;
+  }
+
+  &__color-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 4px;
+    border: 1px solid var(--lex-select-border);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+    position: relative;
+    overflow: hidden;
+    color: var(--lex-text);
+    transition: background 0.1s;
+
+    &:hover {
+      background: var(--lex-hover);
+    }
+
+    &--bg {
+      font-size: 16px;
+      font-weight: 400;
+    }
+  }
+
+  &__color-input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+// ─── Zone d'édition ───────────────────────────────────────────────────────────
+.lexical-editor__body {
+  flex: 1;
+  position: relative;
+  overflow-y: auto;
+}
+
+.lexical-editor__content {
+  min-height: 200px;
+  padding: 12px 16px;
+  outline: none;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #000000;
+  caret-color: #000000;
+}
+
+.lexical-editor__placeholder {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  pointer-events: none;
+  color: #000000;
+  opacity: 0.4;
+  font-size: 14px;
+  font-style: italic;
+}
+
+// ─── Styles du contenu Lexical ────────────────────────────────────────────────
+.lex-bold {
+  font-weight: bold;
+}
+.lex-italic {
+  font-style: italic;
+}
+.lex-underline {
+  text-decoration: underline;
+}
+.lex-strikethrough {
+  text-decoration: line-through;
+}
+.lex-superscript {
+  font-size: 0.75em;
+  vertical-align: super;
+}
+.lex-subscript {
+  font-size: 0.75em;
+  vertical-align: sub;
+}
+.lex-code-inline {
+  font-family: monospace;
+  background: color-mix(in srgb, var(--ody-1) 10%, var(--ody-darkest));
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 0.9em;
+}
+
+.lex-paragraph {
+  margin: 0 0 8px;
+}
+.lex-h1 {
+  font-size: 1.6em;
+  font-weight: 700;
+  margin: 12px 0 6px;
+}
+.lex-h2 {
+  font-size: 1.3em;
+  font-weight: 600;
+  margin: 10px 0 5px;
+}
+.lex-h3 {
+  font-size: 1.1em;
+  font-weight: 600;
+  margin: 8px 0 4px;
+}
+
+.lex-quote {
+  border-left: 3px solid var(--ody-1);
+  padding-left: 12px;
+  margin: 8px 0;
+  opacity: 0.8;
+  font-style: italic;
+}
+
+.lex-ul,
+.lex-ol {
+  padding-left: 20px;
+  margin: 6px 0;
+}
+
+.lex-listitem {
+  margin: 2px 0;
+}
+.lex-nested-listitem {
+  list-style: none;
+}
+
+// ─── Bloc de code ─────────────────────────────────────────────────────────────
+.lex-code-block {
+  font-family: "Courier New", monospace;
+  background: color-mix(in srgb, var(--ody-darkest) 6%, white);
+  border: 1px solid color-mix(in srgb, var(--ody-darkest) 20%, transparent);
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 8px 0;
+  white-space: pre-wrap;
+  tab-size: 2;
+  color: var(--ody-darkest);
+  display: block;
+}
+
+// ─── Image insérée ────────────────────────────────────────────────────────────
+.lex-image-wrapper {
+  display: inline-block;
+  line-height: 0;
+}
+
+.lex-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+// ─── Marques de formatage (¶) ─────────────────────────────────────────────────
+.lexical-editor__content.show-format-marks {
+  .lex-paragraph::after {
+    content: "¶";
+    opacity: 0.3;
+    color: var(--ody-1);
+    font-weight: normal;
+    pointer-events: none;
+  }
+}

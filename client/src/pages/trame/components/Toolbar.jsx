@@ -1,17 +1,14 @@
-import '../styles/Toolbar.scss';
+import "../styles/Toolbar.scss";
 
-import {
-  useCallback,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useRef, useState } from "react";
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
-import { useReactFlow } from '@xyflow/react';
+import { useReactFlow } from "@xyflow/react";
 
-import IconMaison from '../../../assets/IconMaison';
-import { useClickOutside } from '../../../components/hooks/useClickOutside';
+import { IconMaison } from "../../../assets/IconMaison";
+import { useAuth } from "../../../components/hooks/useAuth";
+import { useClickOutside } from "../../../components/hooks/useClickOutside";
 
 export default function Toolbar({ onAddNode, onSave }) {
   const navigate = useNavigate();
@@ -19,6 +16,7 @@ export default function Toolbar({ onAddNode, onSave }) {
   const [status, setStatus] = useState("idle");
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const { logout } = useAuth();
   useClickOutside(menuRef, () => setMenuOpen(false));
 
   const handleSave = useCallback(async () => {
@@ -34,12 +32,6 @@ export default function Toolbar({ onAddNode, onSave }) {
       setTimeout(() => setStatus("idle"), 3500);
     }
   }, [onSave, status]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
-  };
 
   return (
     <>
@@ -198,39 +190,49 @@ export default function Toolbar({ onAddNode, onSave }) {
           )}
         </button>
         <div className="toolbar__separator" />
-        <div className="toolbar__more" ref={menuRef}>
+        <div className="toolbar__menu-wrapper" ref={menuRef}>
           <button
-            className="toolbar__btn"
-            onClick={() => setMenuOpen((v) => !v)}
+            className={`toolbar__btn ${menuOpen ? "toolbar__btn--active" : ""}`}
+            onClick={() => setMenuOpen((o) => !o)}
             title="Plus d'options"
-            aria-expanded={menuOpen}
+            aria-label="Plus d'options"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <circle cx="8" cy="3" r="1.25" fill="currentColor" />
-              <circle cx="8" cy="8" r="1.25" fill="currentColor" />
-              <circle cx="8" cy="13" r="1.25" fill="currentColor" />
+              <circle cx="8" cy="3" r="1.2" fill="currentColor" />
+              <circle cx="8" cy="8" r="1.2" fill="currentColor" />
+              <circle cx="8" cy="13" r="1.2" fill="currentColor" />
             </svg>
           </button>
           {menuOpen && (
-            <div className="toolbar__more-menu">
-              <div className="toolbar__more-separator" />
-              <div className="toolbar__more-actions">
+            <div className="toolbar__menu" role="menu">
+              <div className="toolbar__menu-separator" role="separator" />
+              <div className="toolbar__menu-actions">
                 <button
-                  className="toolbar__more-btn"
-                  onClick={() => navigate("/")}
-                  aria-label="Accueil"
+                  className="toolbar__menu-item"
+                  role="menuitem"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    navigate("/");
+                  }}
                   title="Accueil"
+                  aria-label="Accueil"
                 >
-                  <IconMaison />
+                  <IconMaison size={15} />
                 </button>
                 <button
-                  className="toolbar__more-btn toolbar__more-btn--danger"
-                  onClick={handleLogout}
-                  aria-label="Déconnexion"
+                  className="toolbar__menu-item toolbar__menu-item--danger"
+                  role="menuitem"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    logout();
+                  }}
                   title="Déconnexion"
+                  aria-label="Déconnexion"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
+                    width="15"
+                    height="15"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"

@@ -30,6 +30,11 @@ const UserSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
     isVerified: {
       type: Boolean,
       default: false,
@@ -52,6 +57,10 @@ const UserSchema = new mongoose.Schema(
     },
     passwordResetRequests: {
       type: [Date],
+      default: [],
+    },
+    frequentCountries: {
+      type: [String],
       default: [],
     },
   },

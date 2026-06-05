@@ -1,0 +1,584 @@
+// Wrapper de la section flex colonne (navBar + interface)
+.catalog-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+// Conteneur principal flex de l'interface hérarchique
+.catalog-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+// Sidebar gauche
+.catalog-sidebar {
+  width: 68px;
+  background: var(--ody-darkest);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0;
+  position: relative;
+  flex-shrink: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  > * {
+    flex-shrink: 0;
+  }
+}
+
+// Barres indicateur de sélection/survol
+.catalog-sidebar__indicator {
+  position: absolute;
+  left: 0;
+  width: 3px;
+  height: 22px;
+  background: var(--ody-lightness);
+  border-radius: 0 3px 3px 0;
+  transform: translateY(-50%);
+  pointer-events: none;
+
+  &--active {
+    height: 32px;
+    opacity: 1;
+    transition:
+      top 0.2s ease,
+      background-color 0.2s ease;
+  }
+}
+
+// Icône de catégorie (initiales)
+.catalog-sidebar__icon {
+  width: 32px;
+  height: 32px;
+  background: var(--ody-darker);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4px 0;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ody-lightness);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px;
+  overflow: hidden;
+  transition: background 0.2s;
+  user-select: none;
+
+  &:hover,
+  &.active {
+    background: var(--ody-dark);
+  }
+
+  img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+
+  // Variante dossier : fond et contour injectés via inline styles (couleur dynamique)
+  &--folder {
+    background: transparent;
+    transition: opacity 0.2s;
+
+    &:hover {
+      background: transparent;
+      opacity: 0.8;
+    }
+  }
+
+  // Variante imbriquée (dans un dossier ouvert)
+  &--nested {
+    width: 32px;
+    height: 32px;
+    font-size: 10px;
+    border-radius: 6px;
+    margin: 4px 0;
+    transition: filter 0.2s;
+
+    &:hover {
+      filter: brightness(1.4);
+    }
+
+    img {
+      width: 26px;
+      height: 26px;
+    }
+  }
+
+  &.drop-target {
+    outline: 2px dashed var(--ody-1);
+  }
+}
+
+// Dossier (conteneur icône + enfants)
+.catalog-sidebar__folder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: fit-content;
+  border-radius: 10px;
+  border: 2px solid transparent; // remplacé par inline style dynamique
+  padding: 2px;
+  margin: 4px 0;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.catalog-sidebar__folder-children {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+// Ghost — icône fantome pendant le drag
+.catalog-sidebar__icon--ghost {
+  border: 2px dashed var(--ody-1);
+  background: transparent !important;
+  cursor: default;
+  opacity: 0.35;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.catalog-sidebar__icon--nested.catalog-sidebar__icon--ghost {
+  opacity: 0.35;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.catalog-sidebar__folder--ghost {
+  cursor: default;
+  opacity: 0.65;
+}
+
+// ── Tooltip sidebar ──────────────────────────────────────────────────────────
+
+// Tooltip produit (position: fixed, rendu dans CatalogMain)
+.catalog-card-tooltip {
+  position: fixed;
+  background: var(--ody-darker);
+  border: 1px solid var(--ody-dark);
+  border-radius: 6px;
+  padding: 5px 10px 6px;
+  color: var(--ody-lightness);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 500;
+  transform: translateY(-50%);
+
+  // Flèche gauche — bord
+  &::before {
+    content: "";
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 7px solid transparent;
+    border-right-color: var(--ody-dark);
+  }
+
+  // Flèche gauche — remplissage
+  &::after {
+    content: "";
+    position: absolute;
+    right: calc(100% - 1px);
+    top: 50%;
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-right-color: var(--ody-darker);
+  }
+}
+
+.sidebar-tooltip {
+  position: fixed;
+  left: 65px; // 60px sidebar + 5px espace (inclut la flèche)
+  background: var(--ody-darker);
+  border: 1px solid var(--ody-dark);
+  border-radius: 6px;
+  padding: 4px 8px 5px;
+  pointer-events: none;
+  z-index: 500;
+  width: max-content;
+  transform: translateY(-50%);
+
+  // Flèche gauche — bord (couleur bordure)
+  &::before {
+    content: "";
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 7px solid transparent;
+    border-right-color: var(--ody-dark);
+  }
+
+  // Flèche gauche — remplissage (couleur fond)
+  &::after {
+    content: "";
+    position: absolute;
+    right: calc(100% - 1px);
+    top: 50%;
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-right-color: var(--ody-darker);
+  }
+
+  &__name {
+    color: var(--ody-lightness);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  &__list {
+    margin: 4px 0 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      color: var(--ody-1);
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: nowrap;
+    }
+  }
+}
+
+// ── Menu contextuel clic droit ───────────────────────────────────────────────
+
+.folder-ctx-menu {
+  position: fixed;
+  background: var(--ody-darker);
+  border: 1px solid var(--ody-dark);
+  border-radius: 8px;
+  padding: 4px 0;
+  z-index: 600;
+  min-width: 200px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: calc(100% - 12px);
+    margin: 0 6px;
+    background: none;
+    border: none;
+    border-radius: 5px;
+    color: var(--ody-lightness);
+    font-size: 13px;
+    text-align: left;
+    padding: 10px 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover {
+      background: var(--ody-dark);
+    }
+  }
+}
+
+// ── Menu contextuel générique ────────────────────────────────────────────────
+
+.ctx-menu {
+  position: fixed;
+  background: var(--ody-darker);
+  border: 1px solid var(--ody-dark);
+  border-radius: 8px;
+  padding: 4px 0;
+  z-index: 600;
+  min-width: 160px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: calc(100% - 12px);
+    margin: 0 6px;
+    background: none;
+    border: none;
+    border-radius: 5px;
+    color: var(--ody-lightness);
+    font-size: 13px;
+    text-align: left;
+    padding: 10px 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover {
+      background: var(--ody-dark);
+    }
+  }
+
+  &__separator {
+    height: 1px;
+    background: var(--ody-dark);
+    margin: 4px 0;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 4px 8px;
+    gap: 4px;
+  }
+
+  &__action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--ody-lightness);
+    transition:
+      background 0.15s,
+      color 0.15s;
+
+    .svgBtn {
+      width: 18px;
+      padding: 0;
+    }
+
+    &--danger {
+      color: var(--ody-lightness);
+
+      &:hover {
+        color: var(--ody-danger);
+      }
+
+      svg {
+        pointer-events: none;
+      }
+    }
+  }
+}
+
+// ── Modal paramètres dossier ─────────────────────────────────────────────────
+
+.folder-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 700;
+}
+
+.folder-modal {
+  position: relative;
+  background: var(--ody-darker);
+  border: 1px solid var(--ody-dark);
+  border-radius: 12px;
+  padding: 28px 24px 24px;
+  width: 340px;
+  max-width: 90vw;
+
+  &__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--ody-1);
+    font-size: 16px;
+    cursor: pointer;
+    line-height: 1;
+
+    &:hover {
+      color: var(--ody-lightness);
+    }
+  }
+
+  &__title {
+    margin: 0 0 20px;
+    color: var(--ody-lightness);
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  &__label {
+    display: block;
+    color: var(--ody-1);
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  &__input {
+    width: 100%;
+    background: var(--ody-darkest);
+    border: 1px solid var(--ody-dark);
+    border-radius: 6px;
+    color: var(--ody-lightness);
+    font-size: 13px;
+    padding: 8px 10px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: var(--ody-dark);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--ody-1);
+    }
+  }
+
+  &__palette {
+    display: grid;
+    grid-template-columns: repeat(6, 36px);
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  &__swatch {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+
+    &.selected {
+      transform: scale(1.1);
+    }
+  }
+
+  &__swatch-check {
+    color: var(--ody-lightness);
+    font-size: 14px;
+    font-weight: 700;
+    pointer-events: none;
+  }
+
+  &__confirm {
+    width: 100%;
+    background: var(--ody-dark);
+    border: none;
+    border-radius: 8px;
+    color: var(--ody-lightness);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+      background: var(--ody-1);
+    }
+  }
+}
+
+// Zone de dépôt entre les éléments
+.catalog-sidebar__drop-stripe {
+  width: 36px;
+  height: 6px;
+  border-radius: 3px;
+  transition:
+    height 0.15s,
+    background 0.15s;
+
+  &.active {
+    height: 12px;
+    background: var(--ody-1);
+  }
+}
+
+// Bouton + à la suite des catégories
+.catalog-no-library {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+  user-select: none;
+
+  &:hover {
+    opacity: 0.75;
+  }
+}
+
+.catalog-sidebar__add {
+  width: 32px;
+  height: 32px;
+  background: var(--ody-darker);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--ody-lightness);
+  transition: filter 0.2s;
+  user-select: none;
+  flex-shrink: 0;
+  margin-bottom: 4px;
+
+  &:hover {
+    filter: brightness(1.4);
+  }
+}
+
+// Overlay de modal
+.catalog-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+// Contenu de la modal
+.catalog-modal {
+  background: var(--ody-lightness);
+  border-radius: 12px;
+  padding: 30px;
+  width: 400px;
+  max-width: 90vw;
+
+  h3 {
+    margin: 0 0 20px 0;
+    color: var(--ody-darkest);
+    font-size: 16px;
+  }
+}

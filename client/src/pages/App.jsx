@@ -1,48 +1,40 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import AccountTabs from '../components/AccountTabs';
-import {
-  APP_LABELS,
-  TABLE_HEADERS,
-} from '../components/utils';
-import AppShell from '../components/AppShell';
-import BalanceCalculator from '../components/BalanceCalculator';
-import ChartsDashboard from '../components/ChartsDashboard';
-import ConfirmationModal from '../components/ConfirmationModal';
-import DrawerThemeManager from '../components/DrawerThemeManager';
-import { enrichTransactions } from '../components/utils/themeResolver';
+import AccountTabs from "../components/AccountTabs";
+import { APP_LABELS, TABLE_HEADERS } from "../components/utils";
+import AppShell from "../components/AppShell";
+import BalanceCalculator from "../components/BalanceCalculator";
+import ChartsDashboard from "../components/ChartsDashboard";
+import ConfirmationModal from "../components/ConfirmationModal";
+import DrawerThemeManager from "../components/DrawerThemeManager";
+import { enrichTransactions } from "../components/utils/themeResolver";
 import {
   filterByMonth,
   sortByFRDate,
-} from '../components/utils/transactionsDerivers';
-import { filterByPeriod } from '../components/utils/periodFilter';
-import { getProjectionOccurrences } from '../components/utils/projectionsApi';
-import IconGraphActivated from '../assets/IconGraphActivated';
-import IcongraphDisable from '../assets/IconGraph';
-import { migrateTransactions } from '../components/utils/themeMigration';
-import MonthTabs from '../components/MonthTabs';
-import { parseFRDate } from '../components/utils/date';
-import PaymentFilterMenu from '../components/filters/PaymentFilterMenu';
+} from "../components/utils/transactionsDerivers";
+import { filterByPeriod } from "../components/utils/periodFilter";
+import { getProjectionOccurrences } from "../components/utils/projectionsApi";
+import IconGraphActivated from "../assets/IconGraphActivated";
+import IcongraphDisable from "../assets/IconGraph";
+import { migrateTransactions } from "../components/utils/themeMigration";
+import MonthTabs from "../components/MonthTabs";
+import { parseFRDate } from "../components/utils/date";
+import PaymentFilterMenu from "../components/filters/PaymentFilterMenu";
 // Filtres
-import PeriodFilter from '../components/filters/PeriodFilter';
-import { saveThemes } from '../components/utils/themesApi';
-import ScrollButton from '../components/ScrollButton';
-import SynapseUserMenu from '../components/SynapseUserMenu';
-import ThemeFilterMenu from '../components/filters/ThemeFilterMenu';
-import TransactionForm from '../components/TransactionForm';
-import TransactionsTable from '../components/TransactionsTable';
-import { useAccounts } from '../contexts/useAccounts';
-import { useLastUpdate } from '../components/hooks/useLastUpdate';
-import { useSettings } from '../components/hooks/useSettings';
-import { useThemes } from '../contexts/useThemes';
-import { useTransactionForm } from '../components/hooks/useTransactionForm';
-import { useTransactions } from '../components/hooks/useTransactions';
-import YearTabs from '../components/filters/YearTabs';
+import PeriodFilter from "../components/filters/PeriodFilter";
+import { saveThemes } from "../components/utils/themesApi";
+import ScrollButton from "../components/ScrollButton";
+import SynapseUserMenu from "../components/SynapseUserMenu";
+import ThemeFilterMenu from "../components/filters/ThemeFilterMenu";
+import TransactionForm from "../components/TransactionForm";
+import TransactionsTable from "../components/TransactionsTable";
+import { useAccounts } from "../contexts/useAccounts";
+import { useLastUpdate } from "../components/hooks/useLastUpdate";
+import { useSettings } from "../components/hooks/useSettings";
+import { useThemes } from "../contexts/useThemes";
+import { useTransactionForm } from "../components/hooks/useTransactionForm";
+import { useTransactions } from "../components/hooks/useTransactions";
+import YearTabs from "../components/filters/YearTabs";
 
 const App = () => {
   const {
@@ -256,11 +248,7 @@ const App = () => {
 
   return (
     <AppShell
-      headerRight={
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <SynapseUserMenu />
-        </div>
-      }
+      headerRight={<SynapseUserMenu />}
       accountTabs={<AccountTabs />}
       lastUpdateText={lastUpdateText}
     >

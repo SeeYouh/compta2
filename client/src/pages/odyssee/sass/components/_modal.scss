@@ -1,0 +1,118 @@
+.modal-content {
+  background: var(--ody-darkest);
+  border: 1px solid var(--ody-darker);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+  .modal-header .modal-title {
+    color: var(--ody-lightness);
+  }
+
+  .modal-body .modal-message {
+    color: var(--ody-light);
+
+    span {
+      background-image: linear-gradient(
+        var(--ody-danger),
+        var(--ody-danger)
+      );
+      background-size: 0% 2px;
+      background-position: left bottom;
+      background-repeat: no-repeat;
+      padding-bottom: 2px;
+      transition: background-size 0.2s ease;
+    }
+  }
+
+  &:has(.modal-toggle__options--checked) .modal-body .modal-message span {
+    background-size: 100% 2px;
+  }
+
+  .modal-body .modal-toggle {
+    color: var(--ody-light);
+
+    &__label {
+      flex: 0 0 auto;
+      margin-left: auto;
+      color: var(--ody-lightness);
+      font-weight: 600;
+      position: relative;
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: -7px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: var(--ody-danger);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.2s ease;
+      }
+    }
+
+    &:has(.modal-toggle__options--checked) .modal-toggle__label::after {
+      transform: scaleX(1);
+    }
+
+    &__options {
+      border: 1px solid var(--ody-dark);
+
+      &::before {
+        background: var(--ody-dark);
+      }
+
+      &--checked::before {
+        background: var(--ody-danger);
+      }
+    }
+
+    &__opt {
+      color: var(--ody-light);
+
+      &--active {
+        color: var(--ody-lightness);
+      }
+
+      &--danger {
+        color: white;
+      }
+    }
+  }
+
+  .modal-footer .btn {
+    &.btn-secondary {
+      background: var(--ody-darker);
+      color: var(--ody-lightness);
+      border-color: var(--ody-darker);
+
+      &:hover {
+        background: var(--ody-dark);
+      }
+    }
+
+    &.btn-danger {
+      background: var(--ody-darker);
+      color: var(--ody-lightness);
+      border: 1px solid var(--ody-dark);
+
+      &:hover:not(:disabled) {
+        background: var(--ody-dark);
+      }
+    }
+
+    &.btn-danger-soft {
+      background: var(--ody-danger);
+      color: white;
+
+      &:hover:not(:disabled) {
+        background: var(--ody-danger-light);
+      }
+
+      &:focus {
+        outline: 2px solid var(--ody-danger);
+        outline-offset: 2px;
+      }
+    }
+  }
+}

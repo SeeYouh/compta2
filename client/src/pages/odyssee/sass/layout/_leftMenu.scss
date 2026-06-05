@@ -1,0 +1,17 @@
+.left-menu {
+  position: relative;
+}
+
+.left-menu-resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  cursor: ew-resize;
+  border-right: 4px solid transparent;
+
+  &:hover {
+    transition: border-right-color 0.1s ease 1s;
+  }
+}

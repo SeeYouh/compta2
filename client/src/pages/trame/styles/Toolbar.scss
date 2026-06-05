@@ -137,6 +137,76 @@
     &--error {
       color: $danger;
     }
+    &--active {
+      background: $surface-hover;
+      color: $text;
+    }
+  }
+
+  &__menu-wrapper {
+    position: relative;
+  }
+
+  &__menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    min-width: 120px;
+    margin: 0;
+    padding: 4px 0;
+    background: $surface;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    box-shadow: $shadow-menu;
+    user-select: none;
+    z-index: 300;
+  }
+
+  &__menu-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2px;
+    padding: 4px 6px;
+  }
+
+  &__menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: $radius-sm;
+    color: $text-muted;
+    cursor: pointer;
+    transition:
+      background $transition-quick,
+      color $transition-quick;
+
+    &:hover {
+      background: $surface-hover;
+      color: $text;
+    }
+
+    &--danger {
+      color: $danger;
+
+      &:hover {
+        background: $danger-bg;
+        color: $danger;
+      }
+    }
+  }
+
+  &__menu-separator {
+    height: 1px;
+    background: $border;
+    margin: 0;
   }
 }
 

@@ -1,25 +1,55 @@
-import {
-  useRef,
-  useState,
-} from 'react';
+import { useRef, useState } from "react";
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
-import IconMaison from '../assets/IconMaison';
-import styles from '../sass/components/UserMenu.module.scss';
-import ThemeToggle from './ThemeToggle';
-import { useClickOutside } from './hooks/useClickOutside';
+import { IconAvatar } from "../assets/IconAvatar";
+import { IconMaison } from "../assets/IconMaison";
+import styles from "../sass/components/UserMenu.module.scss";
+import ThemeToggle from "./ThemeToggle";
+import { useClickOutside } from "./hooks/useClickOutside";
 
-export default function SynapseUserMenu() {
+export default function SynapseUserMenu({ align = "right", menuItems }) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const userName = user.name || "Utilisateur";
-  const userInitial = userName.charAt(0).toUpperCase();
 
   useClickOutside(menuRef, () => setIsOpen(false));
+
+  const defaultMenuItems = [
+    {
+      label: "Personnaliser les labels",
+      onClick: () => {
+        navigate("/labels-settings");
+        setIsOpen(false);
+      },
+    },
+    {
+      label: "Projections budgétaires",
+      onClick: () => {
+        navigate("/projections-settings");
+        setIsOpen(false);
+      },
+    },
+    {
+      label: "Contacts & invitations",
+      onClick: () => {
+        navigate("/contacts");
+        setIsOpen(false);
+      },
+    },
+    {
+      label: "Importer un CSV",
+      onClick: () => {
+        navigate("/import");
+        setIsOpen(false);
+      },
+    },
+  ];
+
+  const resolvedMenuItems = menuItems ?? defaultMenuItems;
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -27,33 +57,8 @@ export default function SynapseUserMenu() {
     navigate("/login");
   };
 
-  const handleNavigateToSettings = () => {
-    navigate("/labels-settings");
-    setIsOpen(false);
-  };
-
-  const handleNavigateToProjections = () => {
-    navigate("/projections-settings");
-    setIsOpen(false);
-  };
-
-  const handleNavigateToContacts = () => {
-    navigate("/contacts");
-    setIsOpen(false);
-  };
-
-  const handleNavigateToImport = () => {
-    navigate("/import");
-    setIsOpen(false);
-  };
-
   const handleNavigateToGlobalSettings = () => {
     navigate("/settings");
-    setIsOpen(false);
-  };
-
-  const handleNavigateHome = () => {
-    navigate("/");
     setIsOpen(false);
   };
 
@@ -64,39 +69,26 @@ export default function SynapseUserMenu() {
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Menu utilisateur"
       >
-        {userInitial}
+        {IconAvatar}
       </button>
 
       {isOpen && (
-        <div className={styles.dropdown}>
+        <div
+          className={`${styles.dropdown} ${align === "left" ? styles.dropdownLeft : ""}`}
+        >
           <div className={styles.userInfo}>
             <div className={styles.userName}>{userName}</div>
           </div>
           <hr className={styles.divider} />
-          <button
-            className={styles.menuButton}
-            onClick={handleNavigateToSettings}
-          >
-            Personnaliser les labels
-          </button>
-          <button
-            className={styles.menuButton}
-            onClick={handleNavigateToProjections}
-          >
-            Projections budgétaires
-          </button>
-          <button
-            className={styles.menuButton}
-            onClick={handleNavigateToContacts}
-          >
-            Contacts & invitations
-          </button>
-          <button
-            className={styles.menuButton}
-            onClick={handleNavigateToImport}
-          >
-            Importer un CSV
-          </button>
+          {resolvedMenuItems.map((item) => (
+            <button
+              key={item.label}
+              className={styles.menuButton}
+              onClick={item.onClick}
+            >
+              {item.label}
+            </button>
+          ))}
           <hr className={styles.divider} />
           <div className={styles.actionBar}>
             <div className={styles.actionBarLeft}>
@@ -123,10 +115,14 @@ export default function SynapseUserMenu() {
             <div className={styles.actionBarRight}>
               <button
                 className={styles.iconBtn}
-                onClick={handleNavigateHome}
+                onClick={() => {
+                  navigate("/");
+                  setIsOpen(false);
+                }}
                 aria-label="Accueil"
+                title="Accueil"
               >
-                <IconMaison />
+                <IconMaison size={18} />
               </button>
               <button
                 className={styles.iconBtnDanger}

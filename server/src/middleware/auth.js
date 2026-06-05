@@ -20,8 +20,9 @@ export const authenticate = async (req, res, next) => {
     // Vérifier et décoder le token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Ajouter l'userId à la requête
+    // Ajouter l'userId et le rôle à la requête
     req.userId = decoded.userId;
+    req.userRole = decoded.role || "user";
 
     next();
   } catch (error) {
@@ -56,6 +57,7 @@ export const optionalAuthenticate = async (req, res, next) => {
       const token = authHeader.substring(7);
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.userId = decoded.userId;
+      req.userRole = decoded.role || "user";
     }
 
     next();

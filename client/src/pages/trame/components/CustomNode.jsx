@@ -35,12 +35,38 @@ function computeBorderColor(hex) {
 }
 
 function computeFontSize(width, height, text) {
-  if (!text || text.length === 0) return 14;
-  const w = width - 24;
-  const h = height - 56;
-  if (w <= 0 || h <= 0) return 8;
-  const size = Math.sqrt((w * h) / (text.length * 0.77));
-  return Math.min(18, Math.max(8, size));
+  const w = width - 24; // padding horizontal 2×10px + bordure 2×2px
+  const h = height - 56; // en-tête (~28px) + bordure + padding vertical body 2×6px
+  if (w <= 0 || h <= 0) return 1;
+  if (!text || text.length === 0) return Math.min(w, h) / 4;
+
+  const CHAR_WIDTH_RATIO = 0.6; // largeur moyenne d'un caractère = 0.6 × fontSize
+  const LINE_HEIGHT = 1.45; // identique au CSS
+
+  const paragraphs = text.split("\n");
+
+  // Calcule la hauteur totale occupée pour un fontSize donné
+  const heightFor = (fs) => {
+    const charsPerLine = w / (fs * CHAR_WIDTH_RATIO);
+    let totalLines = 0;
+    for (const para of paragraphs) {
+      totalLines += Math.max(1, Math.ceil(para.length / charsPerLine));
+    }
+    return totalLines * fs * LINE_HEIGHT;
+  };
+
+  // Recherche binaire sans bornes artificielles :
+  // lo = 1 (pas de minimum imposé — le zoom ReactFlow gère la lisibilité)
+  // hi = Math.min(w, h) (borne naturelle : la font ne peut dépasser la dimension du nœud)
+  let lo = 1;
+  let hi = Math.min(w, h);
+  while (hi - lo > 0.25) {
+    const mid = (lo + hi) / 2;
+    if (heightFor(mid) <= h) lo = mid;
+    else hi = mid;
+  }
+
+  return Math.max(1, Math.floor(lo));
 }
 
 function renderContent(text, fontSize) {
