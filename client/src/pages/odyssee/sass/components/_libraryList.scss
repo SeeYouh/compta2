@@ -16,7 +16,7 @@
 // Sidebar gauche
 .catalog-sidebar {
   width: 68px;
-  background: var(--ody-darkest);
+  background: var(--color-darkest);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -41,7 +41,7 @@
   left: 0;
   width: 3px;
   height: 22px;
-  background: var(--ody-lightness);
+  background: var(--color-lightness);
   border-radius: 0 3px 3px 0;
   transform: translateY(-50%);
   pointer-events: none;
@@ -59,7 +59,7 @@
 .catalog-sidebar__icon {
   width: 32px;
   height: 32px;
-  background: var(--ody-darker);
+  background: var(--color-darker);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -68,7 +68,7 @@
   cursor: pointer;
   font-size: 10px;
   font-weight: 700;
-  color: var(--ody-lightness);
+  color: var(--color-lightness);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   padding: 2px;
@@ -78,7 +78,7 @@
 
   &:hover,
   &.active {
-    background: var(--ody-dark);
+    background: var(--color-dark);
   }
 
   img {
@@ -120,7 +120,7 @@
   }
 
   &.drop-target {
-    outline: 2px dashed var(--ody-base);
+    outline: 2px dashed var(--color-1);
   }
 }
 
@@ -149,7 +149,7 @@
 
 // Ghost — icône fantome pendant le drag
 .catalog-sidebar__icon--ghost {
-  border: 2px dashed var(--ody-base);
+  border: 2px dashed var(--color-1);
   background: transparent !important;
   cursor: default;
   opacity: 0.35;
@@ -173,11 +173,11 @@
 // Tooltip produit (position: fixed, rendu dans CatalogMain)
 .catalog-card-tooltip {
   position: fixed;
-  background: var(--ody-darker);
-  border: 1px solid var(--ody-dark);
+  background: var(--color-darker);
+  border: 1px solid var(--color-dark);
   border-radius: 6px;
   padding: 5px 10px 6px;
-  color: var(--ody-lightness);
+  color: var(--color-lightness);
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
@@ -193,7 +193,7 @@
     top: 50%;
     transform: translateY(-50%);
     border: 7px solid transparent;
-    border-right-color: var(--ody-dark);
+    border-right-color: var(--color-dark);
   }
 
   // Flèche gauche — remplissage
@@ -204,15 +204,15 @@
     top: 50%;
     transform: translateY(-50%);
     border: 6px solid transparent;
-    border-right-color: var(--ody-darker);
+    border-right-color: var(--color-darker);
   }
 }
 
 .sidebar-tooltip {
   position: fixed;
   left: 65px; // 60px sidebar + 5px espace (inclut la flèche)
-  background: var(--ody-darker);
-  border: 1px solid var(--ody-dark);
+  background: var(--color-darker);
+  border: 1px solid var(--color-dark);
   border-radius: 6px;
   padding: 4px 8px 5px;
   pointer-events: none;
@@ -228,7 +228,7 @@
     top: 50%;
     transform: translateY(-50%);
     border: 7px solid transparent;
-    border-right-color: var(--ody-dark);
+    border-right-color: var(--color-dark);
   }
 
   // Flèche gauche — remplissage (couleur fond)
@@ -239,11 +239,11 @@
     top: 50%;
     transform: translateY(-50%);
     border: 6px solid transparent;
-    border-right-color: var(--ody-darker);
+    border-right-color: var(--color-darker);
   }
 
   &__name {
-    color: var(--ody-lightness);
+    color: var(--color-lightness);
     font-size: 13px;
     font-weight: 600;
     white-space: nowrap;
@@ -255,7 +255,7 @@
     list-style: none;
 
     li {
-      color: var(--ody-base);
+      color: var(--color-1);
       font-size: 13px;
       line-height: 1.6;
       white-space: nowrap;
@@ -267,8 +267,8 @@
 
 .folder-ctx-menu {
   position: fixed;
-  background: var(--ody-darker);
-  border: 1px solid var(--ody-dark);
+  background: var(--color-darker);
+  border: 1px solid var(--color-dark);
   border-radius: 8px;
   padding: 4px 0;
   z-index: 600;
@@ -284,7 +284,7 @@
     background: none;
     border: none;
     border-radius: 5px;
-    color: var(--ody-lightness);
+    color: var(--color-lightness);
     font-size: 13px;
     text-align: left;
     padding: 10px 10px;
@@ -292,7 +292,7 @@
     transition: background 0.15s;
 
     &:hover {
-      background: var(--ody-dark);
+      background: var(--color-dark);
     }
   }
 }
@@ -301,8 +301,8 @@
 
 .ctx-menu {
   position: fixed;
-  background: var(--ody-darker);
-  border: 1px solid var(--ody-dark);
+  background: var(--color-darker);
+  border: 1px solid var(--color-dark);
   border-radius: 8px;
   padding: 4px 0;
   z-index: 600;
@@ -318,7 +318,7 @@
     background: none;
     border: none;
     border-radius: 5px;
-    color: var(--ody-lightness);
+    color: var(--color-lightness);
     font-size: 13px;
     text-align: left;
     padding: 10px 10px;
@@ -326,13 +326,13 @@
     transition: background 0.15s;
 
     &:hover {
-      background: var(--ody-dark);
+      background: var(--color-dark);
     }
   }
 
   &__separator {
     height: 1px;
-    background: var(--ody-dark);
+    background: var(--color-dark);
     margin: 4px 0;
   }
 
@@ -352,7 +352,7 @@
     padding: 5px;
     border-radius: 4px;
     cursor: pointer;
-    color: var(--ody-lightness);
+    color: var(--color-lightness);
     transition:
       background 0.15s,
       color 0.15s;
@@ -363,10 +363,10 @@
     }
 
     &--danger {
-      color: var(--ody-lightness);
+      color: var(--color-lightness);
 
       &:hover {
-        color: var(--ody-danger);
+        color: var(--color-danger);
       }
 
       svg {
@@ -390,8 +390,8 @@
 
 .folder-modal {
   position: relative;
-  background: var(--ody-darker);
-  border: 1px solid var(--ody-dark);
+  background: var(--color-darker);
+  border: 1px solid var(--color-dark);
   border-radius: 12px;
   padding: 28px 24px 24px;
   width: 340px;
@@ -403,26 +403,26 @@
     right: 12px;
     background: none;
     border: none;
-    color: var(--ody-base);
+    color: var(--color-1);
     font-size: 16px;
     cursor: pointer;
     line-height: 1;
 
     &:hover {
-      color: var(--ody-lightness);
+      color: var(--color-lightness);
     }
   }
 
   &__title {
     margin: 0 0 20px;
-    color: var(--ody-lightness);
+    color: var(--color-lightness);
     font-size: 15px;
     font-weight: 700;
   }
 
   &__label {
     display: block;
-    color: var(--ody-base);
+    color: var(--color-1);
     font-size: 12px;
     font-weight: 600;
     margin-bottom: 6px;
@@ -430,22 +430,22 @@
 
   &__input {
     width: 100%;
-    background: var(--ody-darkest);
-    border: 1px solid var(--ody-dark);
+    background: var(--color-darkest);
+    border: 1px solid var(--color-dark);
     border-radius: 6px;
-    color: var(--ody-lightness);
+    color: var(--color-lightness);
     font-size: 13px;
     padding: 8px 10px;
     margin-bottom: 20px;
     box-sizing: border-box;
 
     &::placeholder {
-      color: var(--ody-dark);
+      color: var(--color-dark);
     }
 
     &:focus {
       outline: none;
-      border-color: var(--ody-base);
+      border-color: var(--color-1);
     }
   }
 
@@ -478,7 +478,7 @@
   }
 
   &__swatch-check {
-    color: var(--ody-lightness);
+    color: var(--color-lightness);
     font-size: 14px;
     font-weight: 700;
     pointer-events: none;
@@ -486,10 +486,10 @@
 
   &__confirm {
     width: 100%;
-    background: var(--ody-dark);
+    background: var(--color-dark);
     border: none;
     border-radius: 8px;
-    color: var(--ody-lightness);
+    color: var(--color-lightness);
     font-size: 14px;
     font-weight: 700;
     padding: 12px;
@@ -497,7 +497,7 @@
     transition: background 0.2s;
 
     &:hover {
-      background: var(--ody-base);
+      background: var(--color-1);
     }
   }
 }
@@ -513,7 +513,7 @@
 
   &.active {
     height: 12px;
-    background: var(--ody-base);
+    background: var(--color-1);
   }
 }
 
@@ -537,13 +537,13 @@
 .catalog-sidebar__add {
   width: 32px;
   height: 32px;
-  background: var(--ody-darker);
+  background: var(--color-darker);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: var(--ody-lightness);
+  color: var(--color-lightness);
   transition: filter 0.2s;
   user-select: none;
   flex-shrink: 0;
@@ -570,7 +570,7 @@
 
 // Contenu de la modal
 .catalog-modal {
-  background: var(--ody-lightness);
+  background: var(--color-lightness);
   border-radius: 12px;
   padding: 30px;
   width: 400px;
@@ -578,7 +578,7 @@
 
   h3 {
     margin: 0 0 20px 0;
-    color: var(--ody-darkest);
+    color: var(--color-darkest);
     font-size: 16px;
   }
 }

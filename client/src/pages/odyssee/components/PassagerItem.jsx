@@ -604,12 +604,14 @@ const PassagerItem = ({
           : await passengersItemService.createItem(formData);
 
       if (result.success) {
+        const label =
+          aliasName.trim() || `${firstName} ${lastName}`.trim() || "Passager";
         setSaveStatus({
           type: "success",
           message:
             productId && editMode
-              ? "Passager mis à jour !"
-              : "Passager créé avec succès !",
+              ? `${label} mis à jour !`
+              : `${label} créé avec succès !`,
         });
         setIsDirty(false);
         localStorage.removeItem(draftKey);
@@ -775,15 +777,14 @@ const PassagerItem = ({
               </div>
             )}
           </div>
+          {saveStatus && (
+            <div
+              className={`paper-product__status paper-product__status--${saveStatus.type}`}
+            >
+              {saveStatus.message}
+            </div>
+          )}
         </div>
-
-        {saveStatus && (
-          <div
-            className={`paper-product__status paper-product__status--${saveStatus.type}`}
-          >
-            {saveStatus.message}
-          </div>
-        )}
 
         {/* ─── Blocs côte à côte ───────────────────────────────────────── */}
         <div className="passager-item__container">

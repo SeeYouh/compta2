@@ -16,20 +16,23 @@ export function buildOdysseeGlobalStyles(c) {
   return `
     /* ─── Variables CSS scoped à .odyssee-root ─── */
     .odyssee-root {
-      --ody-base: ${c.base};
-      --ody-lightness: ${c.lightness};
-      --ody-light: ${c.light};
-      --ody-dark: ${c.dark};
-      --ody-darker: ${c.darker};
-      --ody-darkest: ${c.darkest};
-      --ody-danger: ${c.danger};
-      --ody-danger-light: ${c.dangerLight};
-      --ody-contrast-base: ${c.contrastBase};
-      --ody-contrast-lightness: ${c.contrastLightness};
-      --ody-contrast-light: ${c.contrastLight};
-      --ody-contrast-dark: ${c.contrastDark};
-      --ody-contrast-darker: ${c.contrastDarker};
-      --ody-contrast-darkest: ${c.contrastDarkest};
+      --color-1: ${c.base};
+      --color-lightness: ${c.lightness};
+      --color-light: ${c.light};
+      --color-dark: ${c.dark};
+      --color-darker: ${c.darker};
+      --color-darkest: ${c.darkest};
+      --color-danger: ${c.danger};
+      --color-danger-light: ${c.dangerLight};
+      --color-contrast-1: ${c.contrastBase};
+      --color-contrast-lightness: ${c.contrastLightness};
+      --color-contrast-light: ${c.contrastLight};
+      --color-contrast-dark: ${c.contrastDark};
+      --color-contrast-darker: ${c.contrastDarker};
+      --color-contrast-darkest: ${c.contrastDarkest};
+      --color-text: ${c.lightness};
+      --color-border: ${c.dark};
+      --color-primary: ${c.base};
     }
 
     /* ─── Body ─── */

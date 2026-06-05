@@ -27,22 +27,22 @@ export function computeThemeTokens(baseColor) {
   const colorDarkest = darken(baseColor, DARKEST);
 
   return {
-    "--ody-base": baseColor,
-    "--ody-lightness": colorLightness,
-    "--ody-light": colorLight,
-    "--ody-dark": colorDark,
-    "--ody-darker": colorDarker,
-    "--ody-darkest": colorDarkest,
-    "--ody-danger": COLOR_DANGER,
-    "--ody-danger-light": COLOR_DANGER_LIGHT,
+    "--color-1": baseColor,
+    "--color-lightness": colorLightness,
+    "--color-light": colorLight,
+    "--color-dark": colorDark,
+    "--color-darker": colorDarker,
+    "--color-darkest": colorDarkest,
+    "--color-danger": COLOR_DANGER,
+    "--color-danger-light": COLOR_DANGER_LIGHT,
 
     // Valeurs pré-calculées pour remplacer get-contrast($color-xxx) dans le SCSS
-    "--ody-contrast-base": getContrast(baseColor),
-    "--ody-contrast-lightness": getContrast(colorLightness),
-    "--ody-contrast-light": getContrast(colorLight),
-    "--ody-contrast-dark": getContrast(colorDark),
-    "--ody-contrast-darker": getContrast(colorDarker),
-    "--ody-contrast-darkest": getContrast(colorDarkest),
+    "--color-contrast-1": getContrast(baseColor),
+    "--color-contrast-lightness": getContrast(colorLightness),
+    "--color-contrast-light": getContrast(colorLight),
+    "--color-contrast-dark": getContrast(colorDark),
+    "--color-contrast-darker": getContrast(colorDarker),
+    "--color-contrast-darkest": getContrast(colorDarkest),
   };
 }
 

@@ -57,7 +57,7 @@
     right: 0;
     width: 80%;
     height: 3px;
-    background: var(--ody-dark);
+    background: var(--color-dark);
   }
 
   &-fields {
@@ -83,9 +83,6 @@
       font-style: italic;
     }
 
-    &:focus {
-    }
-
     &--bold {
       font-weight: 600;
     }
@@ -107,9 +104,6 @@
     cursor: pointer;
     font-size: 0.85rem;
     flex-shrink: 0;
-
-    &:hover:not(:disabled) {
-    }
 
     &:disabled {
       opacity: 0.4;
@@ -144,12 +138,6 @@
   svg {
     width: 16px;
     height: 16px;
-  }
-
-  &:hover:not(:disabled) {
-  }
-
-  &--active {
   }
 
   &:disabled {
@@ -204,9 +192,6 @@
     transition:
       border-color 0.2s,
       opacity 0.2s;
-
-    &:hover:not(:disabled) {
-    }
 
     &:disabled {
       opacity: 0.6;
@@ -314,9 +299,6 @@
   justify-content: center;
   flex-shrink: 0;
   transition: background 0.15s;
-
-  &:hover {
-  }
 }
 
 .passager-item__add-btn {
@@ -328,9 +310,6 @@
   font-size: 12px;
   cursor: pointer;
   transition: background 0.15s;
-
-  &:hover {
-  }
 }
 
 // ─── Info Supp — pleine largeur ───────────────────────────────────────────────
@@ -416,9 +395,6 @@
   align-items: center;
   justify-content: center;
   transition: background 0.15s;
-
-  &:hover {
-  }
 }
 
 .passager-item__is-editor {

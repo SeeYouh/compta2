@@ -250,12 +250,13 @@ const PaperProduct = ({
           : await ProductService.createProduct(formData);
 
       if (result.success) {
+        const label = aliasName.trim() || productName.trim() || "Produit";
         setSaveStatus({
           type: "success",
           message:
             productId && editMode
-              ? "Produit mis à jour !"
-              : "Produit sauvegardé avec succès !",
+              ? `${label} mis à jour !`
+              : `${label} sauvegardé avec succès !`,
         });
         setTimeout(() => setSaveStatus(null), 3000);
         if (onProductCreated) onProductCreated(result.product);
@@ -341,15 +342,14 @@ const PaperProduct = ({
               </div>
             )}
           </div>
+          {saveStatus && (
+            <div
+              className={`paper-product__status paper-product__status--${saveStatus.type}`}
+            >
+              {saveStatus.message}
+            </div>
+          )}
         </div>
-
-        {saveStatus && (
-          <div
-            className={`paper-product__status paper-product__status--${saveStatus.type}`}
-          >
-            {saveStatus.message}
-          </div>
-        )}
 
         <div className="paper-product-container" inert={readOnly || undefined}>
           <div className="bloc">

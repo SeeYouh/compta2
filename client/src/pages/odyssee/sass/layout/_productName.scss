@@ -1,6 +1,7 @@
 @use "../utils/_variable" as *;
 
 .paper-product-container-navBar {
+  position: relative;
   padding: 7px 20px 15px 20px;
   position: relative;
   display: flex;
@@ -15,7 +16,7 @@
     right: 0;
     width: 88%;
     height: 2px;
-    background: var(--ody-dark);
+    background: var(--color-dark);
   }
 
   .paper-product-container-navBar_titleProduct {
@@ -101,13 +102,19 @@
 }
 
 .paper-product__status {
-  padding: 8px 16px;
-  margin: 8px;
-  border-radius: 4px;
-  font-size: 14px;
+  position: absolute;
+  top: 100%;
+  right: 18px;
+  margin-top: 6px;
+  padding: 6px 14px;
+  border-radius: 0 8px 8px 8px;
+  font-size: 13px;
+  z-index: 10;
+  pointer-events: none;
+  white-space: nowrap;
 
   &--success {
-    border-left: 3px solid;
+    border-right: 3px solid;
   }
 
   &--error {

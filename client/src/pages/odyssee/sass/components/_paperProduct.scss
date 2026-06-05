@@ -2,6 +2,8 @@
 // (Styles réservés à ce fichier — utilitaires dans sass/utils/)
 
 .paper-product {
+  position: relative;
+
   &__color-wrap {
     position: relative;
     display: flex;

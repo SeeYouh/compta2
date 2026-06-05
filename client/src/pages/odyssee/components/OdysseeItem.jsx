@@ -250,12 +250,13 @@ const OdysseeItem = ({
           : await odysseyItemService.createItem(formData);
 
       if (result.success) {
+        const label = aliasName.trim() || productName.trim() || "Voyage";
         setSaveStatus({
           type: "success",
           message:
             productId && editMode
-              ? "Voyage mis à jour !"
-              : "Voyage sauvegardé avec succès !",
+              ? `${label} mis à jour !`
+              : `${label} sauvegardé avec succès !`,
         });
         setTimeout(() => setSaveStatus(null), 3000);
         if (onProductCreated) onProductCreated(result.product);
@@ -339,15 +340,14 @@ const OdysseeItem = ({
             </div>
           )}
         </div>
+        {saveStatus && (
+          <div
+            className={`paper-product__status paper-product__status--${saveStatus.type}`}
+          >
+            {saveStatus.message}
+          </div>
+        )}
       </div>
-
-      {saveStatus && (
-        <div
-          className={`paper-product__status paper-product__status--${saveStatus.type}`}
-        >
-          {saveStatus.message}
-        </div>
-      )}
 
       <div className="paper-product-container">
         <div className="bloc">

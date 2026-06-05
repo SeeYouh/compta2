@@ -11,7 +11,7 @@
 
 // Carte du formulaire
 .cat-form {
-  background: var(--ody-darkest);
+  background: var(--color-darkest);
   border-radius: 12px;
   padding: 28px;
   width: 380px;
@@ -20,7 +20,7 @@
 
   &__title {
     margin: 0 0 24px 0;
-    color: var(--ody-lightness);
+    color: var(--color-lightness);
     font-size: 16px;
     font-weight: 600;
   }
@@ -32,35 +32,35 @@
   &__label {
     display: block;
     margin-bottom: 8px;
-    color: var(--ody-light);
+    color: var(--color-light);
     font-size: 13px;
     font-weight: 600;
   }
 
   &__hint {
     font-weight: 400;
-    color: var(--ody-dark);
+    color: var(--color-dark);
     font-size: 12px;
   }
 
   &__input {
     width: 100%;
     padding: 10px 12px;
-    background: var(--ody-darker);
-    border: 1px solid var(--ody-dark);
+    background: var(--color-darker);
+    border: 1px solid var(--color-dark);
     border-radius: 6px;
-    color: var(--ody-lightness);
+    color: var(--color-lightness);
     font-size: 14px;
     outline: none;
     box-sizing: border-box;
     transition: border-color 0.2s;
 
     &::placeholder {
-      color: var(--ody-dark);
+      color: var(--color-dark);
     }
 
     &:focus {
-      border-color: var(--ody-light);
+      border-color: var(--color-light);
     }
   }
 
@@ -68,7 +68,7 @@
     display: block;
     text-align: right;
     font-size: 11px;
-    color: var(--ody-dark);
+    color: var(--color-dark);
     margin-top: 4px;
   }
 
@@ -76,10 +76,10 @@
   &__upload-btn {
     width: 100%;
     padding: 10px;
-    background: var(--ody-darker);
-    border: 1px dashed var(--ody-dark);
+    background: var(--color-darker);
+    border: 1px dashed var(--color-dark);
     border-radius: 6px;
-    color: var(--ody-light);
+    color: var(--color-light);
     font-size: 13px;
     cursor: pointer;
     transition:
@@ -87,8 +87,8 @@
       border-color 0.2s;
 
     &:hover {
-      background: var(--ody-dark);
-      border-color: var(--ody-light);
+      background: var(--color-dark);
+      border-color: var(--color-light);
     }
   }
 
@@ -104,7 +104,7 @@
       height: 64px;
       object-fit: cover;
       border-radius: 6px;
-      border: 1px solid var(--ody-dark);
+      border: 1px solid var(--color-dark);
     }
   }
 
@@ -114,10 +114,10 @@
     right: -6px;
     width: 18px;
     height: 18px;
-    background: var(--ody-darker);
-    border: 1px solid var(--ody-dark);
+    background: var(--color-darker);
+    border: 1px solid var(--color-dark);
     border-radius: 50%;
-    color: var(--ody-lightness);
+    color: var(--color-lightness);
     font-size: 10px;
     cursor: pointer;
     display: flex;
@@ -127,14 +127,14 @@
     line-height: 1;
 
     &:hover {
-      background: var(--ody-dark);
+      background: var(--color-dark);
     }
   }
 
   // Message d'erreur image
   &__error {
     margin: 6px 0 0 0;
-    color: var(--ody-danger);
+    color: var(--color-danger);
     font-size: 12px;
     line-height: 1.4;
   }
@@ -157,20 +157,20 @@
     transition: background 0.2s;
 
     &--cancel {
-      background: var(--ody-darker);
-      color: var(--ody-light);
+      background: var(--color-darker);
+      color: var(--color-light);
 
       &:hover {
-        background: var(--ody-dark);
+        background: var(--color-dark);
       }
     }
 
     &--submit {
-      background: var(--ody-dark);
-      color: var(--ody-lightness);
+      background: var(--color-dark);
+      color: var(--color-lightness);
 
       &:hover:not(:disabled) {
-        background: var(--ody-darker);
+        background: var(--color-darker);
       }
 
       &:disabled {

@@ -172,7 +172,7 @@
 }
 .lex-code-inline {
   font-family: monospace;
-  background: color-mix(in srgb, var(--ody-base) 10%, var(--ody-darkest));
+  background: color-mix(in srgb, var(--color-1) 10%, var(--color-darkest));
   border-radius: 3px;
   padding: 1px 4px;
   font-size: 0.9em;
@@ -198,7 +198,7 @@
 }
 
 .lex-quote {
-  border-left: 3px solid var(--ody-base);
+  border-left: 3px solid var(--color-1);
   padding-left: 12px;
   margin: 8px 0;
   opacity: 0.8;
@@ -221,8 +221,8 @@
 // ─── Bloc de code ─────────────────────────────────────────────────────────────
 .lex-code-block {
   font-family: "Courier New", monospace;
-  background: color-mix(in srgb, var(--ody-darkest) 6%, white);
-  border: 1px solid color-mix(in srgb, var(--ody-darkest) 20%, transparent);
+  background: color-mix(in srgb, var(--color-darkest) 6%, white);
+  border: 1px solid color-mix(in srgb, var(--color-darkest) 20%, transparent);
   border-radius: 6px;
   padding: 12px 16px;
   font-size: 13px;
@@ -230,7 +230,7 @@
   margin: 8px 0;
   white-space: pre-wrap;
   tab-size: 2;
-  color: var(--ody-darkest);
+  color: var(--color-darkest);
   display: block;
 }
 
@@ -251,7 +251,7 @@
   .lex-paragraph::after {
     content: "¶";
     opacity: 0.3;
-    color: var(--ody-base);
+    color: var(--color-1);
     font-weight: normal;
     pointer-events: none;
   }
