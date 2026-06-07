@@ -7,10 +7,13 @@ import contactsRoutes from "./contacts.js";
 import importRoutes from "./import.js";
 import { injectType } from "../middleware/injectType.js";
 import labelsRoutes from "./labels.js";
+import odysseeBlocksRoutes from "./odysseeBlocks.js";
 import odysseeCategoriesRoutes from "./odysseeCategories.js";
+import odysseeDocumentsRoutes from "./odysseeDocuments.js";
 import odysseeProductFoldersRoutes from "./odysseeProductFolders.js";
 import odysseeProductsRoutes from "./odysseeProducts.js";
 import odysseeSidebarRoutes from "./odysseeSidebar.js";
+import odysseeTemplatesRoutes from "./odysseeTemplates.js";
 import odysseeTrashRoutes from "./odysseeTrash.js";
 import odysseyItemsRoutes from "./odysseyItems.js";
 import organigrammeRoutes from "./organigramme.js";
@@ -99,5 +102,8 @@ router.use(
   injectType("odyssey"),
   odysseeProductFoldersRoutes,
 );
+router.use("/odyssee/odyssey/blocks", odysseeBlocksRoutes);
+router.use("/odyssee/odyssey/templates", odysseeTemplatesRoutes);
+router.use("/odyssee/odyssey/documents", odysseeDocumentsRoutes);
 
 export default router;
