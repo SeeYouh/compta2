@@ -1,4 +1,5 @@
 import { config } from "../../../config/env.js";
+import { markDirty } from "./odysseeSidebarCacheService";
 
 const TYPE = "passengers";
 const BASE_CAT = `${config.apiUrl}/api/odyssee/${TYPE}/categories`;
@@ -49,6 +50,7 @@ export const passengersCategoryService = {
       const data = await res.json();
       if (!res.ok)
         throw new Error(data.message || data.error || "Erreur serveur");
+      markDirty("passengers");
       return { success: true, category: data.category };
     } catch (error) {
       return { success: false, error: error.message };
@@ -63,6 +65,7 @@ export const passengersCategoryService = {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Erreur serveur");
+      markDirty("passengers");
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
@@ -91,6 +94,7 @@ export const passengersSidebarService = {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Erreur serveur");
+      markDirty("passengers");
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
@@ -106,6 +110,7 @@ export const passengersSidebarService = {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Erreur serveur");
+      markDirty("passengers");
       return { success: true, folder: data.folder };
     } catch (error) {
       return { success: false, error: error.message };
@@ -121,6 +126,7 @@ export const passengersSidebarService = {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Erreur serveur");
+      markDirty("passengers");
       return { success: true, folder: data.folder };
     } catch (error) {
       return { success: false, error: error.message };
@@ -135,6 +141,7 @@ export const passengersSidebarService = {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Erreur serveur");
+      markDirty("passengers");
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };

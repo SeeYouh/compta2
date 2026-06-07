@@ -1,4 +1,5 @@
 import { config } from '../../../config/env.js';
+import { markDirty } from './odysseeSidebarCacheService';
 
 const BASE = `${config.apiUrl}/api/odyssee/catalog/sidebar`;
 
@@ -34,6 +35,7 @@ const FolderService = {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Erreur serveur");
+      markDirty("catalogue");
       return { success: true, layout: data.layout };
     } catch (error) {
       return { success: false, error: error.message };
@@ -49,6 +51,7 @@ const FolderService = {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Erreur serveur");
+      markDirty("catalogue");
       return { success: true, folder: data.folder };
     } catch (error) {
       return { success: false, error: error.message };
@@ -64,6 +67,7 @@ const FolderService = {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Erreur serveur");
+      markDirty("catalogue");
       return { success: true, folder: data.folder };
     } catch (error) {
       return { success: false, error: error.message };
@@ -78,6 +82,7 @@ const FolderService = {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Erreur serveur");
+      markDirty("catalogue");
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };

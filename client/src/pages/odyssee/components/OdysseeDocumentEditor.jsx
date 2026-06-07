@@ -10,6 +10,7 @@ import OdysseeCanvas from "./OdysseeCanvas";
 import OdysseeDocumentSidebar from "./OdysseeDocumentSidebar";
 import OdysseeDocumentToggle, {
   MODE_DOCUMENT,
+  MODE_RUBRIQUE,
   MODE_TEMPLATE,
 } from "./OdysseeDocumentToggle";
 
@@ -98,6 +99,7 @@ const OdysseeDocumentEditor = ({ categoryId, color }) => {
   };
 
   const handleSave = async () => {
+    if (mode === MODE_RUBRIQUE) return;
     if (!categoryId) {
       setSaveStatus({ type: "error", message: "Aucune catégorie sélectionnée." });
       return;

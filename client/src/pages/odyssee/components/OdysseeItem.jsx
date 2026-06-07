@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import ColorPicker from '../../../components/ColorPicker';
 import IconSaveFalse from '../../../assets/IconSaveFalse';
@@ -10,11 +10,13 @@ import {
 import { computeColorPalette } from '../utils/colorPalette';
 import { useOdysseeColor } from '../contexts/OdysseeColorContext';
 import OdysseeCanvas from './OdysseeCanvas';
+import OdysseeRubriqueCanvas from './OdysseeRubriqueCanvas';
 import SaveStatus from './SaveStatus';
 import { odysseeDocumentService } from '../services/odysseeDocumentService';
 import OdysseeDocumentSidebar from './OdysseeDocumentSidebar';
 import OdysseeDocumentToggle, {
   MODE_DOCUMENT,
+  MODE_RUBRIQUE,
   MODE_TEMPLATE,
 } from './OdysseeDocumentToggle';
 import { odysseeTemplateService } from '../services/odysseeTemplateService';
@@ -63,17 +65,11 @@ function buildOdysseeItemStyles(c, id) {
       color: ${c.dangerLight};
       border-left-color: ${c.danger};
     }
-    [data-ody-item="${id}"] .ody-doc-toggle label {
+    [data-ody-item="${id}"] .ody-doc-toggle__pill {
       border-color: color-mix(in srgb, ${c.contrastBase} 40%, transparent);
       color: ${c.contrastBase};
     }
-    [data-ody-item="${id}"] .ody-doc-toggle label p:first-child {
-      background: color-mix(in srgb, ${c.contrastBase} 20%, transparent);
-    }
-    [data-ody-item="${id}"] .ody-doc-toggle input:checked + label p:first-child {
-      background: transparent;
-    }
-    [data-ody-item="${id}"] .ody-doc-toggle input:checked + label p:last-child {
+    [data-ody-item="${id}"] .ody-doc-toggle__btn--active {
       background: color-mix(in srgb, ${c.contrastBase} 20%, transparent);
     }
     [data-ody-item="${id}"] .ody-canvas { background: ${c.light}; }
@@ -91,41 +87,158 @@ function buildOdysseeItemStyles(c, id) {
       border-color: color-mix(in srgb, ${c.base} 50%, transparent);
     }
     [data-ody-item="${id}"] .ody-doc-sidebar {
-      background: ${c.lightness};
-      border-left-color: ${c.dark};
+      background: ${c.darkest};
+      border-left-color: color-mix(in srgb, ${c.contrastDarkest} 12%, transparent);
     }
-    [data-ody-item="${id}"] .ody-sidebar-section-title { color: ${c.darker}; }
+    [data-ody-item="${id}"] .ody-sidebar-msg {
+      color: color-mix(in srgb, ${c.contrastDarkest} 45%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-sidebar-panel__header {
+      color: ${c.contrastDarkest};
+      border-bottom-color: color-mix(in srgb, ${c.contrastDarkest} 12%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-sidebar-panel__header:hover {
+      background: color-mix(in srgb, ${c.contrastDarkest} 8%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-sidebar-panel--open .ody-sidebar-panel__header {
+      background: color-mix(in srgb, ${c.contrastDarkest} 5%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-sidebar-panel__body {
+      background: color-mix(in srgb, black 20%, ${c.darkest});
+    }
     [data-ody-item="${id}"] .ody-sidebar-block-card {
-      border-color: color-mix(in srgb, ${c.base} 25%, transparent);
-      color: ${c.darkest};
+      border-color: color-mix(in srgb, ${c.contrastDarkest} 15%, transparent);
+      color: ${c.contrastDarkest};
+      background: color-mix(in srgb, ${c.contrastDarkest} 5%, transparent);
     }
     [data-ody-item="${id}"] .ody-sidebar-block-card:hover {
-      border-color: ${c.base};
+      border-color: color-mix(in srgb, ${c.contrastDarkest} 35%, transparent);
+      background: color-mix(in srgb, ${c.contrastDarkest} 10%, transparent);
     }
-    [data-ody-item="${id}"] .ody-sidebar-block-card__meta { color: ${c.dark}; }
+    [data-ody-item="${id}"] .ody-sidebar-block-card__meta {
+      color: color-mix(in srgb, ${c.contrastDarkest} 55%, transparent);
+    }
     [data-ody-item="${id}"] .ody-sidebar-item-card {
-      border-color: color-mix(in srgb, ${c.base} 25%, transparent);
-      color: ${c.darkest};
+      border-color: color-mix(in srgb, ${c.contrastDarkest} 15%, transparent);
+      color: ${c.contrastDarkest};
+      background: color-mix(in srgb, ${c.contrastDarkest} 5%, transparent);
     }
     [data-ody-item="${id}"] .ody-sidebar-item-card--bound {
-      background: color-mix(in srgb, ${c.base} 6%, transparent);
-      border-color: color-mix(in srgb, ${c.base} 40%, transparent);
+      background: color-mix(in srgb, ${c.base} 18%, ${c.darkest});
+      border-color: color-mix(in srgb, ${c.base} 45%, transparent);
     }
     [data-ody-item="${id}"] .ody-sidebar-item-card__check { color: ${c.base}; }
-    [data-ody-item="${id}"] .ody-sidebar-idle-msg { color: ${c.dark}; }
-    [data-ody-item="${id}"] .ody-sidebar-selected-name { color: ${c.darkest}; }
     [data-ody-item="${id}"] .ody-sidebar-selected-type {
-      background: color-mix(in srgb, ${c.base} 8%, transparent);
-      color: ${c.darker};
+      background: color-mix(in srgb, ${c.base} 15%, transparent);
+      color: color-mix(in srgb, ${c.contrastDarkest} 70%, transparent);
     }
     [data-ody-item="${id}"] .ody-sidebar-warning {
-      color: ${c.danger};
-      background: color-mix(in srgb, ${c.danger} 8%, transparent);
-      border-color: color-mix(in srgb, ${c.danger} 20%, transparent);
+      color: ${c.dangerLight};
+      background: color-mix(in srgb, ${c.danger} 12%, transparent);
+      border-color: color-mix(in srgb, ${c.danger} 30%, transparent);
     }
-    [data-ody-item="${id}"] .ody-sidebar-close-btn { color: ${c.dark}; }
-    [data-ody-item="${id}"] .ody-sidebar-close-btn:hover { color: ${c.darkest}; }
-    [data-ody-item="${id}"] .ody-sidebar-empty-msg { color: ${c.dark}; }
+    [data-ody-item="${id}"] .ody-sidebar-close-btn {
+      color: color-mix(in srgb, ${c.contrastDarkest} 50%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-sidebar-close-btn:hover {
+      color: ${c.contrastDarkest};
+    }
+    [data-ody-item="${id}"] .ody-sidebar-cat-icon {
+      background: color-mix(in srgb, ${c.contrastDarkest} 12%, transparent);
+      color: ${c.contrastDarkest};
+    }
+    [data-ody-item="${id}"] .ody-sidebar-cat-icon--selected {
+      outline: 2px solid ${c.base};
+      outline-offset: 1px;
+    }
+    [data-ody-item="${id}"] .ody-sidebar-panel__item-strip {
+      border-left-color: color-mix(in srgb, ${c.contrastDarkest} 10%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-sidebar-cat-items__info {
+      color: color-mix(in srgb, ${c.contrastDarkest} 40%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-sidebar-item-icon {
+      background: color-mix(in srgb, ${c.contrastDarkest} 12%, transparent);
+      color: ${c.contrastDarkest};
+    }
+    [data-ody-item="${id}"] .ody-sidebar-item-icon--bound {
+      outline-color: ${c.base};
+    }
+    [data-ody-item="${id}"] .ody-sidebar-context {
+      border-color: color-mix(in srgb, ${c.contrastDarkest} 15%, transparent);
+      color: color-mix(in srgb, ${c.contrastDarkest} 70%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-sidebar-field-chip {
+      border-color: color-mix(in srgb, ${c.contrastDarkest} 15%, transparent);
+      color: ${c.contrastDarkest};
+      background: color-mix(in srgb, ${c.contrastDarkest} 5%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-sidebar-field-chip:hover {
+      border-color: color-mix(in srgb, ${c.contrastDarkest} 35%, transparent);
+      background: color-mix(in srgb, ${c.contrastDarkest} 10%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__config-input {
+      color: ${c.darker};
+      border-color: color-mix(in srgb, ${c.darker} 30%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__config-input::placeholder {
+      color: color-mix(in srgb, ${c.darker} 40%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__stepper {
+      color: ${c.darker};
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__stepper-btn {
+      color: ${c.darker};
+      border-color: color-mix(in srgb, ${c.darker} 30%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__stepper-btn:hover:not(:disabled) {
+      background: color-mix(in srgb, ${c.darker} 10%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__config-btn {
+      color: ${c.darker};
+      border-color: color-mix(in srgb, ${c.darker} 30%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__config-btn:hover:not(:disabled) {
+      background: color-mix(in srgb, ${c.darker} 10%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__source-label {
+      background: color-mix(in srgb, ${c.base} 15%, transparent);
+      color: ${c.darker};
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__grid-wrap {
+      background: ${c.light};
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__cell {
+      border-color: color-mix(in srgb, ${c.darker} 18%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__cell--over {
+      background: color-mix(in srgb, ${c.base} 12%, transparent);
+      border-color: color-mix(in srgb, ${c.base} 55%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__block {
+      border-color: color-mix(in srgb, ${c.base} 40%, transparent);
+      background: color-mix(in srgb, ${c.base} 12%, transparent);
+      color: ${c.darker};
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__orientation-toggle {
+      border-color: color-mix(in srgb, ${c.darker} 30%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__orientation-btn {
+      color: ${c.darker};
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__orientation-btn--active {
+      background: color-mix(in srgb, ${c.darker} 12%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__status--success {
+      background: color-mix(in srgb, ${c.base} 10%, transparent);
+      color: ${c.darker};
+      border-left-color: ${c.base};
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__status--error {
+      background: color-mix(in srgb, ${c.danger} 10%, transparent);
+      color: ${c.dangerLight};
+      border-left-color: ${c.danger};
+    }
   `;
 }
 
@@ -167,6 +280,7 @@ const OdysseeItem = ({
   const [documentId, setDocumentId] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState(null);
+  const rubriqueCanvasRef = useRef(null);
 
   const handleModeChange = (newMode) => {
     setSelectedBlockPlacement(null);
@@ -264,6 +378,10 @@ const OdysseeItem = ({
   };
 
   const handleSave = async () => {
+    if (mode === MODE_RUBRIQUE) {
+      await rubriqueCanvasRef.current?.save();
+      return;
+    }
     if (!categoryId) {
       setSaveStatus({ type: 'error', message: 'Aucune catégorie sélectionnée.' });
       return;
@@ -443,19 +561,23 @@ const OdysseeItem = ({
 
       {/* ─── Body : canvas + sidebar droite ───────────────────────────────── */}
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        <OdysseeCanvas
-          pages={pages}
-          margins={margins}
-          mode={mode}
-          onPagesChange={setPages}
-          onBlockDrop={handleBlockDrop}
-          onBlockMove={handleBlockMove}
-          onBlockClick={handleBlockClick}
-          onBlockRemove={handleBlockRemove}
-          onBindingDrop={handleBindingDrop}
-          selectedBlockPlacement={selectedBlockPlacement}
-          bindings={bindings}
-        />
+        {mode === MODE_RUBRIQUE ? (
+          <OdysseeRubriqueCanvas ref={rubriqueCanvasRef} onSaved={() => handleModeChange(MODE_TEMPLATE)} />
+        ) : (
+          <OdysseeCanvas
+            pages={pages}
+            margins={margins}
+            mode={mode}
+            onPagesChange={setPages}
+            onBlockDrop={handleBlockDrop}
+            onBlockMove={handleBlockMove}
+            onBlockClick={handleBlockClick}
+            onBlockRemove={handleBlockRemove}
+            onBindingDrop={handleBindingDrop}
+            selectedBlockPlacement={selectedBlockPlacement}
+            bindings={bindings}
+          />
+        )}
         <OdysseeDocumentSidebar
           mode={mode}
           categoryId={categoryId}

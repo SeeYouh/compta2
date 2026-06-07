@@ -1,4 +1,5 @@
 import { config } from '../config/env.js';
+import { markDirty } from '../pages/odyssee/services/odysseeSidebarCacheService';
 
 const BASE = `${config.apiUrl}/api/odyssee/catalog/categories`;
 
@@ -46,6 +47,7 @@ const OdysseeCategoryService = {
       const data = await res.json();
       if (!res.ok)
         throw new Error(data.message || data.error || "Erreur serveur");
+      markDirty("catalogue");
       return { success: true, category: data.category, message: data.message };
     } catch (error) {
       return { success: false, error: error.message };
@@ -69,6 +71,7 @@ const OdysseeCategoryService = {
       const data = await res.json();
       if (!res.ok)
         throw new Error(data.message || data.error || "Erreur serveur");
+      markDirty("catalogue");
       return { success: true, category: data.category, message: data.message };
     } catch (error) {
       return { success: false, error: error.message };
@@ -83,6 +86,7 @@ const OdysseeCategoryService = {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Erreur serveur");
+      markDirty("catalogue");
       return { success: true, message: data.message };
     } catch (error) {
       return { success: false, error: error.message };
