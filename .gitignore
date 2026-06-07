@@ -47,7 +47,7 @@ Thumbs.db
 .cache/
 
 .github/*
-.claude/*
+.claude/
 .vscode/*
 
 server/node_modules/
