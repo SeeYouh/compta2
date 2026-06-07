@@ -1,5 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 
+import SaveStatus from "./SaveStatus";
+
 import { ArrayGraduation } from "./utils/ArrayGraduation";
 import ColorPicker from "../../../components/ColorPicker";
 import { computeColorPalette } from "../utils/colorPalette.js";
@@ -342,13 +344,7 @@ const PaperProduct = ({
               </div>
             )}
           </div>
-          {saveStatus && (
-            <div
-              className={`paper-product__status paper-product__status--${saveStatus.type}`}
-            >
-              {saveStatus.message}
-            </div>
-          )}
+          <SaveStatus status={saveStatus} />
         </div>
 
         <div className="paper-product-container" inert={readOnly || undefined}>

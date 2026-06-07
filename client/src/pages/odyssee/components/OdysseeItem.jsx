@@ -1,142 +1,131 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from 'react';
 
-import { ArrayGraduation } from "./utils/ArrayGraduation";
-import ColorPicker from "../../../components/ColorPicker";
-import { computeColorPalette } from "../utils/colorPalette.js";
-import IconSaveFalse from "../../../assets/IconSaveFalse.jsx";
-import IconSaveTrue from "../../../assets/IconSaveTrue.jsx";
-import InTakeTimeAdvancedMode from "./InTakeTimeAdvancedMode";
-import InTakeTimeNormalMode from "./InTakeTimeNormalMode";
-import { odysseyItemService } from "../services/odysseyServices";
-import Range14 from "./Range14";
-import RangeDays from "./RangeDays";
-import { useOdysseeColor } from "../contexts/OdysseeColorContext.jsx";
+import ColorPicker from '../../../components/ColorPicker';
+import IconSaveFalse from '../../../assets/IconSaveFalse';
+import IconSaveTrue from '../../../assets/IconSaveTrue';
+import {
+  DOCUMENT_MARGINS_DEFAULT,
+  DOCUMENT_PAGE_DEFAULT,
+} from '../config/documentGrid';
+import { computeColorPalette } from '../utils/colorPalette';
+import { useOdysseeColor } from '../contexts/OdysseeColorContext';
+import OdysseeCanvas from './OdysseeCanvas';
+import SaveStatus from './SaveStatus';
+import { odysseeDocumentService } from '../services/odysseeDocumentService';
+import OdysseeDocumentSidebar from './OdysseeDocumentSidebar';
+import OdysseeDocumentToggle, {
+  MODE_DOCUMENT,
+  MODE_TEMPLATE,
+} from './OdysseeDocumentToggle';
+import { odysseeTemplateService } from '../services/odysseeTemplateService';
+import { odysseyItemService } from '../services/odysseyServices';
 
-function buildOdysseeStyles(c, id) {
+function buildOdysseeItemStyles(c, id) {
   return `
-    [data-odyssee="${id}"] {
-      background-color: ${c.lightness};
+    [data-ody-item="${id}"] .ody-item__toolbar {
+      background: ${c.base};
+      border-bottom-color: ${c.dark};
     }
-    [data-odyssee="${id}"] .paper-product-container-navBar {
-      background-color: ${c.base};
-    }
-    [data-odyssee="${id}"] .paper-product__name-input,
-    [data-odyssee="${id}"] .paper-product__alias-input {
-      border-bottom-color: color-mix(in srgb, ${c.contrastBase} 40%, transparent);
+    [data-ody-item="${id}"] .ody-item__toolbar-input {
       color: ${c.contrastBase};
+      border-color: color-mix(in srgb, ${c.contrastBase} 35%, transparent);
     }
-    [data-odyssee="${id}"] .paper-product__name-input::placeholder,
-    [data-odyssee="${id}"] .paper-product__alias-input::placeholder {
+    [data-ody-item="${id}"] .ody-item__toolbar-input::placeholder {
       color: color-mix(in srgb, ${c.contrastBase} 45%, transparent);
     }
-    [data-odyssee="${id}"] .paper-product__name-input:focus,
-    [data-odyssee="${id}"] .paper-product__alias-input:focus {
-      border-bottom-color: ${c.contrastBase};
+    [data-ody-item="${id}"] .ody-item__margins-label {
+      color: ${c.contrastBase};
     }
-    [data-odyssee="${id}"] .paper-product__alias-input {
-      color: color-mix(in srgb, ${c.contrastBase} 75%, transparent);
+    [data-ody-item="${id}"] .ody-item__margins-label span {
+      color: color-mix(in srgb, ${c.contrastBase} 60%, transparent);
     }
-    [data-odyssee="${id}"] .paper-product__color-btn {
+    [data-ody-item="${id}"] .ody-item__save-btn {
+      background: color-mix(in srgb, ${c.contrastBase} 12%, transparent);
+      border-color: color-mix(in srgb, ${c.contrastBase} 30%, transparent);
+      color: ${c.contrastBase};
+    }
+    [data-ody-item="${id}"] .ody-item__save-btn:hover:not(:disabled) {
+      background: color-mix(in srgb, ${c.contrastBase} 22%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-item__color-btn {
       border-color: color-mix(in srgb, ${c.contrastBase} 30%, transparent);
     }
-    [data-odyssee="${id}"] .paper-product__color-btn:hover {
+    [data-ody-item="${id}"] .ody-item__color-btn:hover {
       border-color: color-mix(in srgb, ${c.contrastBase} 60%, transparent);
     }
-    [data-odyssee="${id}"] .paper-product__status--success {
+    [data-ody-item="${id}"] .paper-product__status--success {
       background-color: ${c.dark};
       color: ${c.lightness};
       border-left-color: ${c.base};
     }
-    [data-odyssee="${id}"] .paper-product__status--error {
+    [data-ody-item="${id}"] .paper-product__status--error {
       background-color: ${c.darkest};
       color: ${c.dangerLight};
       border-left-color: ${c.danger};
     }
-    [data-odyssee="${id}"] .paper-product__upload-label {
-      border-color: ${c.dark};
-      color: ${c.light};
+    [data-ody-item="${id}"] .ody-doc-toggle label {
+      border-color: color-mix(in srgb, ${c.contrastBase} 40%, transparent);
+      color: ${c.contrastBase};
     }
-    [data-odyssee="${id}"] .paper-product__upload-label:hover {
-      border-color: ${c.base};
-      color: ${c.lightness};
+    [data-ody-item="${id}"] .ody-doc-toggle label p:first-child {
+      background: color-mix(in srgb, ${c.contrastBase} 20%, transparent);
     }
-    [data-odyssee="${id}"] .paper-product__image-preview img {
-      border-color: ${c.dark};
+    [data-ody-item="${id}"] .ody-doc-toggle input:checked + label p:first-child {
+      background: transparent;
     }
-    [data-odyssee="${id}"] .paper-product__image-remove {
-      background-color: ${c.darkest};
-      color: ${c.lightness};
-      border-color: ${c.dark};
+    [data-ody-item="${id}"] .ody-doc-toggle input:checked + label p:last-child {
+      background: color-mix(in srgb, ${c.contrastBase} 20%, transparent);
     }
-    [data-odyssee="${id}"] .paper-product__image-remove:hover {
-      background-color: ${c.danger};
+    [data-ody-item="${id}"] .ody-canvas { background: ${c.light}; }
+    [data-ody-item="${id}"] .ody-canvas-page__controls { color: ${c.darkest}; }
+    [data-ody-item="${id}"] .ody-canvas-block {
+      border-color: color-mix(in srgb, ${c.base} 30%, transparent);
+      color: ${c.darker};
     }
-    [data-odyssee="${id}"] .paper-product-container {
+    [data-ody-item="${id}"] .ody-canvas-block--selected {
+      border-color: ${c.base} !important;
+      background: color-mix(in srgb, ${c.base} 8%, transparent) !important;
+    }
+    [data-ody-item="${id}"] .ody-canvas-block--bound {
+      background: color-mix(in srgb, ${c.base} 8%, transparent);
+      border-color: color-mix(in srgb, ${c.base} 50%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-doc-sidebar {
+      background: ${c.lightness};
+      border-left-color: ${c.dark};
+    }
+    [data-ody-item="${id}"] .ody-sidebar-section-title { color: ${c.darker}; }
+    [data-ody-item="${id}"] .ody-sidebar-block-card {
+      border-color: color-mix(in srgb, ${c.base} 25%, transparent);
       color: ${c.darkest};
     }
-    [data-odyssee="${id}"] .inTakeTime-container h4 {
-      border-color: ${c.darkest};
-      background-color: ${c.darkest};
-      color: ${c.light};
-    }
-    [data-odyssee="${id}"] .title-inTakeTime-container label {
-      border-color: ${c.darkest};
-    }
-    [data-odyssee="${id}"] .title-inTakeTime-container input[type="checkbox"]:checked + label p:first-child {
-      background-color: ${c.base};
-      color: ${c.light};
-    }
-    [data-odyssee="${id}"] .title-inTakeTime-container p:last-child {
-      background-color: ${c.base};
-      color: ${c.light};
-    }
-    [data-odyssee="${id}"] .inTakeTime-moment label {
-      border-color: ${c.dark};
-    }
-    [data-odyssee="${id}"] .inTakeTime-moment input[type="checkbox"]:checked + label {
-      background-color: ${c.base};
-      color: ${c.light};
-    }
-    [data-odyssee="${id}"] .inTakeTime-container_moment__label::after {
-      background-color: ${c.darkest};
-    }
-    [data-odyssee="${id}"] .inTakeTime-container_moment li input[type="radio"]:checked + label .inTakeTime-container_moment__label::after {
-      background-color: ${c.base};
-    }
-    [data-odyssee="${id}"] .custom-range input[type="range"]::-webkit-slider-runnable-track {
-      background: ${c.darker};
-    }
-    [data-odyssee="${id}"] .custom-range input[type="range"]::-moz-range-track {
-      background: ${c.darker};
-    }
-    [data-odyssee="${id}"] .custom-range input[type="range"]::-moz-range-progress {
-      background-color: ${c.darker};
-    }
-    [data-odyssee="${id}"] .custom-range input[type="range"]::-webkit-slider-thumb {
-      background: ${c.darker};
-    }
-    [data-odyssee="${id}"] .custom-range input[type="range"]::-moz-range-thumb {
-      background: ${c.darker};
-    }
-    [data-odyssee="${id}"] .inTakeTime-container_moment .custom-range input[type="range"]::-webkit-slider-runnable-track {
-      background: ${c.darker};
-    }
-    [data-odyssee="${id}"] .inTakeTime-container_moment .custom-range input[type="range"]::-webkit-slider-thumb {
-      background: ${c.base};
-    }
-    [data-odyssee="${id}"] .inTakeTime-container_moment .custom-range input[type="range"]::-moz-range-thumb {
-      background: ${c.darker};
-    }
-    [data-odyssee="${id}"] .array-graduation_text label {
-      border-bottom-color: ${c.light};
-    }
-    [data-odyssee="${id}"] .array-graduation_text label span {
-      background-color: ${c.light};
+    [data-ody-item="${id}"] .ody-sidebar-block-card:hover {
       border-color: ${c.base};
     }
-    [data-odyssee="${id}"] .array-graduation input[type="radio"]:checked + label {
-      border-bottom-color: ${c.base};
+    [data-ody-item="${id}"] .ody-sidebar-block-card__meta { color: ${c.dark}; }
+    [data-ody-item="${id}"] .ody-sidebar-item-card {
+      border-color: color-mix(in srgb, ${c.base} 25%, transparent);
+      color: ${c.darkest};
     }
+    [data-ody-item="${id}"] .ody-sidebar-item-card--bound {
+      background: color-mix(in srgb, ${c.base} 6%, transparent);
+      border-color: color-mix(in srgb, ${c.base} 40%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-sidebar-item-card__check { color: ${c.base}; }
+    [data-ody-item="${id}"] .ody-sidebar-idle-msg { color: ${c.dark}; }
+    [data-ody-item="${id}"] .ody-sidebar-selected-name { color: ${c.darkest}; }
+    [data-ody-item="${id}"] .ody-sidebar-selected-type {
+      background: color-mix(in srgb, ${c.base} 8%, transparent);
+      color: ${c.darker};
+    }
+    [data-ody-item="${id}"] .ody-sidebar-warning {
+      color: ${c.danger};
+      background: color-mix(in srgb, ${c.danger} 8%, transparent);
+      border-color: color-mix(in srgb, ${c.danger} 20%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-sidebar-close-btn { color: ${c.dark}; }
+    [data-ody-item="${id}"] .ody-sidebar-close-btn:hover { color: ${c.darkest}; }
+    [data-ody-item="${id}"] .ody-sidebar-empty-msg { color: ${c.dark}; }
   `;
 }
 
@@ -147,342 +136,335 @@ const OdysseeItem = ({
   editMode = false,
   onActivate,
 }) => {
-  const productId = contentFilesData._id || null;
-  const folderId = contentFilesData.folderId || null;
-  const entityId = productId || "new-odyssee";
+  const entityId = contentFilesData._id || 'new-ody';
 
-  const [color, setColor] = useState(contentFilesData.color || "");
+  const { colors: themeColors } = useOdysseeColor();
+  const [color, setColor] = useState(contentFilesData.color || '');
   const [previewColor, setPreviewColor] = useState(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
 
-  const { colors: themeColors } = useOdysseeColor();
   const activeColor = previewColor || color;
   const colors = useMemo(
     () => (activeColor ? computeColorPalette(activeColor) : themeColors),
     [activeColor, themeColors],
   );
-  const [productName, setProductName] = useState(
-    contentFilesData.productName || "",
-  );
-  const [aliasName, setAliasName] = useState(
-    contentFilesData.aliasName?.name || "",
-  );
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [imageError, setImageError] = useState("");
-  const fileInputRef = useRef(null);
 
-  const [duration, setDuration] = useState(contentFilesData.treatmentDuration);
-  const [quantity, setQuantity] = useState(contentFilesData.amountToAdminister);
-  const [advancedMode, setAdvancedMode] = useState(false);
-  const [checkedMoments, setCheckedMoments] = useState(["Matin"]);
-  const [selectedTime, setSelectedTime] = useState("beforeMeal");
-  const [durationBefore, setDurationBefore] = useState(10);
-  const [durationAfter, setDurationAfter] = useState("");
-  const [nightDuration, setNightDuration] = useState(10);
+  const itemStyles = useMemo(
+    () => buildOdysseeItemStyles(colors, entityId),
+    [colors, entityId],
+  );
+
+  const [mode, setMode] = useState(MODE_TEMPLATE);
+  const [pages, setPages] = useState([{ ...DOCUMENT_PAGE_DEFAULT, blocks: [] }]);
+  const [margins, setMargins] = useState(DOCUMENT_MARGINS_DEFAULT);
+  const [productName, setProductName] = useState(contentFilesData.productName || '');
+  const [aliasName, setAliasName] = useState(
+    contentFilesData.aliasName?.name || '',
+  );
+  const [bindings, setBindings] = useState([]);
+  const [selectedBlockPlacement, setSelectedBlockPlacement] = useState(null);
+  const [templateId, setTemplateId] = useState(null);
+  const [documentId, setDocumentId] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState(null);
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setImageError("");
-
-    const MAX_SIZE = 2 * 1024 * 1024;
-    if (file.size > MAX_SIZE) {
-      setImageError(
-        `Image trop lourde (${(file.size / 1024 / 1024).toFixed(1)} Mo). Max 2 Mo.`,
-      );
-      e.target.value = "";
-      return;
-    }
-
-    const url = URL.createObjectURL(file);
-    setImagePreview(url);
-    setImageFile(file);
+  const handleModeChange = (newMode) => {
+    setSelectedBlockPlacement(null);
+    setMode(newMode);
   };
 
-  const handleTimeChange = (time) => {
-    setSelectedTime(time);
-    switch (time) {
-      case "beforeMeal":
-        setDurationBefore(10);
-        setDurationAfter("");
-        break;
-      case "afterMeal":
-        setDurationAfter(10);
-        setDurationBefore("");
-        break;
-      default:
-        setDurationBefore("");
-        setDurationAfter("");
-        break;
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData();
-    formData.append("productName", productName);
-    formData.append("aliasName", aliasName);
-    formData.append("treatmentDuration", duration);
-    formData.append("amountToAdminister", quantity);
-    formData.append(
-      "intakeTime",
-      JSON.stringify({
-        mode: advancedMode ? "advanced" : "normal",
-        checkedMoments,
-        selectedTime,
-        durationBefore,
-        durationAfter,
-        nightDuration,
+  const handleBlockDrop = ({ pageIndex, colStart, rowStart, blockDef }) => {
+    const colSpan = blockDef.defaultColSpan ?? 1;
+    const rowSpan = blockDef.defaultRowSpan ?? 1;
+    setPages((prev) =>
+      prev.map((page, i) => {
+        if (i !== pageIndex) return page;
+        return {
+          ...page,
+          blocks: [
+            ...page.blocks,
+            { colStart, rowStart, colSpan, rowSpan, blockDef },
+          ],
+        };
       }),
     );
-    formData.append("categoryId", categoryId);
-    formData.append("color", color);
-    if (folderId) formData.append("folderId", folderId);
-    if (imageFile) formData.append("image", imageFile);
+  };
 
-    try {
-      const result =
-        productId && editMode
-          ? await odysseyItemService.updateItemForm(productId, formData)
-          : await odysseyItemService.createItem(formData);
+  const handleBlockClick = (pageIndex, blockIndex, block) => {
+    if (mode !== MODE_DOCUMENT) return;
+    setSelectedBlockPlacement({
+      pageIndex,
+      blockIndex,
+      sourceType: block.blockDef?.sourceType,
+      blockId: block.blockDef?._id,
+      name: block.blockDef?.name,
+    });
+  };
 
-      if (result.success) {
-        const label = aliasName.trim() || productName.trim() || "Voyage";
-        setSaveStatus({
-          type: "success",
-          message:
-            productId && editMode
-              ? `${label} mis à jour !`
-              : `${label} sauvegardé avec succès !`,
-        });
-        setTimeout(() => setSaveStatus(null), 3000);
-        if (onProductCreated) onProductCreated(result.product);
-      } else {
-        setSaveStatus({ type: "error", message: "Erreur : " + result.error });
-      }
-    } catch {
-      setSaveStatus({
-        type: "error",
-        message: "Erreur de connexion au serveur",
-      });
+  const handleBlockRemove = (pageIndex, blockIndex) => {
+    setPages((prev) =>
+      prev.map((page, i) =>
+        i !== pageIndex
+          ? page
+          : { ...page, blocks: page.blocks.filter((_, j) => j !== blockIndex) },
+      ),
+    );
+    setBindings((prev) =>
+      prev.filter(
+        (b) =>
+          !(
+            b.pageIndex === pageIndex &&
+            b.blockPlacementIndex === blockIndex
+          ),
+      ),
+    );
+    if (
+      selectedBlockPlacement?.pageIndex === pageIndex &&
+      selectedBlockPlacement?.blockIndex === blockIndex
+    ) {
+      setSelectedBlockPlacement(null);
     }
   };
 
-  const readOnly = !!productId && !editMode;
+  const handleBlockMove = ({ pageIndex, sourceBlockIndex, colStart, rowStart, colSpan, rowSpan, blockDef }) => {
+    setPages((prev) =>
+      prev.map((page, i) => {
+        if (i !== pageIndex) return page;
+        const filtered = page.blocks.filter((_, j) => j !== sourceBlockIndex);
+        return {
+          ...page,
+          blocks: [...filtered, { colStart, rowStart, colSpan, rowSpan, blockDef }],
+        };
+      }),
+    );
+  };
+
+  const handleBindingDrop = ({ pageIndex, blockIndex, bindingData }) => {
+    const { sourceType, sourceId, displayName } = bindingData;
+    const filtered =
+      sourceType === 'passenger'
+        ? bindings.filter((b) => b.sourceType !== 'passenger')
+        : bindings.filter(
+            (b) =>
+              !(
+                b.pageIndex === pageIndex &&
+                b.blockPlacementIndex === blockIndex
+              ),
+          );
+    setBindings([
+      ...filtered,
+      {
+        pageIndex,
+        blockPlacementIndex: blockIndex,
+        sourceType,
+        sourceId,
+        displayName,
+      },
+    ]);
+  };
+
+  const handleSave = async () => {
+    if (!categoryId) {
+      setSaveStatus({ type: 'error', message: 'Aucune catégorie sélectionnée.' });
+      return;
+    }
+    setIsSaving(true);
+    setSaveStatus(null);
+    try {
+      const itemUpdate = await odysseyItemService.updateItem(contentFilesData._id, {
+        color: color || undefined,
+      });
+
+      if (mode === MODE_TEMPLATE) {
+        const serializedPages = pages.map((page) => ({
+          columns: page.columns,
+          rows: page.rows,
+          blocks: page.blocks.map((b) => ({
+            blockId: b.blockDef._id,
+            colStart: b.colStart,
+            rowStart: b.rowStart,
+            colSpan: b.colSpan,
+            rowSpan: b.rowSpan,
+          })),
+        }));
+        const payload = {
+          productName: productName || 'Sans titre',
+          aliasName: { activate: false, name: aliasName },
+          categoryId,
+          color: color || undefined,
+          margins,
+          pages: serializedPages,
+        };
+        const result = templateId
+          ? await odysseeTemplateService.updateTemplate(templateId, payload)
+          : await odysseeTemplateService.createTemplate(payload);
+        if (result.success) {
+          setTemplateId(result.template._id);
+          setSaveStatus({ type: 'success', message: 'Template enregistré.' });
+          setTimeout(() => setSaveStatus(null), 3000);
+          onProductCreated?.(itemUpdate.product ?? contentFilesData);
+        } else {
+          setSaveStatus({ type: 'error', message: result.error });
+        }
+      } else {
+        if (!templateId) {
+          setSaveStatus({ type: 'error', message: "Enregistrez d'abord le template." });
+          return;
+        }
+        const payload = {
+          productName: productName || 'Sans titre',
+          aliasName: { activate: false, name: aliasName },
+          categoryId,
+          color: color || undefined,
+          templateId,
+          bindings: bindings.map(
+            ({ pageIndex, blockPlacementIndex, sourceType, sourceId }) => ({
+              pageIndex,
+              blockPlacementIndex,
+              sourceType,
+              sourceId,
+            }),
+          ),
+        };
+        const result = documentId
+          ? await odysseeDocumentService.updateDocument(documentId, payload)
+          : await odysseeDocumentService.createDocument(payload);
+        if (result.success) {
+          setDocumentId(result.document._id);
+          setSaveStatus({ type: 'success', message: 'Document enregistré.' });
+          setTimeout(() => setSaveStatus(null), 3000);
+          onProductCreated?.(itemUpdate.product ?? contentFilesData);
+        } else {
+          setSaveStatus({ type: 'error', message: result.error });
+        }
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
-    <form
-      className="paper-product"
-      data-odyssee={entityId}
-      onSubmit={handleSubmit}
-      method="POST"
+    <div
+      className="ody-item"
+      data-ody-item={entityId}
+      style={{ display: 'flex', flexDirection: 'column', height: '100%', flex: 1 }}
     >
-      <style>{buildOdysseeStyles(colors, entityId)}</style>
-      <div className="paper-product-container-navBar">
-        <div className="paper-product-container-navBar_titleProduct">
-          <input
-            type="text"
-            className="paper-product__name-input"
-            value={productName}
-            onChange={(e) => setProductName(e.target.value)}
-            placeholder="Nom du voyage"
-            maxLength={60}
-            readOnly={readOnly}
-          />
-          <input
-            type="text"
-            className="paper-product__alias-input"
-            value={aliasName}
-            onChange={(e) => setAliasName(e.target.value)}
-            placeholder="Alias"
-            maxLength={40}
-            readOnly={readOnly}
-          />
-        </div>
-        <div className="paper-product__color-wrap">
-          <div className="paper-product__save-wrap">
-            {readOnly ? (
-              <div className="paper-product__save-btn" onClick={onActivate}>
-                <IconSaveFalse color={colors.contrastBase} />
-              </div>
-            ) : (
-              <button type="submit" className="paper-product__save-btn">
-                <IconSaveTrue color={colors.contrastBase} />
-              </button>
-            )}
-            <span className="save-tooltip">
-              {readOnly ? "Activer l'édition" : "Enregistrer l'odyssée"}
-            </span>
+      <style>{itemStyles}</style>
+
+      {/* ─── Toolbar ──────────────────────────────────────────────────────── */}
+      <div className="ody-item__toolbar">
+        <input
+          type="text"
+          className="ody-item__toolbar-input ody-item__toolbar-input--name"
+          value={productName}
+          onChange={(e) => setProductName(e.target.value)}
+          placeholder="Nom du document"
+        />
+        <input
+          type="text"
+          className="ody-item__toolbar-input ody-item__toolbar-input--alias"
+          value={aliasName}
+          onChange={(e) => setAliasName(e.target.value)}
+          placeholder="Alias"
+        />
+
+        {mode === MODE_TEMPLATE && (
+          <div className="ody-item__margins-wrap">
+            {['top', 'bottom', 'left', 'right'].map((side) => (
+              <label key={side} className="ody-item__margins-label">
+                {side}&nbsp;
+                <input
+                  type="number"
+                  min={0}
+                  max={50}
+                  value={margins[side]}
+                  onChange={(e) =>
+                    setMargins((prev) => ({ ...prev, [side]: Number(e.target.value) }))
+                  }
+                />
+                <span>mm</span>
+              </label>
+            ))}
           </div>
-          <div
-            className="paper-product__color-btn"
-            style={{ background: colors.base }}
-            onClick={() => !readOnly && setShowColorPicker((v) => !v)}
-            title="Couleur du voyage"
+        )}
+
+        <div style={{ marginLeft: 'auto' }} />
+        <OdysseeDocumentToggle mode={mode} onChange={handleModeChange} />
+
+        <div className="paper-product__save-wrap">
+          {editMode ? (
+            <button
+              type="button"
+              className="paper-product__save-btn"
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              <IconSaveTrue color={colors.contrastBase} />
+            </button>
+          ) : (
+            <div className="paper-product__save-btn" onClick={onActivate}>
+              <IconSaveFalse color={colors.contrastBase} />
+            </div>
+          )}
+          <span className="save-tooltip">
+            {editMode ? 'Enregistrer' : "Activer l'édition"}
+          </span>
+        </div>
+
+        <SaveStatus status={saveStatus} />
+
+        <div className="ody-item__color-wrap">
+          <button
+            className="ody-item__color-btn"
+            style={{ background: activeColor || colors.base }}
+            onClick={() => setShowColorPicker((v) => !v)}
+            title="Couleur de l'item"
           />
           {showColorPicker && (
-            <div className="paper-product__color-picker-wrap">
+            <div className="ody-item__color-picker-wrap">
               <ColorPicker
-                value={color || themeColors.base}
-                onChange={(hex) => setColor(hex)}
+                value={color || colors.base}
+                onChange={(hex) => {
+                  setColor(hex);
+                  setPreviewColor(null);
+                  setShowColorPicker(false);
+                }}
                 onPreview={(hex) => setPreviewColor(hex)}
                 onClose={() => {
-                  setShowColorPicker(false);
                   setPreviewColor(null);
+                  setShowColorPicker(false);
                 }}
-                contextKey={`odyssee-item-${productId || "new"}`}
-                showHistory
-                showDefaultButtons={!!productId}
+                showDefaultButtons={false}
               />
             </div>
           )}
         </div>
-        {saveStatus && (
-          <div
-            className={`paper-product__status paper-product__status--${saveStatus.type}`}
-          >
-            {saveStatus.message}
-          </div>
-        )}
       </div>
 
-      <div className="paper-product-container">
-        <div className="bloc">
-          <div className="paper-product__upload-zone">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="paper-product__file-input"
-              onChange={handleImageChange}
-            />
-            {imagePreview ? (
-              <div className="paper-product__image-preview">
-                <img src={imagePreview} alt="Aperçu" />
-                <button
-                  type="button"
-                  className="paper-product__image-remove"
-                  onClick={() => {
-                    setImagePreview(null);
-                    setImageFile(null);
-                    if (fileInputRef.current) fileInputRef.current.value = "";
-                  }}
-                >
-                  ✕
-                </button>
-              </div>
-            ) : (
-              <div
-                className="paper-product__upload-label"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                + Ajouter une image
-              </div>
-            )}
-            {imageError && (
-              <p className="paper-product__image-error">{imageError}</p>
-            )}
-          </div>
-
-          <ul className="paper-product-bloc-img">
-            {contentFilesData.img?.map((item, index) => (
-              <li
-                className="paper-product-li_img"
-                key={"img" + item.alt + index}
-              >
-                <img src={item.adress} alt={item.alt} />
-              </li>
-            ))}
-          </ul>
-
-          <div>
-            <h3>Durée du traitement</h3>
-            <div className="custom-range">
-              <RangeDays value={duration} onChange={setDuration} />
-            </div>
-          </div>
-
-          <div>
-            <h3>Quantité à administrer</h3>
-            <div className="custom-range">
-              <Range14 value={quantity} onChange={setQuantity} />
-            </div>
-            <ul className="array-graduation">
-              {ArrayGraduation.map((category, index) => {
-                return (
-                  <li key={"grad" + category.abbreviatedGraduation + index}>
-                    <h4> {category.title} </h4>
-                    <ul>
-                      {category.categoryGraduation.map((item, index) => {
-                        return (
-                          <div key={"cat" + item.graduation + index}>
-                            <li className="array-graduation_text">
-                              <input
-                                className="input-dysplay-none"
-                                type="radio"
-                                name="graduation"
-                                id={item.abbreviatedGraduation}
-                              />
-                              <label htmlFor={item.abbreviatedGraduation}>
-                                {item.abbreviatedGraduation}
-                                <span> {item.graduation} </span>
-                              </label>
-                            </li>
-                          </div>
-                        );
-                      })}
-                    </ul>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        </div>
-
-        <div className="bloc">
-          <div className="inTakeTime-container">
-            <div className="title-inTakeTime-container">
-              <h3>Moment de prise</h3>
-              <div className="btn-advancedMode-toggle">
-                <p>Mode avancé</p>
-                <input
-                  className="input-dysplay-none"
-                  type="checkbox"
-                  name="toggleOnOff"
-                  id="toggleOnOff"
-                  checked={advancedMode}
-                  onChange={(e) => setAdvancedMode(e.target.checked)}
-                />
-                <label htmlFor="toggleOnOff">
-                  <p>On</p>
-                  <p>Off</p>
-                </label>
-              </div>
-            </div>
-
-            {advancedMode ? (
-              <InTakeTimeAdvancedMode />
-            ) : (
-              <InTakeTimeNormalMode
-                checkedMoments={checkedMoments}
-                selectedTime={selectedTime}
-                durationBefore={durationBefore}
-                durationAfter={durationAfter}
-                onMomentChange={setCheckedMoments}
-                onTimeChange={handleTimeChange}
-                onBeforeChange={setDurationBefore}
-                onAfterChange={setDurationAfter}
-                nightDuration={nightDuration}
-                onNightDurationChange={setNightDuration}
-              />
-            )}
-          </div>
-        </div>
+      {/* ─── Body : canvas + sidebar droite ───────────────────────────────── */}
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        <OdysseeCanvas
+          pages={pages}
+          margins={margins}
+          mode={mode}
+          onPagesChange={setPages}
+          onBlockDrop={handleBlockDrop}
+          onBlockMove={handleBlockMove}
+          onBlockClick={handleBlockClick}
+          onBlockRemove={handleBlockRemove}
+          onBindingDrop={handleBindingDrop}
+          selectedBlockPlacement={selectedBlockPlacement}
+          bindings={bindings}
+        />
+        <OdysseeDocumentSidebar
+          mode={mode}
+          categoryId={categoryId}
+          selectedBlockPlacement={selectedBlockPlacement}
+          onClearSelection={() => setSelectedBlockPlacement(null)}
+          bindings={bindings}
+        />
       </div>
-    </form>
+    </div>
   );
 };
 

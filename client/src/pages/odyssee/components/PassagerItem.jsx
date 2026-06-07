@@ -1,5 +1,7 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 
+import SaveStatus from "./SaveStatus";
+
 import CategoryContextMenu from "./CategoryContextMenu";
 import ColorPicker from "../../../components/ColorPicker";
 import { computeColorPalette } from "../utils/colorPalette.js";
@@ -777,13 +779,7 @@ const PassagerItem = ({
               </div>
             )}
           </div>
-          {saveStatus && (
-            <div
-              className={`paper-product__status paper-product__status--${saveStatus.type}`}
-            >
-              {saveStatus.message}
-            </div>
-          )}
+          <SaveStatus status={saveStatus} />
         </div>
 
         {/* ─── Blocs côte à côte ───────────────────────────────────────── */}

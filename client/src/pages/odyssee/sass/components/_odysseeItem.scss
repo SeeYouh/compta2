@@ -1,0 +1,311 @@
+// ─── OdysseeItem — Styles structurels du module éditeur de documents ─────────
+
+// ─── Toolbar ──────────────────────────────────────────────────────────────────
+.ody-item__toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.ody-item__toolbar-input {
+  font-size: 13px;
+  padding: 3px 8px;
+  border: 1px solid;
+  border-radius: 4px;
+  background: transparent;
+  outline: none;
+
+  &--name { width: 180px; }
+
+  &--alias {
+    font-size: 12px;
+    width: 120px;
+  }
+}
+
+.ody-item__margins-wrap {
+  display: flex;
+  gap: 8px;
+}
+
+.ody-item__margins-label {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+
+  input[type="number"] { width: 40px; }
+
+  span { font-size: 10px; }
+}
+
+.ody-item__save-btn {
+  margin-left: auto;
+  font-size: 12px;
+  padding: 4px 12px;
+  border: 1px solid;
+  border-radius: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+
+.ody-item__color-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ody-item__color-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: transform 0.15s, border-color 0.15s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+
+  &:hover { transform: scale(1.15); }
+}
+
+.ody-item__color-picker-wrap {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 100;
+}
+
+// ─── Toggle mode (pill on/off) ────────────────────────────────────────────────
+.ody-doc-toggle {
+  display: flex;
+  align-items: center;
+  font-size: 0.65rem;
+
+  label {
+    display: flex;
+    cursor: pointer;
+    border: 1px solid;
+    border-radius: 10px;
+    overflow: hidden;
+    user-select: none;
+
+    p {
+      margin: 0;
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+
+      // template mode actif par défaut (unchecked)
+      &:first-child { border-radius: 9px 0 0 9px; }
+      &:last-child  { border-radius: 0 9px 9px 0; }
+
+      svg { display: block; }
+    }
+  }
+}
+
+// ─── Canvas ───────────────────────────────────────────────────────────────────
+.ody-canvas-page__controls {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  align-items: center;
+}
+
+.ody-canvas-page__delete {
+  background: none;
+  border: 1px solid;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 1px 6px;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 1; }
+}
+
+.ody-canvas-cell--free {
+  box-sizing: border-box;
+  border: 1px dashed transparent;
+  transition: border-color 0.1s, background 0.1s;
+
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.03);
+  }
+}
+
+.ody-canvas-cell--occupied {
+  box-sizing: border-box;
+}
+
+.ody-canvas-block {
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+  transition: border-color 0.15s, background 0.15s;
+
+  &--selected { border-width: 2px; }
+
+  &__delete {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    line-height: 16px;
+    text-align: center;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.15);
+    border: none;
+    border-radius: 2px;
+    color: #444;
+    padding: 0;
+  }
+}
+
+// ─── Sidebar droite ───────────────────────────────────────────────────────────
+.ody-doc-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  border-left: 1px solid;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 12px 10px;
+  font-size: 12px;
+}
+
+.ody-sidebar-section {
+  margin-bottom: 16px;
+}
+
+.ody-sidebar-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.ody-sidebar-block-card {
+  padding: 8px 10px;
+  border: 1px solid;
+  border-radius: 4px;
+  cursor: grab;
+  background: #fff;
+  font-size: 12px;
+  margin-bottom: 6px;
+  user-select: none;
+  font-weight: 600;
+  transition: border-color 0.15s;
+}
+
+.ody-sidebar-block-card__meta {
+  font-size: 11px;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.ody-sidebar-item-card {
+  padding: 7px 10px;
+  border: 1px solid;
+  border-radius: 4px;
+  cursor: grab;
+  background: #fff;
+  font-size: 12px;
+  margin-bottom: 6px;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.ody-sidebar-item-card__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ody-sidebar-item-card__check {
+  margin-left: auto;
+  font-size: 10px;
+}
+
+.ody-sidebar-idle-msg {
+  text-align: center;
+  padding: 32px 12px;
+  line-height: 1.6;
+}
+
+.ody-sidebar-selected-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.ody-sidebar-selected-name {
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.ody-sidebar-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0 2px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.ody-sidebar-selected-type {
+  font-size: 11px;
+  margin-bottom: 10px;
+  padding: 4px 8px;
+  border-radius: 3px;
+}
+
+.ody-sidebar-warning {
+  font-size: 11px;
+  border: 1px solid;
+  border-radius: 3px;
+  padding: 6px 8px;
+  margin-bottom: 10px;
+}
+
+.ody-sidebar-loading-msg {
+  color: #999;
+  text-align: center;
+  padding: 16px;
+}
+
+.ody-sidebar-empty-msg {
+  text-align: center;
+  padding: 16px;
+}
