@@ -31,7 +31,7 @@ export const getOneBlock = async (req, res) => {
 
 export const createBlock = async (req, res) => {
   try {
-    const { name, sourceType, columns, rows, fields } = req.body;
+    const { name, sourceType, columns, rows, fieldPlacements } = req.body;
 
     if (!name || !sourceType || !columns || !rows) {
       return res.status(400).json({
@@ -45,7 +45,7 @@ export const createBlock = async (req, res) => {
       sourceType,
       columns,
       rows,
-      fields: fields || [],
+      fieldPlacements: fieldPlacements || [],
       userId: req.userId,
       isDefault: false,
     });
@@ -71,12 +71,12 @@ export const updateBlock = async (req, res) => {
       return res.status(403).json({ success: false, error: "Non autorisé" });
     }
 
-    const { name, sourceType, columns, rows, fields } = req.body;
+    const { name, sourceType, columns, rows, fieldPlacements } = req.body;
     if (name !== undefined) block.name = name;
     if (sourceType !== undefined) block.sourceType = sourceType;
     if (columns !== undefined) block.columns = columns;
     if (rows !== undefined) block.rows = rows;
-    if (fields !== undefined) block.fields = fields;
+    if (fieldPlacements !== undefined) block.fieldPlacements = fieldPlacements;
 
     await block.save();
     res.json({ success: true, block });

@@ -2,20 +2,22 @@ import mongoose from "mongoose";
 
 import { odysseeConn } from "../config/database.js";
 
-// Un bloc définit quels champs afficher ET comment les disposer (grille interne en fr)
+// Une Rubrique est un bloc composite nommé : regroupement de champs issus de
+// fieldDefinitions.js, positionnés sur une grille interne.
+// Réutilisable dans plusieurs Templates.
 const odysseeBlockSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
     trim: true,
   },
-  // "passenger" ou "product"
+  // "passenger" ou "catalogue"
   sourceType: {
     type: String,
-    enum: ["passenger", "product"],
+    enum: ["passenger", "catalogue"],
     required: true,
   },
-  // Grille interne du bloc (proportions en fr)
+  // Dimensions de la grille interne
   columns: {
     type: Number,
     required: true,
@@ -26,18 +28,17 @@ const odysseeBlockSchema = new mongoose.Schema({
     required: true,
     min: 1,
   },
-  // Champs à afficher, positionnés dans la grille interne
-  fields: [
+  // Champs positionnés sur la grille — fieldId fait référence à PASSENGER_FIELDS ou CATALOGUE_FIELDS
+  fieldPlacements: [
     {
-      key: { type: String, required: true }, // ex: "firstName", "address.city", "avatar"
-      label: { type: String, default: "" },
+      fieldId:  { type: String, required: true },
       colStart: { type: Number, required: true },
       rowStart: { type: Number, required: true },
-      colSpan: { type: Number, default: 1 },
-      rowSpan: { type: Number, default: 1 },
+      colSpan:  { type: Number, default: 1 },
+      rowSpan:  { type: Number, default: 1 },
     },
   ],
-  // null = bloc global (fourni par l'app), sinon propre à l'utilisateur
+  // null = rubrique globale (fournie par l'app), sinon propre à l'utilisateur
   userId: {
     type: String,
     default: null,
