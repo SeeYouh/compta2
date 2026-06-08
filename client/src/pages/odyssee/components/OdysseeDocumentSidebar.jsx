@@ -501,15 +501,16 @@ const OdysseeDocumentSidebar = ({
     }).then((data) => { if (data) setCatalogueSidebar(data); });
   }, []);
 
-  // Rubriques disponibles (modes template et rubrique)
+  // Rubriques disponibles — recharge quand le panneau s'ouvre ou que le mode change
   useEffect(() => {
+    if (openPanel !== "create") return;
     if (mode !== MODE_TEMPLATE && mode !== MODE_RUBRIQUE) return;
     setBlocksLoading(true);
     odysseeBlockService.getAllBlocks().then((r) => {
       if (r.success) setBlocks(r.blocks);
       setBlocksLoading(false);
     });
-  }, [mode]);
+  }, [mode, openPanel]);
 
   // Ouvre le bon volet quand un bloc canvas est sélectionné
   useEffect(() => {

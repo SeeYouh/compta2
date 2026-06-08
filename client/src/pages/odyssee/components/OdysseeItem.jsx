@@ -62,7 +62,7 @@ function buildOdysseeItemStyles(c, id) {
     }
     [data-ody-item="${id}"] .paper-product__status--error {
       background-color: ${c.darkest};
-      color: ${c.dangerLight};
+      color: ${c.contrastDarkest};
       border-left-color: ${c.danger};
     }
     [data-ody-item="${id}"] .ody-doc-toggle__pill {
@@ -205,8 +205,14 @@ function buildOdysseeItemStyles(c, id) {
       background: color-mix(in srgb, ${c.base} 15%, transparent);
       color: ${c.darker};
     }
-    [data-ody-item="${id}"] .ody-rubrique-canvas__grid-wrap {
+    [data-ody-item="${id}"] .ody-rubrique-canvas {
       background: ${c.light};
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__canvas-area {
+      background: ${c.lightness};
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__grid-wrap {
+      background: ${c.lightness};
     }
     [data-ody-item="${id}"] .ody-rubrique-canvas__cell {
       border-color: color-mix(in srgb, ${c.darker} 40%, transparent);
@@ -229,6 +235,14 @@ function buildOdysseeItemStyles(c, id) {
     [data-ody-item="${id}"] .ody-rubrique-canvas__orientation-btn--active {
       background: color-mix(in srgb, ${c.darker} 12%, transparent);
     }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__block--invalid {
+      border-color: ${c.danger};
+      background: color-mix(in srgb, ${c.danger} 10%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__block[data-conflicts~="e"] { border-right-color:  ${c.danger}; }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__block[data-conflicts~="w"] { border-left-color:   ${c.danger}; }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__block[data-conflicts~="n"] { border-top-color:    ${c.danger}; }
+    [data-ody-item="${id}"] .ody-rubrique-canvas__block[data-conflicts~="s"] { border-bottom-color: ${c.danger}; }
     [data-ody-item="${id}"] .ody-rubrique-canvas__status--success {
       background: color-mix(in srgb, ${c.base} 10%, transparent);
       color: ${c.darker};
@@ -379,7 +393,23 @@ const OdysseeItem = ({
 
   const handleSave = async () => {
     if (mode === MODE_RUBRIQUE) {
-      await rubriqueCanvasRef.current?.save();
+      setIsSaving(true);
+      setSaveStatus(null);
+      try {
+        if (contentFilesData._id) {
+          await odysseyItemService.updateItem(contentFilesData._id, { color: color || undefined });
+        }
+        const result = await rubriqueCanvasRef.current?.save();
+        if (result?.success) {
+          setSaveStatus({ type: 'success', message: 'Rubrique enregistrée.' });
+          setTimeout(() => setSaveStatus(null), 3000);
+        } else if (result) {
+          setSaveStatus({ type: 'error', message: result.error ?? 'Erreur lors de la sauvegarde.' });
+          setTimeout(() => setSaveStatus(null), 3000);
+        }
+      } finally {
+        setIsSaving(false);
+      }
       return;
     }
     if (!categoryId) {
