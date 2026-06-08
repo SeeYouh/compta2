@@ -268,6 +268,35 @@
     }
   }
 
+  &__input--password {
+    padding-right: 3rem;
+  }
+
+  &__password-toggle {
+    position: absolute;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--color-text-dim);
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--color-primary);
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
   &__submit {
     margin-top: 0.5rem;
   }
@@ -658,6 +687,17 @@
       left: 0.875rem;
       width: 18px;
       height: 18px;
+    }
+
+    &__password-toggle {
+      right: 0.875rem;
+      width: 18px;
+      height: 18px;
+
+      svg {
+        width: 18px;
+        height: 18px;
+      }
     }
   }
 }

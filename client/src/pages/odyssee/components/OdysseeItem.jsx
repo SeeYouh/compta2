@@ -209,7 +209,7 @@ function buildOdysseeItemStyles(c, id) {
       background: ${c.light};
     }
     [data-ody-item="${id}"] .ody-rubrique-canvas__cell {
-      border-color: color-mix(in srgb, ${c.darker} 18%, transparent);
+      border-color: color-mix(in srgb, ${c.darker} 40%, transparent);
     }
     [data-ody-item="${id}"] .ody-rubrique-canvas__cell--over {
       background: color-mix(in srgb, ${c.base} 12%, transparent);

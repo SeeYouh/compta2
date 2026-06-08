@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 import IconPassager from "../assets/IconPassager";
 import IconPassagerLandscape from "../assets/IconPassagerLandscape";
@@ -72,6 +72,29 @@ const OdysseeRubriqueCanvas = forwardRef(({ onSaved }, ref) => {
   const [dragOverCell, setDragOverCell] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState(null);
+  const [zoom, setZoom] = useState(1);
+  const canvasAreaRef = useRef(null);
+
+  const changeZoom = useCallback((delta) => {
+    setZoom((prev) =>
+      Math.min(3, Math.max(0.25, Math.round((prev + delta) * 10) / 10)),
+    );
+  }, []);
+
+  // Ctrl + molette → zoom
+  useEffect(() => {
+    const el = canvasAreaRef.current;
+    if (!el) return;
+    const handler = (e) => {
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+      setZoom((prev) =>
+        Math.min(3, Math.max(0.25, Math.round((prev + (e.deltaY < 0 ? 0.1 : -0.1)) * 10) / 10)),
+      );
+    };
+    el.addEventListener("wheel", handler, { passive: false });
+    return () => el.removeEventListener("wheel", handler);
+  }, []);
 
   // Restore draft on mount (TTL check: expires 10min after last modification)
   useEffect(() => {
@@ -249,21 +272,52 @@ const OdysseeRubriqueCanvas = forwardRef(({ onSaved }, ref) => {
           </span>
         )}
 
+        <div className="ody-rubrique-canvas__zoom">
+          <button
+            type="button"
+            className="ody-rubrique-canvas__stepper-btn"
+            onClick={() => changeZoom(-0.1)}
+            disabled={zoom <= 0.25}
+            title="Dézoomer"
+          >
+            −
+          </button>
+          <button
+            type="button"
+            className="ody-rubrique-canvas__zoom-reset"
+            onClick={() => setZoom(1)}
+            title="Réinitialiser le zoom"
+          >
+            {Math.round(zoom * 100)}%
+          </button>
+          <button
+            type="button"
+            className="ody-rubrique-canvas__stepper-btn"
+            onClick={() => changeZoom(0.1)}
+            disabled={zoom >= 3}
+            title="Zoomer"
+          >
+            +
+          </button>
+        </div>
+
         {isSaving && (
           <span className="ody-rubrique-canvas__saving-indicator">…</span>
         )}
       </div>
 
       {/* ─── Grille ──────────────────────────────────────────────────────── */}
-      <div className="ody-rubrique-canvas__grid-wrap">
-        <div
-          className="ody-rubrique-canvas__grid"
-          style={{
-            gridTemplateColumns: `repeat(${columns}, 1fr)`,
-            gridTemplateRows: `repeat(${rows}, 1fr)`,
-          }}
-        >
-          {cells}
+      <div ref={canvasAreaRef} className="ody-rubrique-canvas__canvas-area">
+        <div className="ody-rubrique-canvas__grid-wrap" style={{ zoom }}>
+          <div
+            className="ody-rubrique-canvas__grid"
+            style={{
+              gridTemplateColumns: `repeat(${columns}, 80px)`,
+              gridTemplateRows: `repeat(${rows}, 80px)`,
+            }}
+          >
+            {cells}
+          </div>
         </div>
       </div>
 
