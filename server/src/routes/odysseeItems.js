@@ -9,7 +9,7 @@ import {
   getOneItem,
   searchItems,
   updateItem,
-} from "../controllers/odysseyItemController.js";
+} from "../controllers/odysseeItemController.js";
 import { odysseeUpload } from "../middleware/odysseeMulter.js";
 
 const router = express.Router();

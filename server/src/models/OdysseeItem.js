@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 import { odysseeConn } from "../config/database.js";
 
-const odysseyItemSchema = new mongoose.Schema({
+const odysseeItemSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -73,6 +73,11 @@ const odysseyItemSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  templateId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "OdysseeTemplate",
+    default: null,
+  },
   folderId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "OdysseeProductFolder",
@@ -104,32 +109,32 @@ const odysseyItemSchema = new mongoose.Schema({
   },
 });
 
-odysseyItemSchema.index({
+odysseeItemSchema.index({
   "contentFilesData.productName": "text",
   "contentFilesData.aliasName.name": "text",
   name: "text",
 });
-odysseyItemSchema.index({ userId: 1 });
-odysseyItemSchema.index({ categoryId: 1 });
-odysseyItemSchema.index({ userId: 1, categoryId: 1 });
+odysseeItemSchema.index({ userId: 1 });
+odysseeItemSchema.index({ categoryId: 1 });
+odysseeItemSchema.index({ userId: 1, categoryId: 1 });
 
-odysseyItemSchema.pre("save", function (next) {
+odysseeItemSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
-odysseyItemSchema.statics.findByUser = function (userId) {
+odysseeItemSchema.statics.findByUser = function (userId) {
   return this.find({ userId, isActive: true, deletedAt: null });
 };
 
-odysseyItemSchema.statics.findByUserAndCategory = function (
+odysseeItemSchema.statics.findByUserAndCategory = function (
   userId,
   categoryId,
 ) {
   return this.find({ userId, categoryId, isActive: true, deletedAt: null });
 };
 
-odysseyItemSchema.statics.searchItems = function (searchTerm, userId) {
+odysseeItemSchema.statics.searchItems = function (searchTerm, userId) {
   return this.find({
     userId,
     isActive: true,
@@ -138,4 +143,10 @@ odysseyItemSchema.statics.searchItems = function (searchTerm, userId) {
   });
 };
 
-export const OdysseyItem = odysseeConn.model("OdysseyItem", odysseyItemSchema);
+// 3e argument : nom de collection explicite — les données existantes vivent dans
+// "odysseyitems" (pluralisation de l'ancien nom de modèle "OdysseyItem")
+export const OdysseeItem = odysseeConn.model(
+  "OdysseeItem",
+  odysseeItemSchema,
+  "odysseyitems",
+);

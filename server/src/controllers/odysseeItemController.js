@@ -2,7 +2,7 @@ import { fileURLToPath } from "url";
 import path from "path";
 
 import { OdysseeProductFolder } from "../models/OdysseeProductFolder.js";
-import { OdysseyItem } from "../models/OdysseyItem.js";
+import { OdysseeItem } from "../models/OdysseeItem.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -66,7 +66,7 @@ export const createItem = async (req, res) => {
       itemData.contentFilesData.img = [{ adress: imageUrl, alt: productName }];
     }
 
-    const item = new OdysseyItem(itemData);
+    const item = new OdysseeItem(itemData);
     const savedItem = await item.save();
 
     res.status(201).json({
@@ -88,7 +88,7 @@ export const getItemsByCategory = async (req, res) => {
     const { categoryId } = req.params;
 
     const [products, folders] = await Promise.all([
-      OdysseyItem.findByUserAndCategory(req.userId, categoryId),
+      OdysseeItem.findByUserAndCategory(req.userId, categoryId),
       OdysseeProductFolder.find({
         userId: req.userId,
         categoryId,
@@ -113,7 +113,7 @@ export const getItemsByCategory = async (req, res) => {
 
 export const getAllUserItems = async (req, res) => {
   try {
-    const items = await OdysseyItem.findByUser(req.userId);
+    const items = await OdysseeItem.findByUser(req.userId);
 
     const itemsByCategory = {};
     items.forEach((item) => {
@@ -138,7 +138,7 @@ export const getAllUserItems = async (req, res) => {
 
 export const getOneItem = async (req, res) => {
   try {
-    const item = await OdysseyItem.findOne({
+    const item = await OdysseeItem.findOne({
       _id: req.params.id,
       isActive: true,
     });
@@ -167,7 +167,7 @@ export const updateItem = async (req, res) => {
       itemObject.img = [imageUrl];
     }
 
-    const existing = await OdysseyItem.findOne({
+    const existing = await OdysseeItem.findOne({
       _id: id,
       userId: req.userId,
     });
@@ -177,7 +177,7 @@ export const updateItem = async (req, res) => {
         .json({ error: "Voyage non trouvé ou non autorisé" });
     }
 
-    const updated = await OdysseyItem.findByIdAndUpdate(id, itemObject, {
+    const updated = await OdysseeItem.findByIdAndUpdate(id, itemObject, {
       new: true,
       runValidators: true,
     });
@@ -195,7 +195,7 @@ export const updateItem = async (req, res) => {
 
 export const deleteItem = async (req, res) => {
   try {
-    const item = await OdysseyItem.findOne({
+    const item = await OdysseeItem.findOne({
       _id: req.params.id,
       userId: req.userId,
     });
@@ -205,7 +205,7 @@ export const deleteItem = async (req, res) => {
         .json({ error: "Voyage non trouvé ou non autorisé" });
     }
 
-    await OdysseyItem.findByIdAndUpdate(req.params.id, {
+    await OdysseeItem.findByIdAndUpdate(req.params.id, {
       deletedAt: new Date(),
     });
 
@@ -223,7 +223,7 @@ export const searchItems = async (req, res) => {
       return res.status(400).json({ error: "Terme de recherche requis" });
     }
 
-    const items = await OdysseyItem.searchItems(q, req.userId);
+    const items = await OdysseeItem.searchItems(q, req.userId);
 
     res
       .status(200)

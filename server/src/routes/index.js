@@ -15,7 +15,7 @@ import odysseeProductsRoutes from "./odysseeProducts.js";
 import odysseeSidebarRoutes from "./odysseeSidebar.js";
 import odysseeTemplatesRoutes from "./odysseeTemplates.js";
 import odysseeTrashRoutes from "./odysseeTrash.js";
-import odysseyItemsRoutes from "./odysseyItems.js";
+import odysseeItemsRoutes from "./odysseeItems.js";
 import organigrammeRoutes from "./organigramme.js";
 import passengerItemsRoutes from "./passengerItems.js";
 import projectionsRoutes from "./projections.js";
@@ -96,7 +96,7 @@ router.use(
   injectType("odyssey"),
   odysseeSidebarRoutes,
 );
-router.use("/odyssee/odyssey/items", injectType("odyssey"), odysseyItemsRoutes);
+router.use("/odyssee/odyssey/items", injectType("odyssey"), odysseeItemsRoutes);
 router.use(
   "/odyssee/odyssey/item-folders",
   injectType("odyssey"),

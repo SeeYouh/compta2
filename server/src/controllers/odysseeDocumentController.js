@@ -1,6 +1,49 @@
 import { OdysseeDocument } from "../models/OdysseeDocument.js";
 import { OdysseeProductFolder } from "../models/OdysseeProductFolder.js";
 import { OdysseeTemplate } from "../models/OdysseeTemplate.js";
+import { OdysseeProduct } from "../models/OdysseeProduct.js";
+import { PassengerItem } from "../models/PassengerItem.js";
+
+export const getDocumentByTemplateId = async (req, res) => {
+  try {
+    const document = await OdysseeDocument.findOne({
+      templateId: req.params.templateId,
+      userId: req.userId,
+      isActive: true,
+      deletedAt: null,
+    });
+
+    if (!document) {
+      return res.json({ success: true, document: null });
+    }
+
+    // Résolution des entités liées selon leur type (PassengerItem / OdysseeProduct)
+    const passengerIds = document.bindings
+      .filter((b) => b.sourceType === "passenger")
+      .map((b) => b.sourceId);
+    const productIds = document.bindings
+      .filter((b) => b.sourceType === "product")
+      .map((b) => b.sourceId);
+
+    const [template, passengers, products] = await Promise.all([
+      OdysseeTemplate.findById(document.templateId).populate("pages.blocks.blockId"),
+      passengerIds.length
+        ? PassengerItem.find({ _id: { $in: passengerIds } })
+        : [],
+      productIds.length
+        ? OdysseeProduct.find({ _id: { $in: productIds } })
+        : [],
+    ]);
+
+    const bindingEntities = Object.fromEntries(
+      [...passengers, ...products].map((e) => [e._id.toString(), e]),
+    );
+
+    res.json({ success: true, document, template, bindingEntities });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
 
 export const getAllUserDocuments = async (req, res) => {
   try {
