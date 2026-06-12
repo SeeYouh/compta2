@@ -7,7 +7,7 @@ import {
   DOCUMENT_MARGINS_DEFAULT,
   DOCUMENT_PAGE_DEFAULT,
 } from '../config/documentGrid';
-import { computeColorPalette } from '../utils/colorPalette';
+import { computeColorPalette } from '../../../../utils/colorPalette';
 import { useOdysseeColor } from '../contexts/OdysseeColorContext';
 import OdysseeCanvas from './OdysseeCanvas';
 import OdysseeRubriqueCanvas from './OdysseeRubriqueCanvas';

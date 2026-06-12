@@ -1,13 +1,13 @@
 import { authFetch } from "../../../components/utils/authFetch.js";
 
 export const getContacts = async () => {
-  const res = await authFetch("/api/contacts");
+  const res = await authFetch("/api/synapse/contacts");
   if (!res.ok) throw new Error("Erreur lors du chargement des contacts");
   return res.json();
 };
 
 export const addContact = async (name, email) => {
-  const res = await authFetch("/api/contacts", {
+  const res = await authFetch("/api/synapse/contacts", {
     method: "POST",
     body: JSON.stringify({ name, email }),
   });

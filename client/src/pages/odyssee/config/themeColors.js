@@ -1,4 +1,4 @@
-import { darken, getContrast, lighten } from "../utils/colorUtils.js";
+import { darken, getContrast, lighten } from '../../../../utils/colorUtils.js";
 
 // Couleur de base par défaut du thème Odyssée (miroir de $color-1 dans __variable.scss)
 export const DEFAULT_THEME_COLOR = "#969696";

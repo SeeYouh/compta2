@@ -1,4 +1,4 @@
-// Reproduit le comportement de color.mix(black, $c, $percent) du SCSS Odyssée.
+// Reproduit le comportement de color.mix(black, $c, $percent) du SCSS.
 // percent : 0–100, part de noir à mélanger (0 = couleur pure, 100 = noir)
 // desat : 0–100, part de gris neutre à mélanger après (0 = aucune désaturation)
 export function darken(hex, percent, desat = 0) {
@@ -19,7 +19,7 @@ export function darken(hex, percent, desat = 0) {
   return `rgb(${rr}, ${gg}, ${bb})`;
 }
 
-// Reproduit color.mix(white, $c, $percent) du SCSS Odyssée.
+// Reproduit color.mix(white, $c, $percent) du SCSS.
 // percent : 0–100, part de blanc à mélanger
 // desat : 0–100, part de gris neutre à mélanger après (0 = aucune désaturation)
 export function lighten(hex, percent, desat = 0) {
@@ -40,7 +40,7 @@ export function lighten(hex, percent, desat = 0) {
   return `rgb(${rr}, ${gg}, ${bb})`;
 }
 
-// Reproduit get-contrast() du SCSS Odyssée.
+// Reproduit get-contrast() du SCSS.
 // Retourne "black" si la couleur est claire (lightness > 50%), sinon "white".
 // Accepte un hex (#rrggbb) ou un rgb(r, g, b).
 export function getContrast(color) {

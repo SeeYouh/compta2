@@ -12,7 +12,7 @@ function useAccounts() {
 
   const fetchAccounts = async () => {
     const token = localStorage.getItem("token");
-    const res = await fetch(`${config.apiUrl}/api/accounts`, {
+    const res = await fetch(`${config.apiUrl}/api/synapse/accounts`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) throw new Error("Erreur chargement comptes");
@@ -140,7 +140,7 @@ export default function SettingsPage() {
     setAccountMsg(null);
     if (!newAccountName.trim()) return;
     try {
-      const res = await fetch(`${config.apiUrl}/api/accounts`, {
+      const res = await fetch(`${config.apiUrl}/api/synapse/accounts`, {
         method: "POST",
         headers: authHeaders,
         body: JSON.stringify({
@@ -171,7 +171,7 @@ export default function SettingsPage() {
   const handleUpdateAccount = async (id) => {
     setAccountMsg(null);
     try {
-      const res = await fetch(`${config.apiUrl}/api/accounts/${id}`, {
+      const res = await fetch(`${config.apiUrl}/api/synapse/accounts/${id}`, {
         method: "PUT",
         headers: authHeaders,
         body: JSON.stringify({ name: editName.trim(), color: editColor }),
@@ -193,7 +193,7 @@ export default function SettingsPage() {
     setDeletingId(id);
     setAccountMsg(null);
     try {
-      const res = await fetch(`${config.apiUrl}/api/accounts/${id}`, {
+      const res = await fetch(`${config.apiUrl}/api/synapse/accounts/${id}`, {
         method: "DELETE",
         headers: authHeaders,
       });
@@ -245,7 +245,7 @@ export default function SettingsPage() {
 
     try {
       const res = await fetch(
-        `${config.apiUrl}/api/accounts/${accountId}/shared-permissions`,
+        `${config.apiUrl}/api/synapse/accounts/${accountId}/shared-permissions`,
         {
           method: "PATCH",
           headers: authHeaders,

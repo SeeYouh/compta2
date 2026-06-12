@@ -12,31 +12,36 @@ import LabelsSettings from "./pages/LabelsSettings";
 import PendingInvitations from "./pages/PendingInvitations";
 import ProjectionsSettings from "./pages/ProjectionsSettings";
 import SettingsPage from "./pages/SettingsPage";
+import { SynapseColorProvider } from "./contexts/SynapseColorContext";
+import ThemeInjector from "./components/ThemeInjector";
 import { ThemesProvider } from "./contexts/ThemesContext";
 
 export default function SynapseDashboard() {
   return (
-    <LabelsProvider>
-      <AccountsProvider>
-        <ThemesProvider>
-          <Routes>
-            <Route path="/" element={<App />} />
-            <Route path="/import" element={<ImportCSVPage />} />
-            <Route path="/contacts" element={<ContactsPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/labels-settings" element={<LabelsSettings />} />
-            <Route
-              path="/projections-settings"
-              element={<ProjectionsSettings />}
-            />
-            <Route
-              path="/account-sharing/:accountId"
-              element={<AccountSharingSettings />}
-            />
-            <Route path="/pending-invitations" element={<PendingInvitations />} />
-          </Routes>
-        </ThemesProvider>
-      </AccountsProvider>
-    </LabelsProvider>
+    <SynapseColorProvider>
+      <ThemeInjector />
+      <LabelsProvider>
+        <AccountsProvider>
+          <ThemesProvider>
+            <Routes>
+              <Route path="/" element={<App />} />
+              <Route path="/import" element={<ImportCSVPage />} />
+              <Route path="/contacts" element={<ContactsPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/labels-settings" element={<LabelsSettings />} />
+              <Route
+                path="/projections-settings"
+                element={<ProjectionsSettings />}
+              />
+              <Route
+                path="/account-sharing/:accountId"
+                element={<AccountSharingSettings />}
+              />
+              <Route path="/pending-invitations" element={<PendingInvitations />} />
+            </Routes>
+          </ThemesProvider>
+        </AccountsProvider>
+      </LabelsProvider>
+    </SynapseColorProvider>
   );
 }

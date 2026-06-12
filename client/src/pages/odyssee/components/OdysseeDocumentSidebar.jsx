@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { darken } from "../utils/colorUtils";
+import { darken } from '../../../../utils/colorUtils";
 import { DARKEN_BG, DARKEN_BORDER } from "../config/folderColors";
 import IconDossierFull from "../assets/IconDossierFull";
 import { MODE_RUBRIQUE, MODE_TEMPLATE } from "./OdysseeDocumentToggle";

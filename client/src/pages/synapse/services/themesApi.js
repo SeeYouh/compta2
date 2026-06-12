@@ -8,7 +8,7 @@ import { authFetch } from "../../../components/utils/authFetch.js";
  * Récupère tous les thèmes depuis l'API
  */
 export async function getThemes() {
-  const response = await authFetch("/api/themes");
+  const response = await authFetch("/api/synapse/themes");
   if (!response.ok) {
     throw new Error(`Erreur ${response.status}: ${response.statusText}`);
   }
@@ -20,7 +20,7 @@ export async function getThemes() {
  * Utilise PUT pour remplacer l'objet complet
  */
 export async function saveThemes(themes) {
-  const response = await authFetch("/api/themes", {
+  const response = await authFetch("/api/synapse/themes", {
     method: "PUT",
     body: JSON.stringify(themes),
   });

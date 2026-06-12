@@ -50,7 +50,7 @@ export const revokeInvitation = async (accountId, token) => {
 };
 
 export const getPendingInvitations = async () => {
-  const res = await authFetch("/api/sharing/invitations/pending");
+  const res = await authFetch("/api/synapse/sharing/invitations/pending");
   if (!res.ok) throw new Error("Erreur lors du chargement des invitations");
   return res.json();
 };

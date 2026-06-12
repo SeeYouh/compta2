@@ -4,7 +4,7 @@ import SaveStatus from "./SaveStatus";
 
 import { ArrayGraduation } from "./utils/ArrayGraduation";
 import ColorPicker from "../../../components/ColorPicker";
-import { computeColorPalette } from "../utils/colorPalette.js";
+import { computeColorPalette } from '../../../../utils/colorPalette.js";
 import IconSaveFalse from "../../../assets/IconSaveFalse.jsx";
 import IconSaveTrue from "../../../assets/IconSaveTrue.jsx";
 import InTakeTimeAdvancedMode from "./InTakeTimeAdvancedMode";

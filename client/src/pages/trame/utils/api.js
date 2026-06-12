@@ -1,6 +1,6 @@
 import { config } from "../../../config/env.js";
 
-const BASE = `${config.apiUrl}/api/organigramme`;
+const BASE = `${config.apiUrl}/api/trame/organigramme`;
 
 function getToken() {
   return localStorage.getItem("token");

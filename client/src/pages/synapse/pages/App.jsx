@@ -7,6 +7,7 @@ import { APP_LABELS, TABLE_HEADERS } from "../utils";
 import AppShell from "../components/AppShell";
 import BalanceCalculator from "../components/BalanceCalculator";
 import ChartsDashboard from "../components/ChartsDashboard";
+import ColorPickerButton from "../components/ColorPickerButton";
 import ConfirmationModal from "../../../components/ConfirmationModal";
 import DrawerThemeManager from "../components/DrawerThemeManager";
 import { enrichTransactions } from "../utils/themeResolver";
@@ -252,12 +253,15 @@ const App = () => {
   return (
     <AppShell
       headerRight={
-        <UserMenu
-          menuItems={[
-            { label: "Paramètres", onClick: () => navigate("/synapse/settings") },
-            { label: "Import CSV", onClick: () => navigate("/synapse/import") },
-          ]}
-        />
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          <ColorPickerButton />
+          <UserMenu
+            menuItems={[
+              { label: "Paramètres", onClick: () => navigate("/synapse/settings") },
+              { label: "Import CSV", onClick: () => navigate("/synapse/import") },
+            ]}
+          />
+        </div>
       }
       accountTabs={<AccountTabs />}
       lastUpdateText={lastUpdateText}

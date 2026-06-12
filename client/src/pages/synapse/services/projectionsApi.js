@@ -6,7 +6,7 @@ import { authFetch } from "../../../components/utils/authFetch.js";
  * @param {string} horizon - "3m"|"6m"|"1y"|"2y"|"5y"|"10y"
  */
 export const computeProjections = async (accountId, horizon = "1y") => {
-  const res = await authFetch("/api/projections/compute", {
+  const res = await authFetch("/api/synapse/projections/compute", {
     method: "POST",
     body: JSON.stringify({ accountId, horizon }),
   });

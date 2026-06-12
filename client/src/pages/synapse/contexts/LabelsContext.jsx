@@ -15,7 +15,7 @@ import {
  * Récupère les labels personnalisés de l'utilisateur
  */
 async function getLabels() {
-  const response = await authFetch("/api/labels");
+  const response = await authFetch("/api/synapse/labels");
   if (!response.ok) throw new Error("Erreur lors du chargement des labels");
   return response.json();
 }
@@ -24,7 +24,7 @@ async function getLabels() {
  * Met à jour les labels personnalisés
  */
 async function updateLabels(labels) {
-  const response = await authFetch("/api/labels", {
+  const response = await authFetch("/api/synapse/labels", {
     method: "PUT",
     body: JSON.stringify(labels),
   });
@@ -37,7 +37,7 @@ async function updateLabels(labels) {
  * Réinitialise les labels aux valeurs par défaut
  */
 async function resetLabels() {
-  const response = await authFetch("/api/labels/reset", {
+  const response = await authFetch("/api/synapse/labels/reset", {
     method: "POST",
   });
   if (!response.ok)

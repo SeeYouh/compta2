@@ -14,7 +14,7 @@ const generateUUID = () => {
 };
 
 export const getTransactions = async () => {
-  const res = await authFetch("/api/transactions");
+  const res = await authFetch("/api/synapse/transactions");
   if (!res.ok) throw new Error(API_ERRORS.loadTransactions);
   return res.json();
 };
@@ -28,7 +28,7 @@ export const addTransaction = async (txn) => {
     updatedAt: now,
   };
 
-  const res = await authFetch("/api/transactions", {
+  const res = await authFetch("/api/synapse/transactions", {
     method: "POST",
     body: JSON.stringify(transactionWithTimestamps),
   });

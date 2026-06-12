@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { darken } from "../utils/colorUtils";
+import { darken } from '../../../../utils/colorUtils";
 import { DARKEN_BG, DARKEN_BORDER } from "../config/folderColors";
 import IconDossierFull from "../assets/IconDossierFull";
 import ProductCard from "./ProductCard";

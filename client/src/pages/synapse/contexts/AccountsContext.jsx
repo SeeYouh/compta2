@@ -7,7 +7,7 @@ import { authFetch } from "../../../components/utils/authFetch";
  * Récupère tous les comptes utilisateurs
  */
 async function getAccounts() {
-  const response = await authFetch("/api/accounts");
+  const response = await authFetch("/api/synapse/accounts");
   if (!response.ok) throw new Error("Erreur lors du chargement des comptes");
   return response.json();
 }
@@ -16,7 +16,7 @@ async function getAccounts() {
  * Crée un nouveau compte
  */
 async function createAccount(name) {
-  const response = await authFetch("/api/accounts", {
+  const response = await authFetch("/api/synapse/accounts", {
     method: "POST",
     body: JSON.stringify({ name }),
   });
