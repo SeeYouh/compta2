@@ -33,7 +33,7 @@ import {
 } from "../../services/passengersServices";
 import ProductFolderService from "../../../../services/productFolderService";
 import ProductService from "../../services/productService";
-import SynapseUserMenu from "../../../../components/SynapseUserMenu";
+import UserMenu from "../../../../components/UserMenu";
 import useCatalogEngine from "../../hooks/useCatalogEngine";
 
 const getTabIcon = (name) => {
@@ -233,7 +233,7 @@ const Dashboard = () => {
               dataTimeRotateGear={dataTimeRotateGear}
             />
           </Link>
-          <SynapseUserMenu
+          <UserMenu
             align="right"
             menuItems={[
               {

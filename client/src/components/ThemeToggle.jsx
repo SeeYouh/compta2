@@ -8,8 +8,6 @@ import {
   motion,
 } from 'framer-motion';
 
-import { APP_LABELS } from './utils';
-
 const MotionSpan = motion.span;
 
 export default function ThemeToggle() {
@@ -31,7 +29,7 @@ export default function ThemeToggle() {
       type="button"
       onClick={toggle}
       className="theme-toggle"
-      aria-label={APP_LABELS.ariaThemeToggle}
+      aria-label="Changer de thème"
     >
       <AnimatePresence mode="wait" initial={false}>
         {theme === "light" ? (

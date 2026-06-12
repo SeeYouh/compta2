@@ -1,0 +1,306 @@
+import { useState } from "react";
+
+import { useNavigate } from "react-router-dom";
+
+import BlobBackground from "../../components/BlobBackground";
+import { config } from "../../config/env";
+import ThemeToggle from "../../components/ThemeToggle";
+import { useDocumentTitle } from "../../components/hooks/useDocumentTitle";
+
+const API_URL = config.apiUrl;
+
+// Icônes SVG intégrées
+const EmailIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <path d="m2 7 10 6 10-6" />
+  </svg>
+);
+
+const LockIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </svg>
+);
+
+const EyeIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+const EyeOffIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+    <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+    <line x1="1" y1="1" x2="23" y2="23" />
+  </svg>
+);
+
+function Login() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showResend, setShowResend] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendMessage, setResendMessage] = useState("");
+
+  useDocumentTitle("Connexion");
+
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setError("");
+    setShowResend(false);
+    setResendMessage("");
+  };
+
+  const handleResend = async () => {
+    setResendLoading(true);
+    setResendMessage("");
+    try {
+      const response = await fetch(`${API_URL}/api/auth/resend-verification`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Erreur");
+      setResendMessage("Email renvoyé ! Vérifiez votre boîte de réception.");
+      setShowResend(false);
+    } catch (err) {
+      setResendMessage(err.message);
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        if (response.status === 403) setShowResend(true);
+        throw new Error(data.error || "Erreur de connexion");
+      }
+
+      const data = await response.json();
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Accepter l'invitation en attente si présente
+      const pendingToken = localStorage.getItem("pendingInvitationToken");
+      if (pendingToken) {
+        localStorage.removeItem("pendingInvitationToken");
+        try {
+          await fetch(
+            `${API_URL}/api/sharing/invitations/${encodeURIComponent(pendingToken)}/accept`,
+            {
+              method: "POST",
+              headers: { Authorization: `Bearer ${data.token}` },
+            },
+          );
+        } catch {
+          // Silencieux : l'utilisateur peut toujours accéder à ses invitations plus tard
+        }
+      }
+
+      navigate("/");
+    } catch (err) {
+      console.error("Erreur de connexion détaillée:", {
+        message: err.message,
+        url: `${API_URL}/api/auth/login`,
+        error: err,
+      });
+
+      if (
+        err.message.includes("Failed to fetch") ||
+        err.message.includes("NetworkError")
+      ) {
+        setError(
+          `Impossible de contacter le serveur sur ${API_URL}. Vérifiez que le serveur est démarré et que l'URL est correcte.`,
+        );
+      } else {
+        setError(err.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="auth-page">
+      <BlobBackground />
+      <div className="auth-page__theme-toggle">
+        <ThemeToggle />
+      </div>
+      <div className="auth-page__container">
+        <div className="auth-page__card">
+          <div className="auth-page__header">
+            <h1 className="auth-page__title">Bienvenue</h1>
+            <p className="auth-page__subtitle">
+              Connectez-vous pour accéder à vos applications
+            </p>
+          </div>
+
+          {error && (
+            <div className="auth-page__error">
+              {error}
+              {showResend && (
+                <button
+                  type="button"
+                  className="auth-page__resend-btn"
+                  onClick={handleResend}
+                  disabled={resendLoading}
+                >
+                  {resendLoading
+                    ? "Envoi…"
+                    : "Renvoyer l'email de vérification"}
+                </button>
+              )}
+            </div>
+          )}
+          {resendMessage && (
+            <div className="auth-page__success">{resendMessage}</div>
+          )}
+
+          <form onSubmit={handleSubmit} className="auth-page__form">
+            <div className="auth-page__field">
+              <label htmlFor="email" className="auth-page__label">
+                Email
+              </label>
+              <div className="auth-page__input-wrapper">
+                <div className="auth-page__icon">
+                  <EmailIcon />
+                </div>
+                <input
+                  type="email"
+                  id="email"
+                  className="auth-page__input"
+                  value={formData.email}
+                  onChange={(e) => handleChange("email", e.target.value)}
+                  placeholder="votre@email.com"
+                  required
+                  autoComplete="email"
+                  disabled={loading}
+                />
+              </div>
+            </div>
+
+            <div className="auth-page__field">
+              <label htmlFor="password" className="auth-page__label">
+                Mot de passe
+              </label>
+              <div className="auth-page__input-wrapper">
+                <div className="auth-page__icon">
+                  <LockIcon />
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  className="auth-page__input auth-page__input--password"
+                  value={formData.password}
+                  onChange={(e) => handleChange("password", e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  autoComplete="current-password"
+                  disabled={loading}
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  className="auth-page__password-toggle"
+                  onClick={() => setShowPassword((v) => !v)}
+                  tabIndex={-1}
+                  aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                >
+                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                </button>
+              </div>
+            </div>
+
+            <div className="auth-page__link auth-page__link--forgot">
+              <button
+                type="button"
+                onClick={() => navigate("/forgot-password")}
+              >
+                Mot de passe oublié ?
+              </button>
+            </div>
+
+            <div className="auth-page__submit">
+              <button
+                type="submit"
+                className="auth-page__button"
+                disabled={loading}
+              >
+                {loading ? "Connexion en cours..." : "Se connecter"}
+              </button>
+            </div>
+
+            <div className="auth-page__links">
+              <div className="auth-page__link auth-page__link--secondary">
+                Pas encore de compte ?{" "}
+                <button type="button" onClick={() => navigate("/register")}>
+                  Créer un compte
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Login;

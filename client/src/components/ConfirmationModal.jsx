@@ -1,15 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { APP_LABELS } from "./utils";
-
 function ConfirmationModal({
   isOpen,
   onConfirm,
   onCancel,
-  title = APP_LABELS.confirmTitle,
+  title = "Confirmer la suppression",
   message,
-  confirmText = APP_LABELS.confirmButton,
-  cancelText = APP_LABELS.confirmCancelButton,
+  confirmText = "Supprimer",
+  cancelText = "Annuler",
   requireTextConfirmation = false,
   confirmationText = "",
   confirmationPlaceholder = "Tapez pour confirmer",

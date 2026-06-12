@@ -5,28 +5,22 @@ import { lazy, StrictMode, Suspense } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 
-import AcceptInvitation from "./pages/AcceptInvitation";
-import AccountSharingSettings from "./pages/AccountSharingSettings";
-import { AccountsProvider } from "./contexts/AccountsContext";
-import App from "./pages/App";
-import ContactsPage from "./pages/ContactsPage";
+import AcceptInvitation from "./pages/auth/AcceptInvitation";
 import Dashboard from "./pages/Dashboard";
-import ForgotPassword from "./pages/ForgotPassword";
-import { LabelsProvider } from "./contexts/LabelsContext";
-import LabelsSettings from "./pages/LabelsSettings";
-import Login from "./pages/Login";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import Login from "./pages/auth/Login";
 import { odysseeDashboardLoader } from "./pages/odyssee/loaders/odysseeDashboardLoader";
-import ProjectionsSettings from "./pages/ProjectionsSettings";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Register from "./pages/Register";
-import ResetPassword from "./pages/ResetPassword";
-import SettingsPage from "./pages/SettingsPage";
-import { ThemesProvider } from "./contexts/ThemesContext";
-import VerifyEmail from "./pages/VerifyEmail";
+import Register from "./pages/auth/Register";
+import ResetPassword from "./pages/auth/ResetPassword";
+import VerifyEmail from "./pages/auth/VerifyEmail";
 
 const TramePage = lazy(() => import("./pages/trame/TramePage.jsx"));
 const OdysseeDashboard = lazy(
   () => import("./pages/odyssee/OdysseeDashboard.jsx"),
+);
+const SynapseDashboard = lazy(
+  () => import("./pages/synapse/SynapseDashboard.jsx"),
 );
 
 function initTheme() {
@@ -48,6 +42,11 @@ const root = window.__reactRoot ?? (window.__reactRoot = createRoot(container));
 
 const router = createBrowserRouter([
   { path: "/login", element: <Login /> },
+  { path: "/register", element: <Register /> },
+  { path: "/verify-email", element: <VerifyEmail /> },
+  { path: "/forgot-password", element: <ForgotPassword /> },
+  { path: "/reset-password", element: <ResetPassword /> },
+  { path: "/accept-invitation", element: <AcceptInvitation /> },
   {
     path: "/",
     element: (
@@ -57,75 +56,12 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/trame",
+    path: "/synapse/*",
     element: (
       <ProtectedRoute>
         <Suspense fallback={null}>
-          <TramePage />
+          <SynapseDashboard />
         </Suspense>
-      </ProtectedRoute>
-    ),
-  },
-  { path: "/register", element: <Register /> },
-  { path: "/verify-email", element: <VerifyEmail /> },
-  { path: "/forgot-password", element: <ForgotPassword /> },
-  { path: "/reset-password", element: <ResetPassword /> },
-  { path: "/accept-invitation", element: <AcceptInvitation /> },
-  {
-    path: "/labels-settings",
-    element: (
-      <ProtectedRoute>
-        <LabelsProvider>
-          <AccountsProvider>
-            <LabelsSettings />
-          </AccountsProvider>
-        </LabelsProvider>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/projections-settings",
-    element: (
-      <ProtectedRoute>
-        <LabelsProvider>
-          <AccountsProvider>
-            <ThemesProvider>
-              <ProjectionsSettings />
-            </ThemesProvider>
-          </AccountsProvider>
-        </LabelsProvider>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/account-sharing/:accountId",
-    element: (
-      <ProtectedRoute>
-        <LabelsProvider>
-          <AccountsProvider>
-            <AccountSharingSettings />
-          </AccountsProvider>
-        </LabelsProvider>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/settings",
-    element: (
-      <ProtectedRoute>
-        <AccountsProvider>
-          <SettingsPage />
-        </AccountsProvider>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/contacts",
-    element: (
-      <ProtectedRoute>
-        <AccountsProvider>
-          <ContactsPage />
-        </AccountsProvider>
       </ProtectedRoute>
     ),
   },
@@ -142,16 +78,12 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/synapse/*",
+    path: "/trame",
     element: (
       <ProtectedRoute>
-        <LabelsProvider>
-          <AccountsProvider>
-            <ThemesProvider>
-              <App />
-            </ThemesProvider>
-          </AccountsProvider>
-        </LabelsProvider>
+        <Suspense fallback={null}>
+          <TramePage />
+        </Suspense>
       </ProtectedRoute>
     ),
   },
