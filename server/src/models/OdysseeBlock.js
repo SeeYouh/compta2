@@ -36,12 +36,16 @@ const odysseeBlockSchema = new mongoose.Schema({
       rowStart: { type: Number, required: true },
       colSpan:  { type: Number, default: 1 },
       rowSpan:  { type: Number, default: 1 },
-      // Mise en forme propre à ce champ — fontFamily référence un id de FONT_DEFINITIONS (client)
-      style: {
-        textAlign:      { type: String, enum: ["left", "center", "right"], default: "left" },
-        fontWeight:     { type: String, enum: ["normal", "bold"], default: "normal" },
-        textDecoration: { type: String, enum: ["none", "underline"], default: "none" },
-        fontFamily:     { type: String, default: "inter" },
+      // Mise en forme du champ — objet déterministe sérialisable.
+      // cssFromFormat() le convertit en styles CSS pour le browser ;
+      // fieldFormatToHtml() produit le HTML sémantique utilisé par le PDF.
+      fieldFormat: {
+        bold:       { type: Boolean, default: false },
+        italic:     { type: Boolean, default: false },
+        underline:  { type: Boolean, default: false },
+        align:      { type: String,  default: "left" },
+        fontFamily: { type: String,  default: "Inter" },
+        fontSize:   { type: String,  default: "12px" },
       },
     },
   ],
