@@ -109,24 +109,25 @@ function buildOdysseeItemStyles(c, id) {
     [data-ody-item="${id}"] .ody-block-renderer__cell--editable:hover {
       background: color-mix(in srgb, ${c.base} 6%, transparent);
     }
-    [data-ody-item="${id}"] .ody-format-toolbar {
+    [data-ody-item="${id}"] .ody-field-toolbar {
       background: ${c.darkest};
       border-color: color-mix(in srgb, ${c.contrastDarkest} 25%, transparent);
       color: ${c.contrastDarkest};
+      box-shadow: 0 2px 8px color-mix(in srgb, ${c.darkest} 45%, transparent);
     }
-    [data-ody-item="${id}"] .ody-format-toolbar__btn {
+    [data-ody-item="${id}"] .ody-field-toolbar__btn {
       color: ${c.contrastDarkest};
     }
-    [data-ody-item="${id}"] .ody-format-toolbar__btn:hover {
+    [data-ody-item="${id}"] .ody-field-toolbar__btn:hover {
       background: color-mix(in srgb, ${c.contrastDarkest} 12%, transparent);
     }
-    [data-ody-item="${id}"] .ody-format-toolbar__btn--active {
+    [data-ody-item="${id}"] .ody-field-toolbar__btn--active {
       background: color-mix(in srgb, ${c.base} 40%, transparent);
     }
-    [data-ody-item="${id}"] .ody-format-toolbar__sep {
+    [data-ody-item="${id}"] .ody-field-toolbar__sep {
       background: color-mix(in srgb, ${c.contrastDarkest} 20%, transparent);
     }
-    [data-ody-item="${id}"] .ody-format-toolbar__select {
+    [data-ody-item="${id}"] .ody-field-toolbar__select {
       color: ${c.contrastDarkest};
       background: ${c.darkest};
       border-color: color-mix(in srgb, ${c.contrastDarkest} 25%, transparent);
@@ -485,13 +486,16 @@ const OdysseeItem = ({
   // définition du bloc (OdysseeBlock), pas sur le template
   const styleSaveTimers = useRef({});
 
-  const handleFieldStyleChange = ({ pageIndex, blockIndex, fieldId, prop, value }) => {
+  const handleFieldEditorChange = ({ pageIndex, blockIndex, fieldId, format }) => {
     const block = pages[pageIndex]?.blocks[blockIndex];
     const blockId = block?.blockDef?.blockId;
     if (!blockId) return;
 
+    const current = block.blockDef.fieldPlacements.find((fp) => fp.fieldId === fieldId);
+    if (!current || JSON.stringify(current.fieldFormat) === JSON.stringify(format)) return;
+
     const fieldPlacements = block.blockDef.fieldPlacements.map((fp) =>
-      fp.fieldId === fieldId ? { ...fp, style: { ...fp.style, [prop]: value } } : fp,
+      fp.fieldId === fieldId ? { ...fp, fieldFormat: format } : fp,
     );
 
     // Le style vit sur la définition du bloc : toutes les occurrences de ce
@@ -783,7 +787,7 @@ const OdysseeItem = ({
             onBlockClick={handleBlockClick}
             onBlockRemove={handleBlockRemove}
             onBindingDrop={handleBindingDrop}
-            onFieldStyleChange={handleFieldStyleChange}
+            onFieldEditorChange={handleFieldEditorChange}
             selectedBlockPlacement={selectedBlockPlacement}
             bindings={bindings}
           />

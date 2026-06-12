@@ -49,7 +49,7 @@ const OdysseeCanvasPage = ({
   onBlockClick,
   onBlockRemove,
   onBindingDrop,
-  onFieldStyleChange,
+  onFieldEditorChange,
   selectedBlockPlacement,
   bindings,
 }) => {
@@ -277,8 +277,8 @@ const OdysseeCanvasPage = ({
                   contentFilesData={mode === MODE_DOCUMENT ? (binding?.contentFilesData ?? null) : null}
                   sourceType={block.blockDef.sourceType}
                   editable={mode === MODE_TEMPLATE}
-                  onFieldStyleChange={(fieldId, prop, value) =>
-                    onFieldStyleChange?.({ pageIndex, blockIndex: i, fieldId, prop, value })
+                  onFieldEditorChange={(fieldId, format) =>
+                    onFieldEditorChange?.({ pageIndex, blockIndex: i, fieldId, format })
                   }
                 />
               ) : (
@@ -315,7 +315,7 @@ const OdysseeCanvas = ({
   onBlockClick,
   onBlockRemove,
   onBindingDrop,
-  onFieldStyleChange,
+  onFieldEditorChange,
   selectedBlockPlacement,
   bindings,
 }) => {
@@ -418,7 +418,7 @@ const OdysseeCanvas = ({
             onBlockClick={onBlockClick}
             onBlockRemove={onBlockRemove}
             onBindingDrop={onBindingDrop}
-            onFieldStyleChange={onFieldStyleChange}
+            onFieldEditorChange={onFieldEditorChange}
             selectedBlockPlacement={selectedBlockPlacement}
             bindings={bindings}
           />

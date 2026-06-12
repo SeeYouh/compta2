@@ -1,9 +1,10 @@
 // ─── Polices disponibles pour la mise en forme des champs de Rubrique ─────────
 // Tableau dynamique : ajouter une police custom = ajouter le @font-face dans
-// _fontFace.scss puis une entrée ici avec loaded: true. Le sélecteur de la
-// toolbar de formatage lit ce tableau — rien d'autre à modifier.
+// _fontFace.scss puis une entrée ici avec loaded: true. Le sélecteur de
+// OdysseeFieldEditor lit ce tableau — rien d'autre à modifier.
 //
-// La DB stocke l'id (fieldPlacements[].style.fontFamily) — jamais la family.
+// La family est stockée dans fieldPlacements[].fieldFormat.fontFamily et
+// appliquée par cssFromFormat() (browser) et fieldFormatToHtml() (PDF).
 
 export const FONT_DEFINITIONS = [
   {
@@ -31,8 +32,3 @@ export const FONT_DEFINITIONS = [
     loaded: false,
   },
 ];
-
-// Résout un id de police vers sa font-family CSS.
-export function getFontFamily(fontId) {
-  return FONT_DEFINITIONS.find((f) => f.id === fontId)?.family;
-}

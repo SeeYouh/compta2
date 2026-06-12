@@ -1,19 +1,5 @@
-import { useState } from 'react';
-
 import { CATALOGUE_FIELDS, PASSENGER_FIELDS } from '../config/fieldDefinitions';
-import { getFontFamily } from '../config/fontDefinitions';
-import OdysseeBlockFormatToolbar from './OdysseeBlockFormatToolbar';
-
-// Convertit le style persisté d'un fieldPlacement en style inline CSS.
-// text-align et text-decoration se propagent de la cellule à son contenu inline.
-function cssFromFieldStyle(style) {
-  return {
-    textAlign: style.textAlign,
-    fontWeight: style.fontWeight,
-    textDecoration: style.textDecoration,
-    fontFamily: getFontFamily(style.fontFamily),
-  };
-}
+import OdysseeFieldEditor, { cssFromFormat } from './OdysseeFieldEditor';
 
 function resolvePath(obj, path) {
   const normalized = path.startsWith('contentFilesData.')
@@ -22,55 +8,39 @@ function resolvePath(obj, path) {
   return normalized.split('.').reduce((acc, key) => acc?.[key], obj);
 }
 
-function renderValue(value, type) {
+function valueToText(value, type) {
   if (value == null || value === '') return null;
 
   switch (type) {
-    case 'text':
-    case 'number':
-    case 'date':
-    case 'enum':
-      return <span className="ody-block-renderer__text">{String(value)}</span>;
-
-    case 'image':
-      return value
-        ? <img className="ody-block-renderer__img" src={value} alt="" />
-        : null;
-
-    case 'images': {
-      const first = Array.isArray(value) ? value[0] : null;
-      return first?.adress
-        ? <img className="ody-block-renderer__img" src={first.adress} alt={first.alt || ''} />
-        : null;
-    }
-
     case 'alias':
-      return value?.activate && value?.name
-        ? <span className="ody-block-renderer__text">{value.name}</span>
-        : null;
+      return value?.activate && value?.name ? value.name : null;
 
     case 'array':
       if (!Array.isArray(value) || value.length === 0) return null;
       if (typeof value[0] === 'object') {
-        return (
-          <span className="ody-block-renderer__text">
-            {value.map((v) => v.handle || v.name || '').filter(Boolean).join(', ')}
-          </span>
-        );
+        return value.map((v) => v.handle || v.name || '').filter(Boolean).join(', ');
       }
-      return <span className="ody-block-renderer__text">{value.join(', ')}</span>;
+      return value.join(', ');
 
     case 'infoSupp':
       if (!Array.isArray(value) || value.length === 0) return null;
-      return (
-        <span className="ody-block-renderer__text">
-          {value.length} bloc{value.length > 1 ? 's' : ''}
-        </span>
-      );
+      return `${value.length} bloc${value.length > 1 ? 's' : ''}`;
 
     default:
-      return <span className="ody-block-renderer__text">{String(value)}</span>;
+      return String(value);
   }
+}
+
+function renderImageValue(value, type) {
+  if (type === 'image') {
+    return value
+      ? <img className="ody-block-renderer__img" src={value} alt="" />
+      : null;
+  }
+  const firstImage = Array.isArray(value) ? value[0] : null;
+  return firstImage?.adress
+    ? <img className="ody-block-renderer__img" src={firstImage.adress} alt={firstImage.alt || ''} />
+    : null;
 }
 
 const OdysseeBlockRenderer = ({
@@ -78,14 +48,10 @@ const OdysseeBlockRenderer = ({
   contentFilesData,
   sourceType,
   editable = false,
-  onFieldStyleChange,
+  onFieldEditorChange,
 }) => {
   const { columns, rows, fieldPlacements } = blockDef;
   const fields = sourceType === 'passenger' ? PASSENGER_FIELDS : CATALOGUE_FIELDS;
-
-  // Cellule survolée en mode éditable : { fieldId, rect } — rect sert à
-  // positionner la toolbar en fixed (échappe aux overflow: hidden parents)
-  const [hovered, setHovered] = useState(null);
 
   return (
     <div
@@ -97,19 +63,40 @@ const OdysseeBlockRenderer = ({
     >
       {(fieldPlacements ?? []).map((placement) => {
         const fieldDef = fields.find((f) => f.id === placement.fieldId);
+        const isImageType = fieldDef?.type === 'image' || fieldDef?.type === 'images';
+
         let content = null;
 
-        if (contentFilesData && fieldDef) {
-          const value = resolvePath(contentFilesData, fieldDef.path);
-          content = renderValue(value, fieldDef.type);
+        if (isImageType) {
+          if (contentFilesData && fieldDef) {
+            content = renderImageValue(
+              resolvePath(contentFilesData, fieldDef.path),
+              fieldDef.type,
+            );
+          }
+        } else if (editable && fieldDef) {
+          // MODE_TEMPLATE : toolbar sur le champ entier, label comme prévisualisation
+          content = (
+            <OdysseeFieldEditor
+              fieldFormat={placement.fieldFormat}
+              fallbackLabel={fieldDef.label}
+              onChange={(fmt) => onFieldEditorChange?.(placement.fieldId, fmt)}
+            />
+          );
+        } else if (fieldDef) {
+          // MODE_DOCUMENT / lecture seule : valeur réelle (ou label) + formatage appliqué
+          const text = contentFilesData
+            ? valueToText(resolvePath(contentFilesData, fieldDef.path), fieldDef.type)
+            : null;
+          content = (
+            <span
+              className="ody-block-renderer__text"
+              style={cssFromFormat(placement.fieldFormat)}
+            >
+              {text ?? fieldDef.label}
+            </span>
+          );
         }
-
-        // Fallback : affiche le label du champ (mode template ou valeur vide)
-        if (!content && fieldDef) {
-          content = <span className="ody-block-renderer__label">{fieldDef.label}</span>;
-        }
-
-        const isHovered = editable && hovered?.fieldId === placement.fieldId;
 
         return (
           <div
@@ -124,29 +111,14 @@ const OdysseeBlockRenderer = ({
             style={{
               gridColumn: `${placement.colStart} / span ${placement.colSpan}`,
               gridRow: `${placement.rowStart} / span ${placement.rowSpan}`,
-              ...(placement.style ? cssFromFieldStyle(placement.style) : {}),
             }}
-            onMouseEnter={
+            onDragStart={
               editable
-                ? (e) =>
-                    setHovered({
-                      fieldId: placement.fieldId,
-                      rect: e.currentTarget.getBoundingClientRect(),
-                    })
+                ? (e) => { e.preventDefault(); e.stopPropagation(); }
                 : undefined
             }
-            onMouseLeave={editable ? () => setHovered(null) : undefined}
           >
             {content}
-            {isHovered && placement.style && (
-              <OdysseeBlockFormatToolbar
-                anchorRect={hovered.rect}
-                style={placement.style}
-                onChange={(prop, value) =>
-                  onFieldStyleChange?.(placement.fieldId, prop, value)
-                }
-              />
-            )}
           </div>
         );
       })}
