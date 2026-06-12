@@ -74,12 +74,12 @@ const Stepper = ({ label, value, min = 1, max = 12, onChange }) => (
 
 const HANDLES = ["n", "s", "e", "w", "ne", "nw", "se", "sw"];
 
-const OdysseeRubriqueCanvas = forwardRef(({ onSaved }, ref) => {
-  const [name, setName] = useState("");
-  const [columns, setColumns] = useState(2);
-  const [rows, setRows] = useState(3);
-  const [fieldPlacements, setFieldPlacements] = useState([]);
-  const [sourceType, setSourceType] = useState(null);
+const OdysseeRubriqueCanvas = forwardRef(({ onSaved, initialBlock }, ref) => {
+  const [name, setName] = useState(initialBlock?.name ?? "");
+  const [columns, setColumns] = useState(initialBlock?.columns ?? 2);
+  const [rows, setRows] = useState(initialBlock?.rows ?? 3);
+  const [fieldPlacements, setFieldPlacements] = useState(initialBlock?.fieldPlacements ?? []);
+  const [sourceType, setSourceType] = useState(initialBlock?.sourceType ?? null);
   const [dragOverCell, setDragOverCell] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState(null);
@@ -112,8 +112,9 @@ const OdysseeRubriqueCanvas = forwardRef(({ onSaved }, ref) => {
     return () => el.removeEventListener("wheel", handler);
   }, []);
 
-  // Restore draft on mount
+  // Restore draft on mount — ignoré si on édite un bloc existant
   useEffect(() => {
+    if (initialBlock) return;
     const draft = loadDraft();
     if (!draft) return;
     if (draft.name) setName(draft.name);
@@ -123,8 +124,9 @@ const OdysseeRubriqueCanvas = forwardRef(({ onSaved }, ref) => {
     if (draft.fieldPlacements?.length) setFieldPlacements(draft.fieldPlacements);
   }, []);
 
-  // Auto-save to localStorage (debounced 500ms, TTL refreshed on each change)
+  // Auto-save to localStorage — désactivé en mode édition
   useEffect(() => {
+    if (initialBlock) return;
     if (!name && fieldPlacements.length === 0) return;
     const timer = setTimeout(() => {
       saveDraft({ name, columns, rows, fieldPlacements, sourceType });
@@ -399,23 +401,25 @@ const OdysseeRubriqueCanvas = forwardRef(({ onSaved }, ref) => {
     if (!name.trim() || !sourceType) return { success: false };
     setIsSaving(true);
     setSaveStatus(null);
-    const result = await odysseeBlockService.createBlock({
-      name: name.trim(),
-      sourceType,
-      columns,
-      rows,
-      fieldPlacements,
-    });
+
+    const payload = { name: name.trim(), sourceType, columns, rows, fieldPlacements };
+    const result = initialBlock?._id
+      ? await odysseeBlockService.updateBlock(initialBlock._id, payload)
+      : await odysseeBlockService.createBlock(payload);
+
     if (result.success) {
       clearDraft();
-      setSaveStatus({ type: "success", message: "Rubrique enregistrée." });
+      setSaveStatus({
+        type: "success",
+        message: initialBlock?._id ? "Rubrique mise à jour." : "Rubrique enregistrée.",
+      });
       onSaved?.(result.block);
     } else {
       setSaveStatus({ type: "error", message: result.error });
     }
     setIsSaving(false);
     return result;
-  }, [name, sourceType, columns, rows, fieldPlacements, onSaved]);
+  }, [name, sourceType, columns, rows, fieldPlacements, onSaved, initialBlock]);
 
   useImperativeHandle(ref, () => ({ save: handleSave }), [handleSave]);
 

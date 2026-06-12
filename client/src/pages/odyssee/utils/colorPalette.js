@@ -13,6 +13,9 @@ const DARK = 53;
 const DARKER = 66;
 const DARKEST = 73;
 
+// Niveau de désaturation appliqué aux variantes "muted" (0–100)
+const DESAT = 55;
+
 /**
  * Calcule une palette complète de couleurs à partir d'une couleur hexadécimale.
  * Retourne un objet JS avec des clés lisibles (pas des noms de variables CSS).
@@ -24,6 +27,12 @@ export function computeColorPalette(hex = DEFAULT_COLOR) {
   const darker = darken(hex, DARKER);
   const darkest = darken(hex, DARKEST);
 
+  const lightnessMuted = lighten(hex, LIGHTNESS, DESAT);
+  const lightMuted     = lighten(hex, LIGHT, DESAT);
+  const darkMuted      = darken(hex, DARK, DESAT);
+  const darkerMuted    = darken(hex, DARKER, DESAT);
+  const darkestMuted   = darken(hex, DARKEST, DESAT);
+
   return {
     base: hex,
     lightness,
@@ -31,6 +40,11 @@ export function computeColorPalette(hex = DEFAULT_COLOR) {
     dark,
     darker,
     darkest,
+    lightnessMuted,
+    lightMuted,
+    darkMuted,
+    darkerMuted,
+    darkestMuted,
     contrastBase: getContrast(hex),
     contrastLightness: getContrast(lightness),
     contrastLight: getContrast(light),

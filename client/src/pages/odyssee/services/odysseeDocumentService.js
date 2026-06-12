@@ -36,6 +36,17 @@ export const odysseeDocumentService = {
     }
   },
 
+  async getDocumentByTemplateId(templateId) {
+    try {
+      const res = await fetch(`${BASE}/by-template/${templateId}`, { headers: authHeaders() });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erreur serveur");
+      return { success: true, document: data.document, template: data.template, bindingEntities: data.bindingEntities };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  },
+
   async getDocument(id) {
     try {
       const res = await fetch(`${BASE}/${id}`, { headers: authHeaders() });

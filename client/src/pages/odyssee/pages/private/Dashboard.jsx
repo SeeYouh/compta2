@@ -16,12 +16,12 @@ import OdysseeCategoryService from "../../../../services/odysseeCategoryService"
 import OdysseeItem from "../../components/OdysseeItem";
 import OdysseeProductService from "../../../../services/odysseeProductService";
 import {
-  odysseyCategoryService,
-  odysseyItemDeleteService,
-  odysseyItemFolderService,
-  odysseyItemService,
-  odysseySidebarService,
-} from "../../services/odysseyServices";
+  odysseeCategoryService,
+  odysseeItemDeleteService,
+  odysseeItemFolderService,
+  odysseeItemService,
+  odysseeSidebarService,
+} from "../../services/odysseeServices";
 import PaperProduct from "../../components/PaperProduct";
 import PassagerItem from "../../components/PassagerItem";
 import {
@@ -140,15 +140,16 @@ const Dashboard = () => {
   });
 
   const odysseeEngine = useCatalogEngine({
-    categoryService: odysseyCategoryService,
-    itemService: odysseyItemService,
-    itemDeleteService: odysseyItemDeleteService,
-    sidebarFolderService: odysseySidebarService,
-    itemFolderService: odysseyItemFolderService,
+    categoryService: odysseeCategoryService,
+    itemService: odysseeItemService,
+    itemDeleteService: odysseeItemDeleteService,
+    sidebarFolderService: odysseeSidebarService,
+    itemFolderService: odysseeItemFolderService,
     transformItemForEdit: (item) => ({
       ...item.contentFilesData,
       _id: item._id,
       color: item.color,
+      templateId: item.templateId,
     }),
     newItemTemplate: (folderId) => ({
       productName: "",

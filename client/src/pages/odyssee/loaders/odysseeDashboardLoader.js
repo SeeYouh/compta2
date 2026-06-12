@@ -2,9 +2,9 @@ import { fetchAndProcessEngine } from "../hooks/useCatalogEngine";
 import FolderService from "../services/folderService";
 import OdysseeCategoryService from "../../../services/odysseeCategoryService";
 import {
-  odysseyCategoryService,
-  odysseySidebarService,
-} from "../services/odysseyServices";
+  odysseeCategoryService,
+  odysseeSidebarService,
+} from "../services/odysseeServices";
 import {
   passengersCategoryService,
   passengersSidebarService,
@@ -19,7 +19,7 @@ export async function odysseeDashboardLoader() {
         passengersCategoryService,
         passengersSidebarService,
       ),
-      fetchAndProcessEngine(odysseyCategoryService, odysseySidebarService),
+      fetchAndProcessEngine(odysseeCategoryService, odysseeSidebarService),
       fetchAndProcessEngine(OdysseeCategoryService, FolderService),
     ]);
   } catch (error) {

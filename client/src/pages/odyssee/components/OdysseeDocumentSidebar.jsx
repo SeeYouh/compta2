@@ -230,7 +230,7 @@ const ItemIcon = ({ item, sourceType, isBound, onMouseEnter, onMouseLeave }) => 
   const handleDragStart = (e) => {
     e.dataTransfer.setData(
       "application/odyssee-block",
-      JSON.stringify({ type: "binding", sourceType, sourceId: item._id, displayName }),
+      JSON.stringify({ type: "binding", sourceType, sourceId: item._id, displayName, contentFilesData: item.contentFilesData }),
     );
   };
 
@@ -425,7 +425,7 @@ const FieldGroupItems = ({ fields, sourceType }) => {
 
 // ─── Carte bloc (volet "Rubriques") ───────────────────────────────────────────
 
-const BlockCard = ({ block }) => {
+const BlockCard = ({ block, onEdit }) => {
   const handleDragStart = (e) => {
     e.dataTransfer.setData(
       "application/odyssee-block",
@@ -436,14 +436,22 @@ const BlockCard = ({ block }) => {
         sourceType: block.sourceType,
         columns: block.columns,
         rows: block.rows,
-        defaultColSpan: 1,
-        defaultRowSpan: 1,
+        fieldPlacements: block.fieldPlacements,
+        defaultColSpan: block.columns,
+        defaultRowSpan: block.rows,
       }),
     );
+    // Encode les dimensions dans le nom du type (lisible pendant dragover)
+    e.dataTransfer.setData(`application/odyssee-span-${block.columns}x${block.rows}`, "");
   };
 
   return (
-    <div draggable onDragStart={handleDragStart} className="ody-sidebar-block-card">
+    <div
+      draggable
+      onDragStart={handleDragStart}
+      onClick={() => onEdit?.(block)}
+      className="ody-sidebar-block-card"
+    >
       {block.name}
       <div className="ody-sidebar-block-card__meta">
         {block.fieldPlacements?.length ?? 0} champs · {block.columns}×{block.rows}
@@ -458,6 +466,7 @@ const OdysseeDocumentSidebar = ({
   mode,
   selectedBlockPlacement,
   bindings,
+  onEditBlock,
 }) => {
   const [openPanel, setOpenPanel] = useState("passagers");
   const [passengerSidebar, setPassengerSidebar] = useState(null);
@@ -628,7 +637,7 @@ const OdysseeDocumentSidebar = ({
               <div className="ody-sidebar-msg">Aucune rubrique définie.</div>
             )}
             {blocks.map((b) => (
-              <BlockCard key={b._id} block={b} />
+              <BlockCard key={b._id} block={b} onEdit={onEditBlock} />
             ))}
           </div>
         </SidebarPanel>

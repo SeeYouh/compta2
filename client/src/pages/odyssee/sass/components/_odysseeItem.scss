@@ -157,17 +157,32 @@
   }
 }
 
+.ody-canvas-page {
+  background: #fff;
+}
+
+.ody-canvas-page--template {
+  /* background via buildOdysseeItemStyles */
+}
+
+.ody-canvas-page__inner--template {
+  background: #fff;
+  outline: 1px dashed;
+  outline-offset: -1px;
+  /* outline-color via buildOdysseeItemStyles */
+}
+
 .ody-canvas-cell--free {
   box-sizing: border-box;
-  border: 1px dashed transparent;
+  border: 1px solid;
   transition:
     border-color 0.1s,
     background 0.1s;
+  /* border-color et hover via buildOdysseeItemStyles */
+}
 
-  &:hover {
-    border-color: rgba(0, 0, 0, 0.15);
-    background: rgba(0, 0, 0, 0.03);
-  }
+.ody-canvas-cell--preview {
+  /* background et border-color via buildOdysseeItemStyles */
 }
 
 .ody-canvas-cell--occupied {
@@ -849,6 +864,114 @@
   &:hover {
     background: rgba(0, 0, 0, 0.3);
   }
+}
+
+// ─── Renderer de bloc (MODE_TEMPLATE = labels, MODE_DOCUMENT = valeurs) ──────
+.ody-block-renderer {
+  display: grid;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.ody-block-renderer__cell {
+  overflow: hidden;
+  padding: 2px 4px;
+  display: flex;
+  align-items: center;
+  border: 1px solid;
+  box-sizing: border-box;
+  min-width: 0;
+  /* border-color via buildOdysseeItemStyles */
+}
+
+.ody-block-renderer__text {
+  font-size: 10px;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.ody-block-renderer__img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+// Fond transparent (le blanc de la page reste visible), délimitation marquée
+.ody-block-renderer__cell--template {
+  border-width: 1.5px;
+  background: transparent;
+  /* border-color via buildOdysseeItemStyles */
+}
+
+.ody-block-renderer__cell--editable {
+  transition: background 0.1s;
+  /* background hover via buildOdysseeItemStyles */
+}
+
+.ody-block-renderer__label {
+  font-size: 9px;
+  font-style: italic;
+  opacity: 0.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+// ─── Toolbar de formatage par champ (hover en MODE_TEMPLATE) ─────────────────
+// position: fixed (coordonnées calculées depuis le rect de la cellule) pour
+// échapper aux overflow: hidden du renderer et du bloc canvas.
+// Toutes les couleurs via buildOdysseeItemStyles.
+.ody-format-toolbar {
+  position: fixed;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 30px;
+  padding: 0 4px;
+  border: 1px solid;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+  cursor: default;
+}
+
+.ody-format-toolbar__btn {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  line-height: 1;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.12s;
+}
+
+.ody-format-toolbar__sep {
+  width: 1px;
+  height: 16px;
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+.ody-format-toolbar__select {
+  font-size: 10px;
+  height: 20px;
+  border: 1px solid;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
 }
 
 .ody-rubrique-canvas__status {

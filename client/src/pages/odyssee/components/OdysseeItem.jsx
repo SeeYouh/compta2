@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import ColorPicker from '../../../components/ColorPicker';
 import IconSaveFalse from '../../../assets/IconSaveFalse';
@@ -20,7 +20,8 @@ import OdysseeDocumentToggle, {
   MODE_TEMPLATE,
 } from './OdysseeDocumentToggle';
 import { odysseeTemplateService } from '../services/odysseeTemplateService';
-import { odysseyItemService } from '../services/odysseyServices';
+import { odysseeItemService } from '../services/odysseeServices';
+import { odysseeBlockService } from '../services/odysseeBlockService';
 
 function buildOdysseeItemStyles(c, id) {
   return `
@@ -74,6 +75,19 @@ function buildOdysseeItemStyles(c, id) {
     }
     [data-ody-item="${id}"] .ody-canvas { background: ${c.light}; }
     [data-ody-item="${id}"] .ody-canvas-page__controls { color: ${c.darkest}; }
+    [data-ody-item="${id}"] .ody-canvas-page--template { background: ${c.lightnessMuted}; }
+    [data-ody-item="${id}"] .ody-canvas-page__inner--template { outline-color: ${c.lightMuted}; }
+    [data-ody-item="${id}"] .ody-canvas-cell--free {
+      border-color: color-mix(in srgb, ${c.darkMuted} 20%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-canvas-cell--free:hover {
+      border-color: color-mix(in srgb, ${c.darkMuted} 45%, transparent);
+      background: color-mix(in srgb, ${c.lightnessMuted} 90%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-canvas-cell--preview {
+      background: color-mix(in srgb, ${c.lightMuted} 40%, transparent);
+      border-color: color-mix(in srgb, ${c.darkMuted} 55%, transparent);
+    }
     [data-ody-item="${id}"] .ody-canvas-block {
       border-color: color-mix(in srgb, ${c.base} 30%, transparent);
       color: ${c.darker};
@@ -85,6 +99,37 @@ function buildOdysseeItemStyles(c, id) {
     [data-ody-item="${id}"] .ody-canvas-block--bound {
       background: color-mix(in srgb, ${c.base} 8%, transparent);
       border-color: color-mix(in srgb, ${c.base} 50%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-block-renderer__cell {
+      border-color: color-mix(in srgb, ${c.darker} 12%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-block-renderer__cell--template {
+      border-color: color-mix(in srgb, ${c.darker} 38%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-block-renderer__cell--editable:hover {
+      background: color-mix(in srgb, ${c.base} 6%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-format-toolbar {
+      background: ${c.darkest};
+      border-color: color-mix(in srgb, ${c.contrastDarkest} 25%, transparent);
+      color: ${c.contrastDarkest};
+    }
+    [data-ody-item="${id}"] .ody-format-toolbar__btn {
+      color: ${c.contrastDarkest};
+    }
+    [data-ody-item="${id}"] .ody-format-toolbar__btn:hover {
+      background: color-mix(in srgb, ${c.contrastDarkest} 12%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-format-toolbar__btn--active {
+      background: color-mix(in srgb, ${c.base} 40%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-format-toolbar__sep {
+      background: color-mix(in srgb, ${c.contrastDarkest} 20%, transparent);
+    }
+    [data-ody-item="${id}"] .ody-format-toolbar__select {
+      color: ${c.contrastDarkest};
+      background: ${c.darkest};
+      border-color: color-mix(in srgb, ${c.contrastDarkest} 25%, transparent);
     }
     [data-ody-item="${id}"] .ody-doc-sidebar {
       background: ${c.darkest};
@@ -290,15 +335,85 @@ const OdysseeItem = ({
   );
   const [bindings, setBindings] = useState([]);
   const [selectedBlockPlacement, setSelectedBlockPlacement] = useState(null);
-  const [templateId, setTemplateId] = useState(null);
+  const [templateId, setTemplateId] = useState(contentFilesData.templateId || null);
   const [documentId, setDocumentId] = useState(null);
+  const [editingBlock, setEditingBlock] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState(null);
   const rubriqueCanvasRef = useRef(null);
 
+  // Chargement du document existant (bindings) au montage
+  useEffect(() => {
+    if (!contentFilesData.templateId) return;
+    odysseeDocumentService.getDocumentByTemplateId(contentFilesData.templateId).then((result) => {
+      if (!result.success || !result.document) return;
+      setDocumentId(result.document._id);
+      const enriched = result.document.bindings.map((b) => {
+        const entity = result.bindingEntities?.[String(b.sourceId)];
+        const cfd = entity?.contentFilesData ?? {};
+        const displayName =
+          b.sourceType === 'passenger'
+            ? (cfd.aliasName?.activate ? cfd.aliasName.name : null) ||
+              [cfd.firstName, cfd.lastName].filter(Boolean).join(' ') ||
+              entity?.name ||
+              '?'
+            : (cfd.aliasName?.activate ? cfd.aliasName.name : cfd.productName) ||
+              entity?.name ||
+              '?';
+        return {
+          pageIndex: b.pageIndex,
+          blockPlacementIndex: b.blockPlacementIndex,
+          sourceType: b.sourceType,
+          sourceId: b.sourceId,
+          displayName,
+          contentFilesData: entity?.contentFilesData ?? null,
+        };
+      });
+      setBindings(enriched);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!contentFilesData.templateId) return;
+    odysseeTemplateService.getTemplate(contentFilesData.templateId).then((result) => {
+      if (!result.success) return;
+      const t = result.template;
+      setTemplateId(t._id);
+      setMargins(t.margins ?? DOCUMENT_MARGINS_DEFAULT);
+      setPages(
+        t.pages.map((page) => ({
+          columns: page.columns,
+          rows: page.rows,
+          blocks: page.blocks.map((b) => ({
+            colStart: b.colStart,
+            rowStart: b.rowStart,
+            colSpan: b.colSpan,
+            rowSpan: b.rowSpan,
+            blockDef: {
+              blockId: b.blockId._id,
+              name: b.blockId.name,
+              sourceType: b.blockId.sourceType,
+              columns: b.blockId.columns,
+              rows: b.blockId.rows,
+              fieldPlacements: b.blockId.fieldPlacements,
+              defaultColSpan: b.colSpan,
+              defaultRowSpan: b.rowSpan,
+            },
+          })),
+        })),
+      );
+    });
+  }, []);
+
   const handleModeChange = (newMode) => {
     setSelectedBlockPlacement(null);
+    if (newMode === MODE_RUBRIQUE) setEditingBlock(null);
     setMode(newMode);
+  };
+
+  const handleEditBlock = (block) => {
+    setEditingBlock(block);
+    setMode(MODE_RUBRIQUE);
   };
 
   const handleBlockDrop = ({ pageIndex, colStart, rowStart, blockDef }) => {
@@ -324,7 +439,6 @@ const OdysseeItem = ({
       pageIndex,
       blockIndex,
       sourceType: block.blockDef?.sourceType,
-      blockId: block.blockDef?._id,
       name: block.blockDef?.name,
     });
   };
@@ -367,8 +481,44 @@ const OdysseeItem = ({
     );
   };
 
+  // Un timer de sauvegarde par bloc — le formatage est persisté sur la
+  // définition du bloc (OdysseeBlock), pas sur le template
+  const styleSaveTimers = useRef({});
+
+  const handleFieldStyleChange = ({ pageIndex, blockIndex, fieldId, prop, value }) => {
+    const block = pages[pageIndex]?.blocks[blockIndex];
+    const blockId = block?.blockDef?.blockId;
+    if (!blockId) return;
+
+    const fieldPlacements = block.blockDef.fieldPlacements.map((fp) =>
+      fp.fieldId === fieldId ? { ...fp, style: { ...fp.style, [prop]: value } } : fp,
+    );
+
+    // Le style vit sur la définition du bloc : toutes les occurrences de ce
+    // bloc posées sur les pages reflètent la modification
+    setPages((prev) =>
+      prev.map((page) => ({
+        ...page,
+        blocks: page.blocks.map((b) =>
+          b.blockDef?.blockId === blockId
+            ? { ...b, blockDef: { ...b.blockDef, fieldPlacements } }
+            : b,
+        ),
+      })),
+    );
+
+    clearTimeout(styleSaveTimers.current[blockId]);
+    styleSaveTimers.current[blockId] = setTimeout(async () => {
+      const result = await odysseeBlockService.updateBlock(blockId, { fieldPlacements });
+      if (!result.success) {
+        setSaveStatus({ type: 'error', message: result.error });
+        setTimeout(() => setSaveStatus(null), 3000);
+      }
+    }, 600);
+  };
+
   const handleBindingDrop = ({ pageIndex, blockIndex, bindingData }) => {
-    const { sourceType, sourceId, displayName } = bindingData;
+    const { sourceType, sourceId, displayName, contentFilesData: itemData } = bindingData;
     const filtered =
       sourceType === 'passenger'
         ? bindings.filter((b) => b.sourceType !== 'passenger')
@@ -387,6 +537,7 @@ const OdysseeItem = ({
         sourceType,
         sourceId,
         displayName,
+        contentFilesData: itemData,
       },
     ]);
   };
@@ -397,7 +548,7 @@ const OdysseeItem = ({
       setSaveStatus(null);
       try {
         if (contentFilesData._id) {
-          await odysseyItemService.updateItem(contentFilesData._id, { color: color || undefined });
+          await odysseeItemService.updateItem(contentFilesData._id, { color: color || undefined });
         }
         const result = await rubriqueCanvasRef.current?.save();
         if (result?.success) {
@@ -419,16 +570,12 @@ const OdysseeItem = ({
     setIsSaving(true);
     setSaveStatus(null);
     try {
-      const itemUpdate = await odysseyItemService.updateItem(contentFilesData._id, {
-        color: color || undefined,
-      });
-
       if (mode === MODE_TEMPLATE) {
         const serializedPages = pages.map((page) => ({
           columns: page.columns,
           rows: page.rows,
           blocks: page.blocks.map((b) => ({
-            blockId: b.blockDef._id,
+            blockId: b.blockDef.blockId,
             colStart: b.colStart,
             rowStart: b.rowStart,
             colSpan: b.colSpan,
@@ -448,9 +595,30 @@ const OdysseeItem = ({
           : await odysseeTemplateService.createTemplate(payload);
         if (result.success) {
           setTemplateId(result.template._id);
+          let currentItemId = contentFilesData._id;
+          if (!currentItemId) {
+            const fd = new FormData();
+            fd.append('productName', productName || 'Sans titre');
+            fd.append('categoryId', categoryId);
+            if (color) fd.append('color', color);
+            const createResult = await odysseeItemService.createItem(fd);
+            if (!createResult.success) {
+              setSaveStatus({ type: 'error', message: createResult.error ?? "Erreur lors de la création de l'item." });
+              return;
+            }
+            currentItemId = createResult.product._id;
+          }
+          const itemUpdate = await odysseeItemService.updateItem(currentItemId, {
+            color: color || undefined,
+            templateId: result.template._id,
+          });
+          if (!itemUpdate.success) {
+            setSaveStatus({ type: 'error', message: itemUpdate.error ?? "Erreur lors de la mise à jour de l'item." });
+            return;
+          }
           setSaveStatus({ type: 'success', message: 'Template enregistré.' });
           setTimeout(() => setSaveStatus(null), 3000);
-          onProductCreated?.(itemUpdate.product ?? contentFilesData);
+          onProductCreated?.(itemUpdate.product);
         } else {
           setSaveStatus({ type: 'error', message: result.error });
         }
@@ -479,6 +647,9 @@ const OdysseeItem = ({
           : await odysseeDocumentService.createDocument(payload);
         if (result.success) {
           setDocumentId(result.document._id);
+          const itemUpdate = await odysseeItemService.updateItem(contentFilesData._id, {
+            color: color || undefined,
+          });
           setSaveStatus({ type: 'success', message: 'Document enregistré.' });
           setTimeout(() => setSaveStatus(null), 3000);
           onProductCreated?.(itemUpdate.product ?? contentFilesData);
@@ -592,7 +763,15 @@ const OdysseeItem = ({
       {/* ─── Body : canvas + sidebar droite ───────────────────────────────── */}
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {mode === MODE_RUBRIQUE ? (
-          <OdysseeRubriqueCanvas ref={rubriqueCanvasRef} onSaved={() => handleModeChange(MODE_TEMPLATE)} />
+          <OdysseeRubriqueCanvas
+            key={editingBlock?._id ?? 'new'}
+            ref={rubriqueCanvasRef}
+            initialBlock={editingBlock}
+            onSaved={() => {
+              setEditingBlock(null);
+              handleModeChange(MODE_TEMPLATE);
+            }}
+          />
         ) : (
           <OdysseeCanvas
             pages={pages}
@@ -604,16 +783,16 @@ const OdysseeItem = ({
             onBlockClick={handleBlockClick}
             onBlockRemove={handleBlockRemove}
             onBindingDrop={handleBindingDrop}
+            onFieldStyleChange={handleFieldStyleChange}
             selectedBlockPlacement={selectedBlockPlacement}
             bindings={bindings}
           />
         )}
         <OdysseeDocumentSidebar
           mode={mode}
-          categoryId={categoryId}
           selectedBlockPlacement={selectedBlockPlacement}
-          onClearSelection={() => setSelectedBlockPlacement(null)}
           bindings={bindings}
+          onEditBlock={handleEditBlock}
         />
       </div>
     </div>

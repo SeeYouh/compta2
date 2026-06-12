@@ -10,6 +10,30 @@ import {
   DOCUMENT_PAGE_DEFAULT,
 } from "../config/documentGrid";
 import { MODE_DOCUMENT, MODE_TEMPLATE } from "./OdysseeDocumentToggle";
+import OdysseeBlockRenderer from "./OdysseeBlockRenderer";
+
+const Stepper = ({ label, value, min, max, onChange }) => (
+  <div className="ody-rubrique-canvas__stepper">
+    <span>{label}</span>
+    <button
+      type="button"
+      className="ody-rubrique-canvas__stepper-btn"
+      onClick={() => onChange(Math.max(min, value - 1))}
+      disabled={value <= min}
+    >
+      ‹
+    </button>
+    <span className="ody-rubrique-canvas__stepper-value">{value}</span>
+    <button
+      type="button"
+      className="ody-rubrique-canvas__stepper-btn"
+      onClick={() => onChange(Math.min(max, value + 1))}
+      disabled={value >= max}
+    >
+      ›
+    </button>
+  </div>
+);
 
 const PX_PER_MM = 3.7795275591;
 const A4_WIDTH_PX = Math.round(A4_WIDTH_MM * PX_PER_MM);
@@ -25,6 +49,7 @@ const OdysseeCanvasPage = ({
   onBlockClick,
   onBlockRemove,
   onBindingDrop,
+  onFieldStyleChange,
   selectedBlockPlacement,
   bindings,
 }) => {
@@ -34,6 +59,7 @@ const OdysseeCanvasPage = ({
   const { columns, rows, blocks } = page;
 
   const [draggingBlockIndex, setDraggingBlockIndex] = useState(null);
+  const [previewZone, setPreviewZone] = useState(null);
 
   // Occupied set — exclut le bloc en cours de déplacement pour que ses cellules restent des cibles valides
   const occupied = new Set();
@@ -60,8 +86,23 @@ const OdysseeCanvasPage = ({
     });
   };
 
-  const handleCellDragOver = (e) => {
+  const getSpanFromDrag = (e) => {
+    const spanType = [...e.dataTransfer.types].find((t) =>
+      t.startsWith("application/odyssee-span-"),
+    );
+    if (!spanType) return { colSpan: 1, rowSpan: 1 };
+    const [cs, rs] = spanType.replace("application/odyssee-span-", "").split("x").map(Number);
+    return { colSpan: cs || 1, rowSpan: rs || 1 };
+  };
+
+  const handleCellDragOver = (e, colStart, rowStart) => {
     e.preventDefault();
+    const { colSpan, rowSpan } = getSpanFromDrag(e);
+    if (isZoneFree(colStart, rowStart, colSpan, rowSpan, draggingBlockIndex ?? -1)) {
+      setPreviewZone({ colStart, rowStart, colSpan, rowSpan });
+    } else {
+      setPreviewZone(null);
+    }
   };
 
   const handleCellDrop = (e, colStart, rowStart) => {
@@ -93,19 +134,22 @@ const OdysseeCanvasPage = ({
 
   return (
     <div
-      className="ody-canvas-page"
+      className={`ody-canvas-page${mode === MODE_TEMPLATE ? " ody-canvas-page--template" : ""}`}
       style={{
         width: A4_WIDTH_PX,
         height: A4_HEIGHT_PX,
         position: "relative",
-        background: "#fff",
         boxShadow: "0 2px 12px rgba(0,0,0,0.18)",
         margin: "0 auto",
         flexShrink: 0,
       }}
+      onDragLeave={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) setPreviewZone(null);
+      }}
+      onDrop={() => setPreviewZone(null)}
     >
       <div
-        className="ody-canvas-page__inner"
+        className={`ody-canvas-page__inner${mode === MODE_TEMPLATE ? " ody-canvas-page__inner--template" : ""}`}
         style={{
           position: "absolute",
           top: margins.top * PX_PER_MM,
@@ -121,15 +165,29 @@ const OdysseeCanvasPage = ({
         {mode === MODE_TEMPLATE &&
           Array.from({ length: rows }, (_, r) =>
             Array.from({ length: columns }, (_, c) => {
-              const key = `${r + 1}-${c + 1}`;
+              const col = c + 1;
+              const row = r + 1;
+              const key = `${row}-${col}`;
               const isFree = !occupied.has(key);
+              const inPreview =
+                previewZone &&
+                col >= previewZone.colStart &&
+                col < previewZone.colStart + previewZone.colSpan &&
+                row >= previewZone.rowStart &&
+                row < previewZone.rowStart + previewZone.rowSpan;
               return (
                 <div
                   key={key}
-                  className={`ody-canvas-cell${isFree ? " ody-canvas-cell--free" : " ody-canvas-cell--occupied"}`}
-                  style={{ gridColumn: c + 1, gridRow: r + 1 }}
-                  onDragOver={isFree ? handleCellDragOver : undefined}
-                  onDrop={isFree ? (e) => handleCellDrop(e, c + 1, r + 1) : undefined}
+                  className={[
+                    "ody-canvas-cell",
+                    isFree ? "ody-canvas-cell--free" : "ody-canvas-cell--occupied",
+                    inPreview ? "ody-canvas-cell--preview" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  style={{ gridColumn: col, gridRow: row }}
+                  onDragOver={isFree ? (e) => handleCellDragOver(e, col, row) : undefined}
+                  onDrop={isFree ? (e) => handleCellDrop(e, col, row) : undefined}
                 />
               );
             }),
@@ -175,12 +233,21 @@ const OdysseeCanvasPage = ({
                           blockDef: block.blockDef,
                         }),
                       );
+                      e.dataTransfer.setData(
+                        `application/odyssee-span-${block.colSpan}x${block.rowSpan}`,
+                        "",
+                      );
                       setDraggingBlockIndex(i);
                     }
                   : undefined
               }
               onDragEnd={
-                mode === MODE_TEMPLATE ? () => setDraggingBlockIndex(null) : undefined
+                mode === MODE_TEMPLATE
+                  ? () => {
+                      setDraggingBlockIndex(null);
+                      setPreviewZone(null);
+                    }
+                  : undefined
               }
               onClick={
                 mode === MODE_DOCUMENT
@@ -204,7 +271,19 @@ const OdysseeCanvasPage = ({
                   : undefined
               }
             >
-              {binding ? binding.displayName : (block.blockDef?.name ?? `Bloc ${i + 1}`)}
+              {block.blockDef?.fieldPlacements?.length > 0 ? (
+                <OdysseeBlockRenderer
+                  blockDef={block.blockDef}
+                  contentFilesData={mode === MODE_DOCUMENT ? (binding?.contentFilesData ?? null) : null}
+                  sourceType={block.blockDef.sourceType}
+                  editable={mode === MODE_TEMPLATE}
+                  onFieldStyleChange={(fieldId, prop, value) =>
+                    onFieldStyleChange?.({ pageIndex, blockIndex: i, fieldId, prop, value })
+                  }
+                />
+              ) : (
+                binding ? binding.displayName : (block.blockDef?.name ?? `Bloc ${i + 1}`)
+              )}
 
               {mode === MODE_TEMPLATE && (
                 <button
@@ -236,6 +315,7 @@ const OdysseeCanvas = ({
   onBlockClick,
   onBlockRemove,
   onBindingDrop,
+  onFieldStyleChange,
   selectedBlockPlacement,
   bindings,
 }) => {
@@ -248,11 +328,23 @@ const OdysseeCanvas = ({
   };
 
   const updatePageGrid = (pageIndex, field, value) => {
-    const clamped =
-      field === "columns"
-        ? Math.min(DOCUMENT_GRID_COLUMNS_MAX, Math.max(DOCUMENT_GRID_COLUMNS_MIN, value))
-        : Math.min(DOCUMENT_GRID_ROWS_MAX, Math.max(DOCUMENT_GRID_ROWS_MIN, value));
+    const page = pages[pageIndex];
+    const absMin = field === "columns" ? DOCUMENT_GRID_COLUMNS_MIN : DOCUMENT_GRID_ROWS_MIN;
+    const absMax = field === "columns" ? DOCUMENT_GRID_COLUMNS_MAX : DOCUMENT_GRID_ROWS_MAX;
 
+    // Le minimum réel = le plus grand footprint de bloc posé sur cette dimension
+    const blockMin =
+      page.blocks.length > 0
+        ? Math.max(
+            ...page.blocks.map((b) =>
+              field === "columns"
+                ? b.colStart + b.colSpan - 1
+                : b.rowStart + b.rowSpan - 1,
+            ),
+          )
+        : absMin;
+
+    const clamped = Math.min(absMax, Math.max(Math.max(absMin, blockMin), value));
     const next = pages.map((p, i) => (i === pageIndex ? { ...p, [field]: clamped } : p));
     onPagesChange?.(next);
   };
@@ -277,28 +369,32 @@ const OdysseeCanvas = ({
         >
           {mode === MODE_TEMPLATE && (
             <div className="ody-canvas-page__controls">
-              <label>
-                Colonnes&nbsp;
-                <input
-                  type="number"
-                  min={DOCUMENT_GRID_COLUMNS_MIN}
-                  max={DOCUMENT_GRID_COLUMNS_MAX}
-                  value={page.columns}
-                  onChange={(e) => updatePageGrid(i, "columns", Number(e.target.value))}
-                  style={{ width: 48 }}
-                />
-              </label>
-              <label>
-                Lignes&nbsp;
-                <input
-                  type="number"
-                  min={DOCUMENT_GRID_ROWS_MIN}
-                  max={DOCUMENT_GRID_ROWS_MAX}
-                  value={page.rows}
-                  onChange={(e) => updatePageGrid(i, "rows", Number(e.target.value))}
-                  style={{ width: 48 }}
-                />
-              </label>
+              {(() => {
+                const minCols = page.blocks.length > 0
+                  ? Math.max(DOCUMENT_GRID_COLUMNS_MIN, Math.max(...page.blocks.map((b) => b.colStart + b.colSpan - 1)))
+                  : DOCUMENT_GRID_COLUMNS_MIN;
+                const minRows = page.blocks.length > 0
+                  ? Math.max(DOCUMENT_GRID_ROWS_MIN, Math.max(...page.blocks.map((b) => b.rowStart + b.rowSpan - 1)))
+                  : DOCUMENT_GRID_ROWS_MIN;
+                return (
+                  <>
+                    <Stepper
+                      label="Colonnes"
+                      value={page.columns}
+                      min={minCols}
+                      max={DOCUMENT_GRID_COLUMNS_MAX}
+                      onChange={(v) => updatePageGrid(i, "columns", v)}
+                    />
+                    <Stepper
+                      label="Lignes"
+                      value={page.rows}
+                      min={minRows}
+                      max={DOCUMENT_GRID_ROWS_MAX}
+                      onChange={(v) => updatePageGrid(i, "rows", v)}
+                    />
+                  </>
+                );
+              })()}
               <span>Page {i + 1}</span>
               {pages.length > 1 && (
                 <button
@@ -322,6 +418,7 @@ const OdysseeCanvas = ({
             onBlockClick={onBlockClick}
             onBlockRemove={onBlockRemove}
             onBindingDrop={onBindingDrop}
+            onFieldStyleChange={onFieldStyleChange}
             selectedBlockPlacement={selectedBlockPlacement}
             bindings={bindings}
           />

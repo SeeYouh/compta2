@@ -21,7 +21,7 @@ function authHeadersMultipart() {
   return { Authorization: `Bearer ${getToken()}` };
 }
 
-export const odysseyCategoryService = {
+export const odysseeCategoryService = {
   async getUserCategories() {
     try {
       const res = await fetch(BASE_CAT, { headers: authHeaders() });
@@ -70,7 +70,7 @@ export const odysseyCategoryService = {
   },
 };
 
-export const odysseySidebarService = {
+export const odysseeSidebarService = {
   async getSidebar() {
     try {
       const res = await fetch(BASE_SIDEBAR, { headers: authHeaders() });
@@ -142,7 +142,7 @@ export const odysseySidebarService = {
   },
 };
 
-export const odysseyItemService = {
+export const odysseeItemService = {
   async getItemsByCategory(categoryId) {
     try {
       const res = await fetch(`${BASE_ITEMS}/category/${categoryId}`, {
@@ -206,7 +206,7 @@ export const odysseyItemService = {
   },
 };
 
-export const odysseyItemDeleteService = {
+export const odysseeItemDeleteService = {
   async deleteItem(id) {
     try {
       const res = await fetch(`${BASE_ITEMS}/${id}`, {
@@ -222,7 +222,7 @@ export const odysseyItemDeleteService = {
   },
 };
 
-export const odysseyItemFolderService = {
+export const odysseeItemFolderService = {
   async createFolder(data) {
     try {
       const res = await fetch(BASE_FOLDERS, {
