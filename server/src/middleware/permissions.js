@@ -1,4 +1,4 @@
-import { Account } from "../models/Account.js";
+import { Account } from "../models/synapse/Account.js";
 
 /**
  * Vérifie si un utilisateur a accès à un compte

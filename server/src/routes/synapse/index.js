@@ -1,0 +1,27 @@
+import express from "express";
+
+import accountsRoutes from "./accounts.js";
+import colorPreferencesRoutes from "./colorPreferences.js";
+import contactsRoutes from "./contacts.js";
+import importRoutes from "./import.js";
+import labelsRoutes from "./labels.js";
+import projectionsRoutes from "./projections.js";
+import settingsRoutes from "./settings.js";
+import sharingRoutes from "./sharing.js";
+import themesRoutes from "./themes.js";
+import transactionsRoutes from "./transactions.js";
+
+const router = express.Router();
+
+router.use("/accounts", accountsRoutes);
+router.use("/color-preferences", colorPreferencesRoutes);
+router.use("/contacts", contactsRoutes);
+router.use("/import", importRoutes);
+router.use("/labels", labelsRoutes);
+router.use("/projections", projectionsRoutes);
+router.use("/settings", settingsRoutes);
+router.use("/sharing", sharingRoutes);
+router.use("/themes", themesRoutes);
+router.use("/transactions", transactionsRoutes);
+
+export default router;

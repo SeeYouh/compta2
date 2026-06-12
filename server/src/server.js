@@ -12,8 +12,8 @@ import {
   errorHandler,
   notFound,
 } from './middleware/errorHandler.js';
-import { OdysseeProduct } from './models/OdysseeProduct.js';
-import { OdysseeProductFolder } from './models/OdysseeProductFolder.js';
+import { OdysseeProduct } from './models/odyssee/OdysseeProduct.js';
+import { OdysseeProductFolder } from './models/odyssee/OdysseeProductFolder.js';
 import routes from './routes/index.js';
 
 // Configuration pour ES Modules
