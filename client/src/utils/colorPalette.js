@@ -94,14 +94,15 @@ function hexToRgba(hex, alpha = 1) {
 }
 
 /**
- * Génère une string CSS avec toutes les variables de couleur Synapse
- * pour les deux modes (light et dark). Reproduit la logique de _variable.scss
- * et ajoute les variables du ColorPicker (--color-darker, --color-light, etc.)
+ * Génère une string CSS avec toutes les variables de couleur pour un préfixe donné.
+ * Utilisable par n'importe quel module (Dashboard, Synapse, Trame, etc.)
+ * pour les deux modes (light et dark).
  *
  * @param {string} hex - Couleur hexadécimale primaire
+ * @param {string} prefix - Préfixe des variables CSS (ex: "color", "dashboard", "synapse")
  * @returns {string} CSS complet avec :root et [data-theme="dark"]
  */
-export function generateSynapseColorVars(hex = DEFAULT_COLOR) {
+export function generateColorVars(hex = DEFAULT_COLOR, prefix = "color") {
   if (!hex) hex = DEFAULT_COLOR;
 
   const success = "#22c55e";
@@ -158,126 +159,129 @@ export function generateSynapseColorVars(hex = DEFAULT_COLOR) {
   const dN50  = darken(dPrimary, 85);
 
   // ─── Variables ColorPicker scindées par mode ─────────────────────────────
-  // --color-darker = fond du picker, --color-lightness = curseurs visibles
+  // --{prefix}-darker = fond du picker, --{prefix}-lightness = curseurs visibles
   const lPickerVars = `
-      --color-1: ${lPrimary};
-      --color-lightness: ${lN900};
-      --color-light: ${lN400};
-      --color-dark: ${lN200};
-      --color-darker: ${lN100};
-      --color-darkest: ${lN50};`;
+      --${prefix}-1: ${lPrimary};
+      --${prefix}-lightness: ${lN900};
+      --${prefix}-light: ${lN400};
+      --${prefix}-dark: ${lN200};
+      --${prefix}-darker: ${lN100};
+      --${prefix}-darkest: ${lN50};`;
 
   const dPickerVars = `
-      --color-1: ${dPrimary};
-      --color-lightness: ${dN900};
-      --color-light: ${dN400};
-      --color-dark: ${dN150};
-      --color-darker: ${dN100};
-      --color-darkest: ${dN50};`;
+      --${prefix}-1: ${dPrimary};
+      --${prefix}-lightness: ${dN900};
+      --${prefix}-light: ${dN400};
+      --${prefix}-dark: ${dN150};
+      --${prefix}-darker: ${dN100};
+      --${prefix}-darkest: ${dN50};`;
 
   // ─── Variables communes (success, danger) ────────────────────────────────
   const commonVars = `
-      --color-success: ${success};
-      --color-success-900: ${darken(success, 60)};
-      --color-success-800: ${darken(success, 50)};
-      --color-success-700: ${darken(success, 35)};
-      --color-success-600: ${success};
-      --color-success-500: ${lighten(success, 15)};
-      --color-success-400: ${lighten(success, 35)};
-      --color-success-300: ${lighten(success, 50)};
-      --color-success-200: ${lighten(success, 70)};
-      --color-success-100: ${lighten(success, 85)};
+      --${prefix}-success: ${success};
+      --${prefix}-success-900: ${darken(success, 60)};
+      --${prefix}-success-800: ${darken(success, 50)};
+      --${prefix}-success-700: ${darken(success, 35)};
+      --${prefix}-success-600: ${success};
+      --${prefix}-success-500: ${lighten(success, 15)};
+      --${prefix}-success-400: ${lighten(success, 35)};
+      --${prefix}-success-300: ${lighten(success, 50)};
+      --${prefix}-success-200: ${lighten(success, 70)};
+      --${prefix}-success-100: ${lighten(success, 85)};
 
-      --color-danger: ${danger};
-      --color-danger-900: ${darken(danger, 60)};
-      --color-danger-800: ${darken(danger, 50)};
-      --color-danger-700: ${darken(danger, 35)};
-      --color-danger-600: ${danger};
-      --color-danger-500: ${lighten(danger, 15)};
-      --color-danger-400: ${lighten(danger, 30)};
-      --color-danger-300: ${lighten(danger, 45)};
-      --color-danger-200: ${lighten(danger, 60)};
-      --color-danger-100: ${lighten(danger, 85)};`;
+      --${prefix}-danger: ${danger};
+      --${prefix}-danger-900: ${darken(danger, 60)};
+      --${prefix}-danger-800: ${darken(danger, 50)};
+      --${prefix}-danger-700: ${darken(danger, 35)};
+      --${prefix}-danger-600: ${danger};
+      --${prefix}-danger-500: ${lighten(danger, 15)};
+      --${prefix}-danger-400: ${lighten(danger, 30)};
+      --${prefix}-danger-300: ${lighten(danger, 45)};
+      --${prefix}-danger-200: ${lighten(danger, 60)};
+      --${prefix}-danger-100: ${lighten(danger, 85)};`;
 
   return `
     :root {
-      --color-primary: ${lPrimary};
-      --color-primary-900: ${lP900};
-      --color-primary-800: ${lP800};
-      --color-primary-700: ${lP700};
-      --color-primary-600: ${lP600};
-      --color-primary-500: ${lP500};
-      --color-primary-400: ${lP400};
-      --color-primary-300: ${lP300};
-      --color-primary-200: ${lP200};
-      --color-primary-100: ${lP100};
-      --color-primary-50: ${lP50};
-      --color-primary-20: ${lP20};
-      --color-primary-10: ${lP10};
-      --color-primary-5: ${lP5};
-      --color-primary-4: ${lP4};
-      --color-primary-alpha-10: ${hexToRgba(hex, 0.1)};
-      --color-primary-alpha-15: ${hexToRgba(hex, 0.15)};
-      --color-primary-alpha-30: ${hexToRgba(hex, 0.3)};
-      --color-primary-alpha-40: ${hexToRgba(hex, 0.4)};
-      --color-neutral-900: ${lN900};
-      --color-neutral-700: ${lN700};
-      --color-neutral-400: ${lN400};
-      --color-neutral-200: ${lN200};
-      --color-neutral-150: ${lN150};
-      --color-neutral-100: ${lN100};
-      --color-neutral-50: ${lN50};
-      --color-bg: ${lN400};
-      --color-subSurface: ${lN150};
-      --color-surface: ${lN100};
-      --color-surface-hover: ${lN200};
-      --color-text: ${lN900};
-      --color-text-dim: ${lN700};
-      --color-border: ${lN400};
-      --color-accent: ${lP600};
-      --color-accent-hover: ${lP700};
+      --${prefix}-primary: ${lPrimary};
+      --${prefix}-primary-900: ${lP900};
+      --${prefix}-primary-800: ${lP800};
+      --${prefix}-primary-700: ${lP700};
+      --${prefix}-primary-600: ${lP600};
+      --${prefix}-primary-500: ${lP500};
+      --${prefix}-primary-400: ${lP400};
+      --${prefix}-primary-300: ${lP300};
+      --${prefix}-primary-200: ${lP200};
+      --${prefix}-primary-100: ${lP100};
+      --${prefix}-primary-50: ${lP50};
+      --${prefix}-primary-20: ${lP20};
+      --${prefix}-primary-10: ${lP10};
+      --${prefix}-primary-5: ${lP5};
+      --${prefix}-primary-4: ${lP4};
+      --${prefix}-primary-alpha-10: ${hexToRgba(hex, 0.1)};
+      --${prefix}-primary-alpha-15: ${hexToRgba(hex, 0.15)};
+      --${prefix}-primary-alpha-30: ${hexToRgba(hex, 0.3)};
+      --${prefix}-primary-alpha-40: ${hexToRgba(hex, 0.4)};
+      --${prefix}-neutral-900: ${lN900};
+      --${prefix}-neutral-700: ${lN700};
+      --${prefix}-neutral-400: ${lN400};
+      --${prefix}-neutral-200: ${lN200};
+      --${prefix}-neutral-150: ${lN150};
+      --${prefix}-neutral-100: ${lN100};
+      --${prefix}-neutral-50: ${lN50};
+      --${prefix}-bg: ${lN400};
+      --${prefix}-subSurface: ${lN150};
+      --${prefix}-surface: ${lN100};
+      --${prefix}-surface-hover: ${lN200};
+      --${prefix}-text: ${lN900};
+      --${prefix}-text-dim: ${lN700};
+      --${prefix}-border: ${lN400};
+      --${prefix}-accent: ${lP600};
+      --${prefix}-accent-hover: ${lP700};
       ${commonVars}
       ${lPickerVars}
     }
 
     [data-theme="dark"] {
-      --color-primary: ${dPrimary};
-      --color-primary-900: ${dP900};
-      --color-primary-800: ${dP800};
-      --color-primary-700: ${dP700};
-      --color-primary-600: ${dP600};
-      --color-primary-500: ${dP500};
-      --color-primary-400: ${dP400};
-      --color-primary-300: ${dP300};
-      --color-primary-200: ${dP200};
-      --color-primary-100: ${dP100};
-      --color-primary-50: ${dP50};
-      --color-primary-20: ${dP20};
-      --color-primary-10: ${dP10};
-      --color-primary-5: ${dP5};
-      --color-primary-4: ${dP4};
-      --color-primary-alpha-10: ${hexToRgba(hex, 0.1)};
-      --color-primary-alpha-15: ${hexToRgba(hex, 0.15)};
-      --color-primary-alpha-30: ${hexToRgba(hex, 0.3)};
-      --color-primary-alpha-40: ${hexToRgba(hex, 0.4)};
-      --color-neutral-900: ${dN900};
-      --color-neutral-700: ${dN700};
-      --color-neutral-400: ${dN400};
-      --color-neutral-200: ${dN200};
-      --color-neutral-150: ${dN150};
-      --color-neutral-100: ${dN100};
-      --color-neutral-50: ${dN50};
-      --color-bg: ${dN50};
-      --color-subSurface: ${dN150};
-      --color-surface: ${dN100};
-      --color-surface-hover: ${dN200};
-      --color-text: ${dN900};
-      --color-text-dim: ${dN700};
-      --color-border: ${dN400};
-      --color-accent: ${dP600};
-      --color-accent-hover: ${dP800};
+      --${prefix}-primary: ${dPrimary};
+      --${prefix}-primary-900: ${dP900};
+      --${prefix}-primary-800: ${dP800};
+      --${prefix}-primary-700: ${dP700};
+      --${prefix}-primary-600: ${dP600};
+      --${prefix}-primary-500: ${dP500};
+      --${prefix}-primary-400: ${dP400};
+      --${prefix}-primary-300: ${dP300};
+      --${prefix}-primary-200: ${dP200};
+      --${prefix}-primary-100: ${dP100};
+      --${prefix}-primary-50: ${dP50};
+      --${prefix}-primary-20: ${dP20};
+      --${prefix}-primary-10: ${dP10};
+      --${prefix}-primary-5: ${dP5};
+      --${prefix}-primary-4: ${dP4};
+      --${prefix}-primary-alpha-10: ${hexToRgba(hex, 0.1)};
+      --${prefix}-primary-alpha-15: ${hexToRgba(hex, 0.15)};
+      --${prefix}-primary-alpha-30: ${hexToRgba(hex, 0.3)};
+      --${prefix}-primary-alpha-40: ${hexToRgba(hex, 0.4)};
+      --${prefix}-neutral-900: ${dN900};
+      --${prefix}-neutral-700: ${dN700};
+      --${prefix}-neutral-400: ${dN400};
+      --${prefix}-neutral-200: ${dN200};
+      --${prefix}-neutral-150: ${dN150};
+      --${prefix}-neutral-100: ${dN100};
+      --${prefix}-neutral-50: ${dN50};
+      --${prefix}-bg: ${dN50};
+      --${prefix}-subSurface: ${dN150};
+      --${prefix}-surface: ${dN100};
+      --${prefix}-surface-hover: ${dN200};
+      --${prefix}-text: ${dN900};
+      --${prefix}-text-dim: ${dN700};
+      --${prefix}-border: ${dN400};
+      --${prefix}-accent: ${dP600};
+      --${prefix}-accent-hover: ${dP800};
       ${commonVars}
       ${dPickerVars}
     }
   `;
 }
+
+// Alias pour rétrocompatibilité avec Synapse (utilise le préfixe par défaut "color")
+export const generateSynapseColorVars = (hex) => generateColorVars(hex, "color");

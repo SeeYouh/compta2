@@ -8,7 +8,7 @@ import styles from "../sass/components/UserMenu.module.scss";
 import ThemeToggle from "./ThemeToggle";
 import { useClickOutside } from "./hooks/useClickOutside";
 
-export default function UserMenu({ align = "right", menuItems = [] }) {
+export default function UserMenu({ align = "right", menuItems = [], leftActions }) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
@@ -55,6 +55,7 @@ export default function UserMenu({ align = "right", menuItems = [] }) {
           <div className={styles.actionBar}>
             <div className={styles.actionBarLeft}>
               <ThemeToggle />
+              {leftActions}
             </div>
             <div className={styles.actionBarRight}>
               <button

@@ -1,4 +1,11 @@
-@use "../utils/variable" as *;
+$card-border-width: 2px;
+$card-border-softness: 0.5;
+$border-start-angle: 100deg;
+$card-background-opacity: 0.3;
+$card-backdrop-blur: 40px;
+$border-trail-length: 30%;
+$border-animation-duration: 40s;
+$gradient-distance: 45%;
 
 .auth-page {
   min-height: 100vh;

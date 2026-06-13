@@ -1,10 +1,8 @@
-@use "../sass/utils/variable" as *;
-
 .dashboard-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--color-bg);
+  background: var(--dashboard-bg);
   position: relative;
 }
 
@@ -15,7 +13,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem 2rem;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--dashboard-border);
 
   &__brand {
     display: flex;
@@ -26,7 +24,7 @@
   &__logo {
     width: 36px;
     height: 36px;
-    background: var(--color-primary);
+    background: var(--dashboard-primary);
     color: #fff;
     border-radius: 10px;
     display: flex;
@@ -39,7 +37,7 @@
   &__name {
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--dashboard-text);
   }
 }
 
@@ -63,7 +61,7 @@
 
 .dashboard-subtitle {
   font-size: 1rem;
-  color: var(--color-text-dim);
+  color: var(--dashboard-text-dim);
   margin: 0 0 3rem;
   text-align: center;
 }
@@ -85,7 +83,7 @@
   padding: 2rem 1.5rem;
   min-height: 330px;
   background: var(--color-surface, rgba(255, 255, 255, 0.04));
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--dashboard-border);
   border-radius: 14px;
   cursor: pointer;
   text-align: center;
@@ -96,8 +94,8 @@
     transform 0.15s;
 
   &:hover {
-    border-color: var(--color-primary);
-    background: color-mix(in srgb, var(--color-primary) 6%, transparent);
+    border-color: var(--dashboard-primary);
+    background: color-mix(in srgb, var(--dashboard-primary) 6%, transparent);
     transform: translateY(-2px);
   }
 
@@ -109,8 +107,8 @@
     width: 86px;
     height: 86px;
     border-radius: 12px;
-    background: color-mix(in srgb, var(--color-primary) 12%, transparent);
-    color: var(--color-primary);
+    background: color-mix(in srgb, var(--dashboard-primary) 12%, transparent);
+    color: var(--dashboard-primary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -119,13 +117,13 @@
   &__label {
     font-size: 1rem;
     font-weight: 600;
-    color: var(--color-text);
+    color: var(--dashboard-text);
     margin: 0 0 0.25rem;
   }
 
   &__description {
     font-size: 0.85rem;
-    color: var(--color-text-dim);
+    color: var(--dashboard-text-dim);
     margin: 0;
   }
 }

@@ -1,0 +1,36 @@
+.container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.colorButton {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+
+  &:hover {
+    border-color: var(--color-text-dim);
+    transform: scale(1.05);
+  }
+
+  &:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1999;
+}
+
+.popover {
+  position: fixed;
+  z-index: 2000;
+}

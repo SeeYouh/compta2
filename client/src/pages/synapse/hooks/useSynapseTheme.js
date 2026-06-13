@@ -22,5 +22,9 @@ export function useSynapseTheme() {
     document.head.appendChild(styleEl);
 
     styleEl.textContent = generateSynapseColorVars(userColor);
+
+    return () => {
+      styleEl.remove();
+    };
   }, [userColor]);
 }

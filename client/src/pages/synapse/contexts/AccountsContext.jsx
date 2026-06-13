@@ -81,17 +81,6 @@ export function AccountsProvider({ children }) {
     loadAccounts();
   }, [loadAccounts]);
 
-  // Appliquer la couleur du compte actif à --color-primary
-  useEffect(() => {
-    const activeAccount = accounts.find((acc) => acc.id === activeAccountId);
-    if (activeAccount?.color) {
-      document.documentElement.style.setProperty(
-        "--color-primary",
-        activeAccount.color
-      );
-    }
-  }, [activeAccountId, accounts]);
-
   /**
    * Sélectionne un compte actif
    */

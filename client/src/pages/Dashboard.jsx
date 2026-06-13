@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import AnimatedBackground from "../components/AnimatedBackground";
 import { useDocumentTitle } from "../components/hooks/useDocumentTitle";
 import UserMenu from "../components/UserMenu";
+import PortalColorPickerButton from "./portal/components/PortalColorPickerButton";
+import { PortalColorProvider } from "./portal/contexts/PortalColorContext";
 
 const apps = [
   {
@@ -81,6 +83,7 @@ export default function Dashboard() {
   useDocumentTitle("Accueil");
 
   return (
+    <PortalColorProvider>
     <div className="dashboard-page">
       <AnimatedBackground />
 
@@ -89,7 +92,7 @@ export default function Dashboard() {
           <span className="dashboard-header__logo">S</span>
           <span className="dashboard-header__name">Synapse</span>
         </div>
-        <UserMenu />
+        <UserMenu leftActions={<PortalColorPickerButton />} />
       </header>
 
       <main className="dashboard-main">
@@ -110,5 +113,6 @@ export default function Dashboard() {
         </div>
       </main>
     </div>
+    </PortalColorProvider>
   );
 }
