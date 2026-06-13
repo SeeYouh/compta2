@@ -346,11 +346,8 @@ const CatalogMain = ({
         )}
       </div>
 
-      {isEmpty ? (
-        selectedCat ? (
-          <EmptyLibraryMessage />
-        ) : null
-      ) : (
+      {!isCompact && isEmpty && selectedCat && <EmptyLibraryMessage />}
+      {(isCompact || !isEmpty) && selectedCat && (
         <div
           className={`catalog-content${isCompact ? " catalog-content--compact" : ""}`}
           onDragOver={(e) => {
@@ -359,7 +356,6 @@ const CatalogMain = ({
             if (!types.includes("folderid")) setFolderDropInfo(null);
             if (!types.includes("productid")) return;
             e.preventDefault();
-            // Détecter si le curseur est dans le gap entre deux éléments fermés
             let detected = false;
             for (const child of e.currentTarget.children) {
               if (!child.classList.contains("product-folder--closed")) continue;
@@ -449,7 +445,7 @@ const CatalogMain = ({
               />
             ),
           )}
-          {isCompact && selectedCat && (
+          {isCompact && (
             <div
               className="catalog-main__add-wrapper catalog-main__add-wrapper--inline"
               ref={addMenuRef}
