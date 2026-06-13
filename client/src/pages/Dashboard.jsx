@@ -1,10 +1,10 @@
-import "./Dashboard.scss";
+import './Dashboard.scss';
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
-import AnimatedBackground from "../components/AnimatedBackground";
-import { useDocumentTitle } from "../components/hooks/useDocumentTitle";
-import UserMenu from "../components/UserMenu";
+import AnimatedBackground from '../components/AnimatedBackground';
+import { useDocumentTitle } from '../components/hooks/useDocumentTitle';
+import UserMenu from '../components/UserMenu';
 
 const apps = [
   {
@@ -100,11 +100,13 @@ export default function Dashboard() {
               className="dashboard-card"
               onClick={() => navigate(app.path)}
             >
-              <div className="dashboard-card__icon">{app.icon}</div>
-              <div className="dashboard-card__content">
-                <h2 className="dashboard-card__label">{app.label}</h2>
-                <p className="dashboard-card__description">{app.description}</p>
-              </div>
+                <div className="dashboard-card__icon">{app.icon}</div>
+                <div className="dashboard-card__content">
+                  <h2 className="dashboard-card__label">{app.label}</h2>
+                  <p className="dashboard-card__description">
+                    {app.description}
+                  </p>
+                </div>
             </button>
           ))}
         </div>
