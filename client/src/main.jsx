@@ -68,7 +68,11 @@ const router = createBrowserRouter([
   {
     path: "/odyssee/*",
     loader: odysseeDashboardLoader,
-    hydrateFallbackElement: null,
+    hydrateFallbackElement: (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--color-bg, #f5f5f5)' }}>
+        <p style={{ color: 'var(--color-text, #333)' }}>Chargement...</p>
+      </div>
+    ),
     element: (
       <ProtectedRoute>
         <Suspense fallback={null}>

@@ -3,6 +3,7 @@ import './sass/index.scss';
 import {
   Route,
   Routes,
+  useLoaderData,
 } from 'react-router-dom';
 
 import AdminPanel from './components/AdminPanel';
@@ -12,6 +13,7 @@ import { OdysseeColorProvider } from './contexts/OdysseeColorContext.jsx';
 import Settings from './pages/private/Settings';
 
 export default function OdysseeDashboard() {
+  useLoaderData();
   return (
     <OdysseeColorProvider>
       <Routes>

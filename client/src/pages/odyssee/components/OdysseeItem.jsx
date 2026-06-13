@@ -315,24 +315,22 @@ const OdysseeItem = ({
 
   const { colors: themeColors } = useOdysseeColor();
   const { getDefault, ready } = useColorPreferences();
-  const [color, setColor] = useState(contentFilesData.color || DEFAULT_COLOR);
   const [previewColor, setPreviewColor] = useState(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const defaultApplied = useRef(!!contentFilesData.color);
 
   const isNew = !contentFilesData._id;
   const effectiveEditMode = isNew || editMode;
+  const color = contentFilesData.color || DEFAULT_COLOR;
 
   useEffect(() => {
     if (defaultApplied.current || !ready) return;
     defaultApplied.current = true;
     const saved = getDefault('odyssee-item-color');
-    if (saved) setColor(saved);
-  }, [ready, getDefault]);
-
-  useEffect(() => {
-    onColorChange?.(color);
-  }, [color, onColorChange]);
+    if (saved && !contentFilesData.color) {
+      onColorChange?.(saved);
+    }
+  }, [ready, getDefault, contentFilesData.color, onColorChange]);
 
   const activeColor = previewColor || color;
   const colors = useMemo(
@@ -766,7 +764,7 @@ const OdysseeItem = ({
               <ColorPicker
                 value={color || colors.base}
                 onChange={(hex) => {
-                  setColor(hex);
+                  onColorChange?.(hex);
                   setPreviewColor(null);
                   setShowColorPicker(false);
                 }}

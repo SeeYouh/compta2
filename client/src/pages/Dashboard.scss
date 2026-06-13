@@ -72,7 +72,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, 230px);
   justify-content: center;
-  gap: 1.25rem;
+  gap: 3rem;
   width: 100%;
 }
 
@@ -90,6 +90,7 @@
   cursor: pointer;
   text-align: center;
   width: 100%;
+  transform-origin: bottom center;
   transition:
     border-color 0.2s,
     background 0.2s,
@@ -98,11 +99,11 @@
   &:hover {
     border-color: var(--color-primary);
     background: color-mix(in srgb, var(--color-primary) 6%, transparent);
-    transform: translateY(-2px);
+    transform: scale(1.05);
   }
 
   &:active {
-    transform: translateY(0);
+    transform: scale(0.95);
   }
 
   &__icon {

@@ -26,5 +26,5 @@ export async function odysseeDashboardLoader() {
     console.error("[odysseeDashboardLoader] Prefetch échoué :", error);
   }
 
-  return null;
+  return { prefetchComplete: true };
 }
