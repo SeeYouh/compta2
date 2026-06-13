@@ -46,7 +46,7 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 import ColorPicker from "../../../components/ColorPicker";
-import { getLexicalColorVars } from '../../../../utils/colorPalette";
+import { getLexicalColorVars } from '../../../utils/colorPalette';
 import IconPicture from "../../../assets/IconPicture";
 
 // ─── ImageNode ────────────────────────────────────────────────────────────────
@@ -656,7 +656,7 @@ function ToolbarPlugin() {
             onChange={handleColorConfirm}
             onPreview={handleColorPreview}
             onClose={handleColorClose}
-            showDefaultButtons={false}
+            contextKey={colorPickerTypeRef.current === "text" ? "lexical-text-color" : "lexical-bg-color"}
             draggable
             initialX={colorPicker.x}
             initialY={colorPicker.y}

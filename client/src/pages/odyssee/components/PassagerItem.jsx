@@ -4,7 +4,7 @@ import SaveStatus from "./SaveStatus";
 
 import CategoryContextMenu from "./CategoryContextMenu";
 import ColorPicker from "../../../components/ColorPicker";
-import { computeColorPalette } from '../../../../utils/colorPalette.js";
+import { computeColorPalette } from '../../../utils/colorPalette.js';
 import CountryPicker from "./CountryPicker";
 import { FOLDER_PALETTE } from "../config/folderColors";
 import { getInitials } from "../utils/stringUtils";
@@ -14,7 +14,7 @@ import IconGenreM from "../../../assets/IconGenreM.jsx";
 import IconSaveFalse from "../../../assets/IconSaveFalse.jsx";
 import IconSaveTrue from "../../../assets/IconSaveTrue.jsx";
 import LexicalEditor from "./LexicalEditor";
-import { lighten } from '../../../../utils/colorUtils";
+import { lighten } from '../../../utils/colorUtils';
 import NameColorModal from "./NameColorModal";
 import { passengersItemService } from "../services/passengersServices";
 import SidebarCategoryItem from "./SidebarCategoryItem";
@@ -177,6 +177,12 @@ const PassagerItem = ({
   const [color, setColor] = useState(contentFilesData.color || "");
   const [previewColor, setPreviewColor] = useState(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
+
+  useEffect(() => {
+    if (color) return;
+    const saved = getDefault('passager-item-color');
+    if (saved) setColor(saved);
+  });
 
   const activeColor = previewColor || color;
   const colors = useMemo(
@@ -772,9 +778,8 @@ const PassagerItem = ({
                     setShowColorPicker(false);
                     setPreviewColor(null);
                   }}
-                  contextKey={`passager-item-${productId || "new"}`}
+                  contextKey="passager-item-color"
                   showHistory
-                  showDefaultButtons={!!productId}
                 />
               </div>
             )}

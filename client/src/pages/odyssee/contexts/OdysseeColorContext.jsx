@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-import { computeColorPalette, DEFAULT_COLOR } from '../../../../utils/colorPalette.js";
+import { computeColorPalette, DEFAULT_COLOR } from '../../../utils/colorPalette.js';
 import { useColorPreferences } from "../../../components/hooks/useColorPreferences.js";
 
 export const ODYSSEE_THEME_KEY = "odyssee-theme";

@@ -1,4 +1,4 @@
-import { darken } from '../../../../utils/colorUtils";
+import { darken } from '../../../utils/colorUtils';
 import { DARKEN_BORDER, FOLDER_PALETTE } from "../config/folderColors";
 
 /**

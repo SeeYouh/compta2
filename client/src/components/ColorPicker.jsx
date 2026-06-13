@@ -4,6 +4,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { createPortal } from 'react-dom';
 
 import {
   addColorToHistory,
@@ -204,7 +205,7 @@ export default function ColorPicker({
   onClose,
   cssVar,
   contextKey,
-  defaultColor = "#000000",
+  defaultColor = "#969696",
   showHistory = true,
   showDefaultButtons = true,
   draggable = false,
@@ -224,6 +225,7 @@ export default function ColorPicker({
   const [activeFamily, setActiveFamily] = useState("red");
   const [history, setHistory] = useState([]);
   const [savedDefault, setSavedDefault] = useState(null);
+  const [confirmDefault, setConfirmDefault] = useState(null);
   const [pos, setPos] = useState({ x: initialX, y: initialY });
 
   const canvasRef = useRef(null);
@@ -398,13 +400,22 @@ export default function ColorPicker({
     onClose?.();
   };
 
-  const handleSetDefault = async () => {
+  const handleSetDefault = () => {
     if (!contextKey) return;
+    setConfirmDefault({
+      oldColor: savedDefault || defaultColor,
+      newColor: currentHex,
+    });
+  };
+
+  const handleConfirmDefault = async () => {
     try {
-      await setDefaultColor(contextKey, currentHex);
-      setSavedDefault(currentHex);
+      await setDefaultColor(contextKey, confirmDefault.newColor);
+      setSavedDefault(confirmDefault.newColor);
     } catch (e) {
       console.warn("[ColorPicker] Erreur couleur par défaut :", e);
+    } finally {
+      setConfirmDefault(null);
     }
   };
 
@@ -476,7 +487,7 @@ export default function ColorPicker({
                 Annuler
               </button>
             </div>
-            {showDefaultButtons && contextKey && (
+            {showDefaultButtons && (
               <>
                 <button
                   type="button"
@@ -583,6 +594,50 @@ export default function ColorPicker({
           ))}
         </div>
       </div>
+
+      {confirmDefault && createPortal(
+        <div className="color-picker__confirm-overlay" onMouseDown={(e) => e.stopPropagation()}>
+          <div className="color-picker__confirm">
+            <p className="color-picker__confirm-title">
+              Changer la couleur par défaut ?
+            </p>
+            <div className="color-picker__confirm-colors">
+              <div className="color-picker__confirm-item">
+                <div
+                  className="color-picker__confirm-swatch"
+                  style={{ background: confirmDefault.oldColor }}
+                />
+                <span>Actuelle</span>
+              </div>
+              <span className="color-picker__confirm-arrow">→</span>
+              <div className="color-picker__confirm-item">
+                <div
+                  className="color-picker__confirm-swatch"
+                  style={{ background: confirmDefault.newColor }}
+                />
+                <span>Nouvelle</span>
+              </div>
+            </div>
+            <div className="color-picker__confirm-actions">
+              <button
+                type="button"
+                className="color-picker__btn"
+                onClick={() => setConfirmDefault(null)}
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                className="color-picker__btn"
+                onClick={handleConfirmDefault}
+              >
+                Ok
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

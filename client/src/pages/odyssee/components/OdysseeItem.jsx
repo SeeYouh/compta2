@@ -7,7 +7,8 @@ import {
   DOCUMENT_MARGINS_DEFAULT,
   DOCUMENT_PAGE_DEFAULT,
 } from '../config/documentGrid';
-import { computeColorPalette } from '../../../../utils/colorPalette';
+import { computeColorPalette } from '../../../utils/colorPalette';
+import { useColorPreferences } from '../../../components/hooks/useColorPreferences';
 import { useOdysseeColor } from '../contexts/OdysseeColorContext';
 import OdysseeCanvas from './OdysseeCanvas';
 import OdysseeRubriqueCanvas from './OdysseeRubriqueCanvas';
@@ -312,9 +313,16 @@ const OdysseeItem = ({
   const entityId = contentFilesData._id || 'new-ody';
 
   const { colors: themeColors } = useOdysseeColor();
+  const { getDefault } = useColorPreferences();
   const [color, setColor] = useState(contentFilesData.color || '');
   const [previewColor, setPreviewColor] = useState(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
+
+  useEffect(() => {
+    if (color) return;
+    const saved = getDefault('odyssee-item-color');
+    if (saved) setColor(saved);
+  });
 
   const activeColor = previewColor || color;
   const colors = useMemo(
@@ -757,7 +765,7 @@ const OdysseeItem = ({
                   setPreviewColor(null);
                   setShowColorPicker(false);
                 }}
-                showDefaultButtons={false}
+                contextKey="odyssee-item-color"
               />
             </div>
           )}

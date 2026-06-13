@@ -13,6 +13,7 @@ $hue-cursor-size: 30px;
 $hue-hex-size: 48px;
 
 .color-picker {
+  position: relative;
   display: inline-flex;
   flex-direction: column;
   gap: 8px;
@@ -287,6 +288,77 @@ $hue-hex-size: 48px;
       transform: scale(1.55);
       border-color: var(--color-lightness);
       box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  // ─── Popup confirmation "Définir par défaut" ─────────────────────────────
+
+  &__confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.719);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  &__confirm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    background: var(--color-darker);
+    border-radius: 8px;
+    border: 1px solid var(--color-1);
+  }
+
+  &__confirm-title {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--color-lightness);
+    text-align: center;
+  }
+
+  &__confirm-colors {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  &__confirm-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    color: var(--color-text);
+  }
+
+  &__confirm-swatch {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--color-light);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  &__confirm-arrow {
+    font-size: 1.4rem;
+    color: var(--color-text);
+    line-height: 1;
+  }
+
+  &__confirm-actions {
+    display: flex;
+    gap: 8px;
+
+    .color-picker__btn {
+      min-width: 64px;
+      margin: 0;
     }
   }
 

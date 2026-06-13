@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 
-import { darken } from '../../../../utils/colorUtils';
+import { darken } from '../../../utils/colorUtils';
 import {
   DARKEN_BG,
   DARKEN_BORDER,

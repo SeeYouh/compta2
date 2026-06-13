@@ -1,10 +1,10 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import SaveStatus from "./SaveStatus";
 
 import { ArrayGraduation } from "./utils/ArrayGraduation";
 import ColorPicker from "../../../components/ColorPicker";
-import { computeColorPalette } from '../../../../utils/colorPalette.js";
+import { computeColorPalette } from '../../../utils/colorPalette.js';
 import IconSaveFalse from "../../../assets/IconSaveFalse.jsx";
 import IconSaveTrue from "../../../assets/IconSaveTrue.jsx";
 import InTakeTimeAdvancedMode from "./InTakeTimeAdvancedMode";
@@ -12,6 +12,7 @@ import InTakeTimeNormalMode from "./InTakeTimeNormalMode";
 import ProductService from "../services/productService";
 import Range14 from "./Range14";
 import RangeDays from "./RangeDays";
+import { useColorPreferences } from "../../../components/hooks/useColorPreferences";
 import { useOdysseeColor } from "../contexts/OdysseeColorContext.jsx";
 
 function buildProductStyles(c, id) {
@@ -178,6 +179,14 @@ const PaperProduct = ({
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   const { colors: themeColors } = useOdysseeColor();
+  const { getDefault } = useColorPreferences();
+
+  useEffect(() => {
+    if (color) return;
+    const saved = getDefault('catalog-product-color');
+    if (saved) setColor(saved);
+  });
+
   const activeColor = previewColor || color;
   const colors = useMemo(
     () => (activeColor ? computeColorPalette(activeColor) : themeColors),
@@ -337,9 +346,8 @@ const PaperProduct = ({
                     setShowColorPicker(false);
                     setPreviewColor(null);
                   }}
-                  contextKey={`catalog-product-${productId || "new"}`}
+                  contextKey="catalog-product-color"
                   showHistory
-                  showDefaultButtons={!!productId}
                 />
               </div>
             )}

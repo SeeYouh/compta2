@@ -4,7 +4,7 @@ import {
   useMemo,
 } from 'react';
 
-import { computeColorPalette } from '../../../../utils/colorPalette.js';
+import { computeColorPalette } from '../../../utils/colorPalette.js';
 import { useOdysseeColor } from './OdysseeColorContext.jsx';
 
 const EntityColorContext = createContext(null);
