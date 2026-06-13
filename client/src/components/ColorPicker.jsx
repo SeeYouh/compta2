@@ -9,9 +9,9 @@ import { createPortal } from 'react-dom';
 import {
   addColorToHistory,
   getColorPreferences,
-  setDefaultColor,
   updateColorVariable,
 } from './utils/colorPreferencesApi.js';
+import { useColorPreferences } from './hooks/useColorPreferences.js';
 
 // ─── Utilitaires couleur ───────────────────────────────────────────────────────
 
@@ -228,6 +228,8 @@ export default function ColorPicker({
   const [confirmDefault, setConfirmDefault] = useState(null);
   const [pos, setPos] = useState({ x: initialX, y: initialY });
 
+  const { saveDefault } = useColorPreferences();
+
   const canvasRef = useRef(null);
   const hueSliderRef = useRef(null);
 
@@ -410,7 +412,7 @@ export default function ColorPicker({
 
   const handleConfirmDefault = async () => {
     try {
-      await setDefaultColor(contextKey, confirmDefault.newColor);
+      await saveDefault(contextKey, confirmDefault.newColor);
       setSavedDefault(confirmDefault.newColor);
     } catch (e) {
       console.warn("[ColorPicker] Erreur couleur par défaut :", e);

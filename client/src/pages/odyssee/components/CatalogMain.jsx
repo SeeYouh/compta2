@@ -4,6 +4,7 @@ import EmptyLibraryMessage from "./EmptyLibraryMessage";
 import { getInitials } from "../utils/stringUtils";
 import ProductCard from "./ProductCard";
 import ProductFolder from "./ProductFolder";
+import { DEFAULT_COLOR } from "../../../utils/colorPalette";
 
 const getTitleFontSize = (name) => {
   const len = (name ?? "").length;
@@ -18,6 +19,7 @@ const CatalogMain = ({
   selectedCat,
   productFolders,
   selectedProductId,
+  newProduct,
   createLabel,
   onAdd,
   onSelect,
@@ -37,7 +39,13 @@ const CatalogMain = ({
   onToggleAllFolders,
   isCompact,
 }) => {
-  const allProducts = selectedCat?.products || [];
+  const pendingNewItem = newProduct
+    ? { ...newProduct, _isNew: true, color: newProduct.color || DEFAULT_COLOR }
+    : null;
+  const allProducts = [
+    ...(selectedCat?.products || []),
+    ...(pendingNewItem ? [pendingNewItem] : []),
+  ];
   const [productTooltip, setProductTooltip] = useState(null);
   const [headerTooltip, setHeaderTooltip] = useState(null);
   const [folderDropInfo, setFolderDropInfo] = useState(null);
@@ -420,23 +428,23 @@ const CatalogMain = ({
               />
             ) : (
               <ProductCard
-                key={item._id}
+                key={item._isNew ? 'new-item' : item._id}
                 product={item}
-                isSelected={item._id === selectedProductId}
-                onClick={() => onSelect(item)}
-                onEdit={() => onEdit(item)}
-                onDelete={() => onDelete(item)}
+                isSelected={item._isNew ? true : item._id === selectedProductId}
+                onClick={item._isNew ? undefined : () => onSelect(item)}
+                onEdit={item._isNew ? undefined : () => onEdit(item)}
+                onDelete={item._isNew ? undefined : () => onDelete(item)}
                 onHover={handleProductHover}
                 onHoverLeave={handleProductHoverLeave}
-                draggable
-                onDragStart={(e) => handleProductDragStart(e, item._id)}
-                onDragOver={(e) => {
+                draggable={!item._isNew}
+                onDragStart={item._isNew ? undefined : (e) => handleProductDragStart(e, item._id)}
+                onDragOver={item._isNew ? undefined : (e) => {
                   if (Array.from(e.dataTransfer.types).includes("productid")) {
                     e.preventDefault();
                     e.stopPropagation();
                   }
                 }}
-                onDrop={(e) => handleProductDropOnProduct(e, item._id)}
+                onDrop={item._isNew ? undefined : (e) => handleProductDropOnProduct(e, item._id)}
                 isCompact={isCompact}
               />
             ),

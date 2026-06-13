@@ -313,6 +313,10 @@ const useCatalogEngine = ({
     setEditMode(false);
   };
 
+  const updateSelectedColor = (color) => {
+    setSelectedFileData((prev) => (prev ? { ...prev, color } : prev));
+  };
+
   const confirmDeleteItem = async () => {
     const result = await itemDeleteService.deleteItem(deleteModal.itemId);
     if (result.success) {
@@ -766,6 +770,7 @@ const useCatalogEngine = ({
     handleEditItem,
     handleSelectItem,
     handleAddItem,
+    updateSelectedColor,
     confirmDeleteItem,
     handleCreateCategory,
     handleCategorySelect,

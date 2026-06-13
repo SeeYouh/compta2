@@ -309,6 +309,7 @@ const OdysseeItem = ({
   onProductCreated,
   editMode = false,
   onActivate,
+  onColorChange,
 }) => {
   const entityId = contentFilesData._id || 'new-ody';
 
@@ -328,6 +329,10 @@ const OdysseeItem = ({
     const saved = getDefault('odyssee-item-color');
     if (saved) setColor(saved);
   }, [ready, getDefault]);
+
+  useEffect(() => {
+    onColorChange?.(color);
+  }, [color, onColorChange]);
 
   const activeColor = previewColor || color;
   const colors = useMemo(

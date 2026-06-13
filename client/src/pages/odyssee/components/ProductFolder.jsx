@@ -167,17 +167,17 @@ const ProductFolder = ({
                 <div className="product-folder__grid">
                   {products.map((product) => (
                     <ProductCard
-                      key={product._id}
+                      key={product._isNew ? 'new-item' : product._id}
                       product={product}
-                      isSelected={product._id === selectedProductId}
-                      onClick={() => onSelectProduct(product)}
-                      onEdit={() => onEditProduct(product)}
-                      onDelete={() => onDeleteProduct(product)}
+                      isSelected={product._isNew ? true : product._id === selectedProductId}
+                      onClick={product._isNew ? undefined : () => onSelectProduct(product)}
+                      onEdit={product._isNew ? undefined : () => onEditProduct(product)}
+                      onDelete={product._isNew ? undefined : () => onDeleteProduct(product)}
                       onHover={onHover}
                       onHoverLeave={onHoverLeave}
-                      draggable
+                      draggable={!product._isNew}
                       isCompact={isCompact}
-                      onDragStart={(e) => {
+                      onDragStart={product._isNew ? undefined : (e) => {
                         e.stopPropagation();
                         e.dataTransfer.setData("productId", product._id);
                         e.dataTransfer.setData(

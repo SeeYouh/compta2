@@ -167,6 +167,7 @@ const PassagerItem = ({
   onProductCreated,
   editMode = false,
   onActivate,
+  onColorChange,
 }) => {
   const productId = contentFilesData._id || null;
   const folderId = contentFilesData.folderId || null;
@@ -185,6 +186,10 @@ const PassagerItem = ({
     const saved = getDefault('passager-item-color');
     if (saved) setColor(saved);
   }, [ready, getDefault]);
+
+  useEffect(() => {
+    onColorChange?.(color);
+  }, [color, onColorChange]);
 
   const activeColor = previewColor || color;
   const colors = useMemo(

@@ -49,11 +49,13 @@ const ProductCard = ({
       ? product.contentFilesData.aliasName.name
       : product.contentFilesData?.productName || product.name || "Produit";
 
-  const handleContextMenu = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setContextMenu({ x: e.clientX, y: e.clientY });
-  };
+  const handleContextMenu = (onEdit || onDelete)
+    ? (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setContextMenu({ x: e.clientX, y: e.clientY });
+      }
+    : undefined;
 
   useEffect(() => {
     if (!contextMenu) return;

@@ -355,6 +355,7 @@ const Dashboard = () => {
               onProductCreated={passengersEngine.handleItemCreated}
               editMode={passengersEngine.editMode}
               onActivate={() => passengersEngine.setEditMode(true)}
+              onColorChange={passengersEngine.updateSelectedColor}
             />
           )}
         {selectedCategoryLibrary === "Odyssée" &&
@@ -366,6 +367,7 @@ const Dashboard = () => {
               onProductCreated={odysseeEngine.handleItemCreated}
               editMode={odysseeEngine.editMode}
               onActivate={() => odysseeEngine.setEditMode(true)}
+              onColorChange={odysseeEngine.updateSelectedColor}
             />
           )}
         {selectedCategoryLibrary === "Catalogues" &&
@@ -377,6 +379,7 @@ const Dashboard = () => {
               onProductCreated={cataloguesEngine.handleItemCreated}
               editMode={cataloguesEngine.editMode}
               onActivate={() => cataloguesEngine.setEditMode(true)}
+              onColorChange={cataloguesEngine.updateSelectedColor}
             />
           )}
       </div>

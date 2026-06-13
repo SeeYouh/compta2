@@ -108,6 +108,7 @@ const CatalogContent = ({ engine, labels, isCompact }) => {
             selectedCat={categories.find((c) => c._id === selectedCategory)}
             productFolders={productFolders}
             selectedProductId={engine.selectedFileData?._id}
+            newProduct={engine.selectedFileData && !engine.selectedFileData._id ? engine.selectedFileData : null}
             createLabel={labels?.createLabel}
             onAdd={() => handleAddItem(undefined)}
             onSelect={handleSelectItem}
