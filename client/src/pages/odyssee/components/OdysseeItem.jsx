@@ -7,7 +7,7 @@ import {
   DOCUMENT_MARGINS_DEFAULT,
   DOCUMENT_PAGE_DEFAULT,
 } from '../config/documentGrid';
-import { computeColorPalette } from '../../../utils/colorPalette';
+import { computeColorPalette, DEFAULT_COLOR } from '../../../utils/colorPalette';
 import { useColorPreferences } from '../../../components/hooks/useColorPreferences';
 import { useOdysseeColor } from '../contexts/OdysseeColorContext';
 import OdysseeCanvas from './OdysseeCanvas';
@@ -313,16 +313,21 @@ const OdysseeItem = ({
   const entityId = contentFilesData._id || 'new-ody';
 
   const { colors: themeColors } = useOdysseeColor();
-  const { getDefault } = useColorPreferences();
-  const [color, setColor] = useState(contentFilesData.color || '');
+  const { getDefault, ready } = useColorPreferences();
+  const [color, setColor] = useState(contentFilesData.color || DEFAULT_COLOR);
   const [previewColor, setPreviewColor] = useState(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const defaultApplied = useRef(!!contentFilesData.color);
+
+  const isNew = !contentFilesData._id;
+  const effectiveEditMode = isNew || editMode;
 
   useEffect(() => {
-    if (color) return;
+    if (defaultApplied.current || !ready) return;
+    defaultApplied.current = true;
     const saved = getDefault('odyssee-item-color');
     if (saved) setColor(saved);
-  });
+  }, [ready, getDefault]);
 
   const activeColor = previewColor || color;
   const colors = useMemo(
@@ -723,7 +728,7 @@ const OdysseeItem = ({
         <OdysseeDocumentToggle mode={mode} onChange={handleModeChange} />
 
         <div className="paper-product__save-wrap">
-          {editMode ? (
+          {effectiveEditMode ? (
             <button
               type="button"
               className="paper-product__save-btn"
@@ -738,7 +743,7 @@ const OdysseeItem = ({
             </div>
           )}
           <span className="save-tooltip">
-            {editMode ? 'Enregistrer' : "Activer l'édition"}
+            {effectiveEditMode ? 'Enregistrer' : "Activer l'édition"}
           </span>
         </div>
 

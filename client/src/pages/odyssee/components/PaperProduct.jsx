@@ -4,7 +4,7 @@ import SaveStatus from "./SaveStatus";
 
 import { ArrayGraduation } from "./utils/ArrayGraduation";
 import ColorPicker from "../../../components/ColorPicker";
-import { computeColorPalette } from '../../../utils/colorPalette.js';
+import { computeColorPalette, DEFAULT_COLOR } from '../../../utils/colorPalette.js';
 import IconSaveFalse from "../../../assets/IconSaveFalse.jsx";
 import IconSaveTrue from "../../../assets/IconSaveTrue.jsx";
 import InTakeTimeAdvancedMode from "./InTakeTimeAdvancedMode";
@@ -174,18 +174,20 @@ const PaperProduct = ({
   const [durationAfter, setDurationAfter] = useState("");
   const [nightDuration, setNightDuration] = useState(10);
   const [saveStatus, setSaveStatus] = useState(null);
-  const [color, setColor] = useState(contentFilesData.color || "");
+  const [color, setColor] = useState(contentFilesData.color || DEFAULT_COLOR);
   const [previewColor, setPreviewColor] = useState(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
 
   const { colors: themeColors } = useOdysseeColor();
-  const { getDefault } = useColorPreferences();
+  const { getDefault, ready } = useColorPreferences();
+  const defaultApplied = useRef(!!contentFilesData.color);
 
   useEffect(() => {
-    if (color) return;
+    if (defaultApplied.current || !ready) return;
+    defaultApplied.current = true;
     const saved = getDefault('catalog-product-color');
     if (saved) setColor(saved);
-  });
+  }, [ready, getDefault]);
 
   const activeColor = previewColor || color;
   const colors = useMemo(

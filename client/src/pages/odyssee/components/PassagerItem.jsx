@@ -4,7 +4,7 @@ import SaveStatus from "./SaveStatus";
 
 import CategoryContextMenu from "./CategoryContextMenu";
 import ColorPicker from "../../../components/ColorPicker";
-import { computeColorPalette } from '../../../utils/colorPalette.js';
+import { computeColorPalette, DEFAULT_COLOR } from '../../../utils/colorPalette.js';
 import CountryPicker from "./CountryPicker";
 import { FOLDER_PALETTE } from "../config/folderColors";
 import { getInitials } from "../utils/stringUtils";
@@ -173,16 +173,18 @@ const PassagerItem = ({
   const entityId = productId || "new-passager";
 
   const { colors: themeColors } = useOdysseeColor();
-  const { getDefault } = useColorPreferences();
-  const [color, setColor] = useState(contentFilesData.color || "");
+  const { getDefault, ready } = useColorPreferences();
+  const [color, setColor] = useState(contentFilesData.color || DEFAULT_COLOR);
   const [previewColor, setPreviewColor] = useState(null);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const defaultApplied = useRef(!!contentFilesData.color);
 
   useEffect(() => {
-    if (color) return;
+    if (defaultApplied.current || !ready) return;
+    defaultApplied.current = true;
     const saved = getDefault('passager-item-color');
     if (saved) setColor(saved);
-  });
+  }, [ready, getDefault]);
 
   const activeColor = previewColor || color;
   const colors = useMemo(
