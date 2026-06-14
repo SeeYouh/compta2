@@ -100,10 +100,7 @@
     border-color: var(--color-primary);
     background: color-mix(in srgb, var(--color-primary) 6%, transparent);
     transform: scale(1.1);
-    transition:
-      transform 0.15s ease,
-      border-color 0.15s,
-      background 0.15s;
+    transition: transform 0.15s ease;
   }
 
   &__icon {
