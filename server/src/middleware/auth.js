@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 
+import { config } from "../config/index.js";
+
 /**
  * Middleware d'authentification JWT
  * Vérifie le token et ajoute userId à req
@@ -18,7 +20,7 @@ export const authenticate = async (req, res, next) => {
     const token = authHeader.substring(7); // Enlever "Bearer "
 
     // Vérifier et décoder le token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, config.jwt.secret);
 
     // Ajouter l'userId et le rôle à la requête
     req.userId = decoded.userId;
@@ -55,13 +57,13 @@ export const optionalAuthenticate = async (req, res, next) => {
 
     if (authHeader && authHeader.startsWith("Bearer ")) {
       const token = authHeader.substring(7);
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, config.jwt.secret);
       req.userId = decoded.userId;
       req.userRole = decoded.role || "user";
     }
 
     next();
-  } catch (error) {
+  } catch {
     // En cas d'erreur, on continue sans userId
     next();
   }

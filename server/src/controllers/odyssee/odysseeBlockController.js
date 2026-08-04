@@ -17,7 +17,12 @@ export const getAllBlocks = async (req, res) => {
 
 export const getOneBlock = async (req, res) => {
   try {
-    const block = await OdysseeBlock.findById(req.params.id);
+    // Filtré sur userId : sans cela, tout utilisateur authentifié pouvait lire
+    // le bloc d'un autre en connaissant son identifiant (SEC-06).
+    const block = await OdysseeBlock.findOne({
+      _id: req.params.id,
+      userId: req.userId,
+    });
     if (!block || !block.isActive) {
       return res
         .status(404)

@@ -20,7 +20,7 @@ export const getColorPreferences = async (req, res) => {
       variables: Object.fromEntries(prefs.variables),
       defaults: Object.fromEntries(prefs.defaults),
     });
-  } catch (err) {
+  } catch {
     res
       .status(500)
       .json({
@@ -49,7 +49,7 @@ export const updateVariable = async (req, res) => {
     );
 
     res.json({ variables: Object.fromEntries(prefs.variables) });
-  } catch (err) {
+  } catch {
     res
       .status(500)
       .json({ error: "Erreur lors de la mise à jour de la variable." });
@@ -87,7 +87,7 @@ export const addToHistory = async (req, res) => {
     await prefs.save();
 
     res.json({ history: prefs.history });
-  } catch (err) {
+  } catch {
     res
       .status(500)
       .json({ error: "Erreur lors de la mise à jour de l'historique." });
@@ -115,7 +115,7 @@ export const setDefault = async (req, res) => {
     );
 
     res.json({ defaults: Object.fromEntries(prefs.defaults) });
-  } catch (err) {
+  } catch {
     res
       .status(500)
       .json({

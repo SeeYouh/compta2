@@ -143,6 +143,7 @@ export const getOneProduct = async (req, res) => {
   try {
     const product = await OdysseeProduct.findOne({
       _id: req.params.id,
+      userId: req.userId,
       isActive: true,
     });
 

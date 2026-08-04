@@ -1,6 +1,10 @@
 import express from "express";
 import multer from "multer";
 
+import {
+  accountFromBody,
+  requirePermission,
+} from "../../middleware/requirePermission.js";
 import { authenticate } from "../../middleware/auth.js";
 import {
   confirmImport,
@@ -29,10 +33,25 @@ const upload = multer({
 router.post("/parse", authenticate, upload.single("file"), parseCSV);
 
 // POST /api/import/preview — applique le mapping et détecte doublons/suggestions
-router.post("/preview", authenticate, upload.single("file"), previewCSV);
+// Lit les transactions existantes du compte pour détecter les doublons : exige
+// donc un droit de lecture sur ce compte.
+router.post(
+  "/preview",
+  authenticate,
+  upload.single("file"),
+  requirePermission("canViewTransactions", accountFromBody()),
+  previewCSV,
+);
 
 // POST /api/import/confirm — insère les transactions validées
-router.post("/confirm", authenticate, confirmImport);
+// Insère en masse dans le compte désigné par le corps : sans garde, on pouvait
+// injecter des transactions dans le compte d'autrui.
+router.post(
+  "/confirm",
+  authenticate,
+  requirePermission("canCreateTransactions", accountFromBody()),
+  confirmImport,
+);
 
 // GET  /api/import/mapping — récupère le mapping mémorisé
 router.get("/mapping", authenticate, getMapping);

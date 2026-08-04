@@ -5,6 +5,7 @@ import {
   AccountInvitation,
   SHARING_ROLES,
 } from "../../models/synapse/AccountInvitation.js";
+import { asyncHandler } from "../../utils/asyncHandler.js";
 import { checkAccountAccess } from "../../middleware/permissions.js";
 import {
   sendInvitationEmail,
@@ -13,7 +14,7 @@ import {
 import { User } from "../../models/User.js";
 
 // POST /api/sharing/:accountId/invite
-export const inviteUser = async (req, res) => {
+export const inviteUser = asyncHandler(async (req, res) => {
   const { accountId } = req.params;
   const { email, role } = req.body;
   const userId = req.userId;
@@ -109,10 +110,10 @@ export const inviteUser = async (req, res) => {
   }
 
   return res.status(201).json({ message: "Invitation envoyée" });
-};
+});
 
 // POST /api/sharing/invitations/:token/accept
-export const acceptInvitation = async (req, res) => {
+export const acceptInvitation = asyncHandler(async (req, res) => {
   const { token } = req.params;
   const userId = req.userId;
 
@@ -169,10 +170,10 @@ export const acceptInvitation = async (req, res) => {
   await invitation.save();
 
   return res.status(200).json({ message: "Invitation acceptée" });
-};
+});
 
 // POST /api/sharing/invitations/:token/decline
-export const declineInvitation = async (req, res) => {
+export const declineInvitation = asyncHandler(async (req, res) => {
   const { token } = req.params;
   const userId = req.userId;
 
@@ -198,10 +199,10 @@ export const declineInvitation = async (req, res) => {
   await invitation.save();
 
   return res.status(200).json({ message: "Invitation refusée" });
-};
+});
 
 // GET /api/sharing/:accountId/members
-export const getMembers = async (req, res) => {
+export const getMembers = asyncHandler(async (req, res) => {
   const { accountId } = req.params;
   const userId = req.userId;
 
@@ -234,10 +235,10 @@ export const getMembers = async (req, res) => {
     : [];
 
   return res.status(200).json({ members, pendingInvitations });
-};
+});
 
 // PATCH /api/sharing/:accountId/members/:memberId
-export const updateMemberRole = async (req, res) => {
+export const updateMemberRole = asyncHandler(async (req, res) => {
   const { accountId, memberId } = req.params;
   const { role } = req.body;
   const userId = req.userId;
@@ -271,10 +272,10 @@ export const updateMemberRole = async (req, res) => {
   await account.save();
 
   return res.status(200).json({ message: "Rôle mis à jour" });
-};
+});
 
 // DELETE /api/sharing/:accountId/members/:memberId
-export const removeMember = async (req, res) => {
+export const removeMember = asyncHandler(async (req, res) => {
   const { accountId, memberId } = req.params;
   const userId = req.userId;
 
@@ -304,10 +305,10 @@ export const removeMember = async (req, res) => {
   await account.save();
 
   return res.status(200).json({ message: "Membre retiré" });
-};
+});
 
 // GET /api/sharing/invitations/pending
-export const getPendingInvitations = async (req, res) => {
+export const getPendingInvitations = asyncHandler(async (req, res) => {
   const userId = req.userId;
   const user = await User.findOne({ id: userId });
 
@@ -342,10 +343,10 @@ export const getPendingInvitations = async (req, res) => {
   );
 
   return res.status(200).json({ invitations: enriched });
-};
+});
 
 // DELETE /api/sharing/:accountId/invitations/:token (révoquer une invitation pending)
-export const revokeInvitation = async (req, res) => {
+export const revokeInvitation = asyncHandler(async (req, res) => {
   const { accountId, token } = req.params;
   const userId = req.userId;
 
@@ -374,7 +375,7 @@ export const revokeInvitation = async (req, res) => {
   await invitation.save();
 
   return res.status(200).json({ message: "Invitation révoquée" });
-};
+});
 
 // Utilitaire : déduire le rôle à partir des permissions stockées
 function resolveRoleFromPermissions(permissions) {

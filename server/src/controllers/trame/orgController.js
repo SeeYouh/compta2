@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
+import { asyncHandler } from "../../utils/asyncHandler.js";
 import { OrgCanvas } from "../../models/trame/OrgCanvas.js";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -34,7 +35,7 @@ async function deleteCanvasRecursive(userId, canvasId) {
 
 // ─── Canvas ───────────────────────────────────────────────────────────────────
 
-export async function getAllCanvases(req, res) {
+export const getAllCanvases = asyncHandler(async (req, res) => {
   const userId = req.userId;
   await getRootCanvas(userId);
 
@@ -47,9 +48,9 @@ export async function getAllCanvases(req, res) {
   }
 
   res.json({ canvases: result });
-}
+});
 
-export async function createCanvas(req, res) {
+export const createCanvas = asyncHandler(async (req, res) => {
   const userId = req.userId;
   const { parentNodeId } = req.body;
 
@@ -74,9 +75,9 @@ export async function createCanvas(req, res) {
   );
 
   res.status(201).json(canvas.toJSON());
-}
+});
 
-export async function deleteCanvas(req, res) {
+export const deleteCanvas = asyncHandler(async (req, res) => {
   const userId = req.userId;
   const { id } = req.params;
 
@@ -97,9 +98,9 @@ export async function deleteCanvas(req, res) {
   await deleteCanvasRecursive(userId, id);
 
   res.json({ success: true });
-}
+});
 
-export async function updateViewport(req, res) {
+export const updateViewport = asyncHandler(async (req, res) => {
   const userId = req.userId;
   const { id } = req.params;
   const { viewport } = req.body;
@@ -113,9 +114,9 @@ export async function updateViewport(req, res) {
   }
 
   res.json({ success: true });
-}
+});
 
-export async function replaceCanvas(req, res) {
+export const replaceCanvas = asyncHandler(async (req, res) => {
   const userId = req.userId;
   const { id } = req.params;
   const { nodes, edges, viewport } = req.body;
@@ -131,11 +132,11 @@ export async function replaceCanvas(req, res) {
 
   await canvas.save();
   res.json({ success: true });
-}
+});
 
 // ─── Nodes ────────────────────────────────────────────────────────────────────
 
-export async function createNode(req, res) {
+export const createNode = asyncHandler(async (req, res) => {
   const userId = req.userId;
   const { canvasId, position, data } = req.body;
 
@@ -168,9 +169,9 @@ export async function createNode(req, res) {
   canvas.nodes.push(node);
   await canvas.save();
   res.status(201).json(node);
-}
+});
 
-export async function updateNode(req, res) {
+export const updateNode = asyncHandler(async (req, res) => {
   const userId = req.userId;
   const { id } = req.params;
   const { canvasId, ...updates } = req.body;
@@ -199,9 +200,9 @@ export async function updateNode(req, res) {
 
   await canvas.save();
   res.json(node.toObject());
-}
+});
 
-export async function deleteNode(req, res) {
+export const deleteNode = asyncHandler(async (req, res) => {
   const userId = req.userId;
   const { id } = req.params;
   const { canvasId } = req.body;
@@ -225,11 +226,11 @@ export async function deleteNode(req, res) {
 
   await canvas.save();
   res.json({ success: true });
-}
+});
 
 // ─── Edges ────────────────────────────────────────────────────────────────────
 
-export async function createEdge(req, res) {
+export const createEdge = asyncHandler(async (req, res) => {
   const userId = req.userId;
   const { canvasId, source, target, sourceHandle, targetHandle } = req.body;
 
@@ -257,9 +258,9 @@ export async function createEdge(req, res) {
   canvas.edges.push(edge);
   await canvas.save();
   res.status(201).json(edge);
-}
+});
 
-export async function deleteEdge(req, res) {
+export const deleteEdge = asyncHandler(async (req, res) => {
   const userId = req.userId;
   const { id } = req.params;
   const { canvasId } = req.body;
@@ -276,4 +277,4 @@ export async function deleteEdge(req, res) {
   canvas.edges = canvas.edges.filter((e) => e.id !== id);
   await canvas.save();
   res.json({ success: true });
-}
+});

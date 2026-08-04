@@ -143,6 +143,7 @@ export const getOneItem = async (req, res) => {
   try {
     const item = await PassengerItem.findOne({
       _id: req.params.id,
+      userId: req.userId,
       isActive: true,
     });
 

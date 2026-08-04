@@ -2,6 +2,8 @@ import { fileURLToPath } from "url";
 import multer from "multer";
 import path from "path";
 
+import { safeFilename } from "../utils/safeFilename.js";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -16,9 +18,11 @@ const storage = multer.diskStorage({
     callback(null, path.join(__dirname, "../../odyssee-images"));
   },
   filename: (req, file, callback) => {
-    const name = file.originalname.split(" ").join("_");
+    // safeFilename neutralise la traversée de chemin : l'ancien traitement ne
+    // remplaçait que les espaces, laissant passer "../" (SEC-07).
+    const name = safeFilename(file.originalname);
     const extension = MIME_TYPES[file.mimetype];
-    callback(null, name + Date.now() + "." + extension);
+    callback(null, `${name}-${Date.now()}.${extension}`);
   },
 });
 

@@ -14,6 +14,7 @@ import {
 } from './middleware/errorHandler.js';
 import { OdysseeProduct } from './models/odyssee/OdysseeProduct.js';
 import { OdysseeProductFolder } from './models/odyssee/OdysseeProductFolder.js';
+import { requestId } from './middleware/requestId.js';
 import routes from './routes/index.js';
 
 // Configuration pour ES Modules
@@ -68,11 +69,41 @@ const limiter = rateLimit({
 });
 app.use("/api/", limiter);
 
+// Limiteur dédié à l'authentification (SEC-10).
+// Le limiteur global partage son budget avec tout le trafic applicatif légitime :
+// le régler assez bas pour freiner une attaque par force brute pénaliserait
+// l'usage normal. Deux limiteurs, deux objectifs.
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true, // seules les tentatives ratées comptent
+  handler: (req, res) => {
+    console.warn(
+      `[${req.id ?? "sans-id"}] Limite d'authentification atteinte — ${req.ip} sur ${req.originalUrl}`,
+    );
+    res.status(429).json({
+      error: "Trop de tentatives d'authentification, réessayez dans 15 minutes",
+      requestId: req.id ?? null,
+    });
+  },
+});
+
+// Identifiant de corrélation — posé avant tout le reste pour que les journaux
+// d'erreur et les réponses puissent s'y référer.
+app.use(requestId);
+
 // Body parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
+app.use("/api/auth/forgot-password", authLimiter);
+app.use("/api/auth/reset-password", authLimiter);
+app.use("/api/auth/resend-verification", authLimiter);
 app.use("/api", routes);
 
 // Servir les images Odyssée (toujours actif)
@@ -136,6 +167,12 @@ server.on("error", (err) => {
   } else {
     throw err;
   }
+});
+
+// Filet de sécurité : toute promesse rejetée qui échappe aux handlers enveloppés
+// par asyncHandler est journalisée au lieu de disparaître silencieusement.
+process.on("unhandledRejection", (reason) => {
+  console.error("❌ Promesse rejetée non gérée:", reason);
 });
 
 // Gestion de l'arrêt propre

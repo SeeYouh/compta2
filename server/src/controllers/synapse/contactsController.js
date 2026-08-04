@@ -1,9 +1,10 @@
 import { Account } from "../../models/synapse/Account.js";
+import { asyncHandler } from "../../utils/asyncHandler.js";
 import { Contact } from "../../models/synapse/Contact.js";
 import { User } from "../../models/User.js";
 
 // GET /api/contacts
-export const getContacts = async (req, res) => {
+export const getContacts = asyncHandler(async (req, res) => {
   const contacts = await Contact.find({ ownerId: req.userId }).sort({
     name: 1,
   });
@@ -45,10 +46,10 @@ export const getContacts = async (req, res) => {
   );
 
   return res.status(200).json(enriched);
-};
+});
 
 // POST /api/contacts
-export const addContact = async (req, res) => {
+export const addContact = asyncHandler(async (req, res) => {
   const { email, name } = req.body;
 
   if (!email || !name) {
@@ -80,10 +81,10 @@ export const addContact = async (req, res) => {
   });
 
   return res.status(201).json(contact.toJSON());
-};
+});
 
 // PATCH /api/contacts/:id
-export const updateContact = async (req, res) => {
+export const updateContact = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { name, email } = req.body;
 
@@ -109,10 +110,10 @@ export const updateContact = async (req, res) => {
 
   await contact.save();
   return res.status(200).json(contact.toJSON());
-};
+});
 
 // DELETE /api/contacts/:id
-export const deleteContact = async (req, res) => {
+export const deleteContact = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   const contact = await Contact.findOne({ id, ownerId: req.userId });
@@ -122,4 +123,4 @@ export const deleteContact = async (req, res) => {
 
   await contact.deleteOne();
   return res.status(200).json({ message: "Contact supprimé" });
-};
+});

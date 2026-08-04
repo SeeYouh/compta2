@@ -13,9 +13,13 @@ const TRANSFER_THEME_ID = "theme-compte-transfer";
  * Synchronise le thème "Compte" dans tous les comptes non-template
  * Crée/met à jour les sous-thèmes pour pointer vers les autres comptes
  */
-async function syncAccountTransferThemes() {
+async function syncAccountTransferThemes(userId) {
   try {
-    const accounts = await Account.find({ isTemplate: false });
+    // Périmètre STRICT : les comptes accessibles à CET utilisateur.
+    // Auparavant `Account.find({ isTemplate: false })` balayait la base entière et
+    // injectait dans chaque compte un sous-thème portant le NOM de tous les autres
+    // comptes existants — y compris ceux d'autres utilisateurs (SEC-05).
+    const accounts = await getUserAccounts(userId);
 
     // Si un seul compte, supprimer le thème "Compte" partout (inutile)
     if (accounts.length <= 1) {
@@ -177,7 +181,7 @@ export const createAccount = async (req, res) => {
     await Theme.insertMany(newThemes);
 
     // Synchroniser le thème "Compte" dans tous les comptes
-    await syncAccountTransferThemes();
+    await syncAccountTransferThemes(req.userId);
 
     res.status(201).json({
       account: newAccount,
@@ -231,7 +235,7 @@ export const updateAccount = async (req, res) => {
 
     // Si le nom a changé, synchroniser le thème "Compte" partout
     if (nameChanged) {
-      await syncAccountTransferThemes();
+      await syncAccountTransferThemes(req.userId);
     }
 
     res.json(account);
@@ -280,7 +284,7 @@ export const deleteAccount = async (req, res) => {
     await Account.deleteOne({ id });
 
     // Synchroniser le thème "Compte" dans tous les comptes restants
-    await syncAccountTransferThemes();
+    await syncAccountTransferThemes(req.userId);
 
     res.json({
       message: "Compte supprimé avec succès",

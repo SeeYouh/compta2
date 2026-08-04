@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 
+import { config } from "../config/index.js";
 import {
   sendPasswordResetEmail,
   sendVerificationEmail,
@@ -113,9 +114,9 @@ export const login = async (req, res) => {
     // Générer le token JWT
     const token = jwt.sign(
       { userId: user.id, role: user.role || "user" },
-      process.env.JWT_SECRET,
+      config.jwt.secret,
       {
-        expiresIn: process.env.JWT_EXPIRES_IN,
+        expiresIn: config.jwt.expiresIn,
       },
     );
 
@@ -184,9 +185,9 @@ export const verifyEmail = async (req, res) => {
     // Générer le token JWT pour connexion automatique
     const jwtToken = jwt.sign(
       { userId: user.id, role: user.role || "user" },
-      process.env.JWT_SECRET,
+      config.jwt.secret,
       {
-        expiresIn: process.env.JWT_EXPIRES_IN,
+        expiresIn: config.jwt.expiresIn,
       },
     );
 

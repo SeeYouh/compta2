@@ -1,3 +1,4 @@
+import { detail, detailFields } from "../../utils/errorDetail.js";
 import { getUserAccounts } from "../../middleware/permissions.js";
 import { Theme } from "../../models/synapse/Theme.js";
 
@@ -40,10 +41,16 @@ export const updateAllThemes = async (req, res) => {
       return res.status(400).json({ error: "Format de données invalide" });
     }
 
-    // Supprimer tous les thèmes existants
-    await Theme.deleteMany({});
+    // Périmètre STRICT : les comptes réellement accessibles à l'appelant.
+    // Auparavant `deleteMany({})` vidait la collection entière — un seul appel par
+    // n'importe quel utilisateur authentifié détruisait les thèmes de TOUS les
+    // comptes de TOUS les utilisateurs (SEC-03).
+    const accounts = await getUserAccounts(req.userId);
+    const accountIds = accounts.map((acc) => acc.id);
 
-    // Créer les nouveaux thèmes
+    // L'accountId fourni par le client n'est jamais suivi aveuglément : tout thème
+    // visant un compte hors périmètre est rejeté, sans quoi on pourrait écrire dans
+    // le compte d'autrui.
     const themesToInsert = Object.values(themesObject).map((theme) => ({
       id: theme.id,
       accountId: theme.accountId,
@@ -52,10 +59,29 @@ export const updateAllThemes = async (req, res) => {
       subThemes: new Map(Object.entries(theme.subThemes || {})),
     }));
 
+    const horsPerimetre = themesToInsert.filter(
+      (t) => !accountIds.includes(t.accountId),
+    );
+    if (horsPerimetre.length > 0) {
+      return res.status(403).json({
+        error: detail(
+          "Accès refusé : certains thèmes visent un compte non accessible",
+          "Accès refusé",
+        ),
+        ...detailFields({
+          comptesRefuses: [...new Set(horsPerimetre.map((t) => t.accountId))],
+          comptesAutorises: accountIds,
+        }),
+      });
+    }
+
+    await Theme.deleteMany({ accountId: { $in: accountIds } });
     await Theme.insertMany(themesToInsert);
 
-    // Récupérer et renvoyer les thèmes mis à jour
-    const updatedThemes = await Theme.find({});
+    // On ne renvoie que les thèmes du périmètre — jamais la collection entière.
+    const updatedThemes = await Theme.find({
+      accountId: { $in: accountIds },
+    });
     const result = {};
     updatedThemes.forEach((theme) => {
       result[theme.id] = theme.toJSON();

@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
+import { asyncHandler } from "../../utils/asyncHandler.js";
 import { CsvMapping } from "../../models/synapse/CsvMapping.js";
 import { Transaction } from "../../models/synapse/Transaction.js";
 
@@ -150,7 +151,7 @@ function extractFromRow(row, headers, mapping) {
  * Reçoit un fichier CSV via multipart/form-data (champ "file").
  * Retourne : séparateur, colonnes, aperçu 5 premières lignes, mapping sauvegardé.
  */
-export const parseCSV = async (req, res) => {
+export const parseCSV = asyncHandler(async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "Aucun fichier fourni." });
   }
@@ -168,14 +169,14 @@ export const parseCSV = async (req, res) => {
   const savedMapping = await CsvMapping.findOne({ userId: req.userId }).lean();
 
   res.json({ separator, headers, preview, savedMapping: savedMapping || null });
-};
+});
 
 /**
  * POST /api/import/preview
  * Reçoit : CSV + mapping + accountId.
  * Retourne : lignes parsées avec statut (doublon, suggestion thème).
  */
-export const previewCSV = async (req, res) => {
+export const previewCSV = asyncHandler(async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "Aucun fichier fourni." });
   }
@@ -253,14 +254,14 @@ export const previewCSV = async (req, res) => {
   });
 
   res.json({ rows: parsed });
-};
+});
 
 /**
  * POST /api/import/confirm
  * Reçoit un tableau de transactions enrichies (themeId, subThemeId, payment).
  * Insère en masse dans Transaction.
  */
-export const confirmImport = async (req, res) => {
+export const confirmImport = asyncHandler(async (req, res) => {
   const { transactions, accountId } = req.body;
 
   if (!accountId) {
@@ -291,22 +292,22 @@ export const confirmImport = async (req, res) => {
   await Transaction.insertMany(docs, { ordered: false });
 
   res.status(201).json({ imported: docs.length });
-};
+});
 
 /**
  * GET /api/import/mapping
  * Retourne le mapping CSV sauvegardé pour l'utilisateur courant.
  */
-export const getMapping = async (req, res) => {
+export const getMapping = asyncHandler(async (req, res) => {
   const mapping = await CsvMapping.findOne({ userId: req.userId }).lean();
   res.json(mapping || null);
-};
+});
 
 /**
  * POST /api/import/mapping
  * Sauvegarde (upsert) le mapping CSV de l'utilisateur courant.
  */
-export const saveMapping = async (req, res) => {
+export const saveMapping = asyncHandler(async (req, res) => {
   const {
     separator,
     colDate,
@@ -334,4 +335,4 @@ export const saveMapping = async (req, res) => {
   );
 
   res.json(doc);
-};
+});
