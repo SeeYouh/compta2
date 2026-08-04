@@ -1,4 +1,5 @@
 @use "../utils/variable" as *;
+@use "../utils/animations" as *;
 
 .auth-page {
   min-height: 100vh;
@@ -31,10 +32,6 @@
   }
 
   &__card {
-    --border-w: #{$card-border-width}; // largeur visuelle de la bordure animée
-    --border-softness: #{$card-border-softness};
-    /* angle de départ pour calibrer l'animation */
-    --a-start: #{$border-start-angle};
     background: color-mix(
       in srgb,
       var(--color-surface) calc($card-background-opacity * 100%),
@@ -48,87 +45,10 @@
       0 4px 6px var(--color-primary-alpha-10),
       0 10px 25px var(--color-primary-alpha-15);
     border: 1px solid var(--color-border);
-    position: relative;
     overflow: visible;
 
-    /* Bordure animée avec deux comètes opposées */
-    &::after {
-      content: "";
-      position: absolute;
-      /* overlay à l'intérieur du card, on garde la bordure visible */
-      inset: 0;
-      border-radius: 24px;
-      padding: var(--border-w);
-      box-sizing: border-box;
-      pointer-events: none;
-      z-index: 3;
-
-      /* on reprend le style linéaire (teinte centrale), mais sous forme d'un segment conique
-         pour qu'il parcours tout le pourtour comme une lueur linéaire */
-      /* Deux bordures superposées : une principale et une opposée (180deg de décalage) */
-      background:
-        conic-gradient(
-          from calc(var(--a-start, 0deg) + var(--a, 0deg) + 180deg),
-          transparent 0deg,
-          transparent calc($border-trail-length * 0.2),
-          color-mix(in srgb, var(--color-primary-200) 19%, transparent)
-            calc($border-trail-length * 0.4),
-          color-mix(in srgb, var(--color-primary-300) 32%, transparent)
-            calc($border-trail-length * 0.48),
-          color-mix(in srgb, var(--color-primary-400) 48%, transparent)
-            calc($border-trail-length * 0.56),
-          color-mix(in srgb, var(--color-primary-500) 64%, transparent)
-            calc($border-trail-length * 0.64),
-          var(--color-primary-500) calc($border-trail-length * 0.72),
-          color-mix(in srgb, var(--color-primary-500) 64%, transparent)
-            calc($border-trail-length * 0.8),
-          color-mix(in srgb, var(--color-primary-400) 48%, transparent)
-            calc($border-trail-length * 0.88),
-          color-mix(in srgb, var(--color-primary-300) 32%, transparent)
-            calc($border-trail-length * 0.96),
-          color-mix(in srgb, var(--color-primary-200) 19%, transparent)
-            calc($border-trail-length * 1.04),
-          transparent calc($border-trail-length * 1.2),
-          transparent 100%
-        ),
-        conic-gradient(
-          from calc(var(--a-start, 0deg) + var(--a, 0deg)),
-          transparent 0deg,
-          transparent calc($border-trail-length * 0.2),
-          color-mix(in srgb, var(--color-primary-200) 19%, transparent)
-            calc($border-trail-length * 0.4),
-          color-mix(in srgb, var(--color-primary-300) 32%, transparent)
-            calc($border-trail-length * 0.48),
-          color-mix(in srgb, var(--color-primary-400) 48%, transparent)
-            calc($border-trail-length * 0.56),
-          color-mix(in srgb, var(--color-primary-500) 64%, transparent)
-            calc($border-trail-length * 0.64),
-          var(--color-primary-500) calc($border-trail-length * 0.72),
-          color-mix(in srgb, var(--color-primary-500) 64%, transparent)
-            calc($border-trail-length * 0.8),
-          color-mix(in srgb, var(--color-primary-400) 48%, transparent)
-            calc($border-trail-length * 0.88),
-          color-mix(in srgb, var(--color-primary-300) 32%, transparent)
-            calc($border-trail-length * 0.96),
-          color-mix(in srgb, var(--color-primary-200) 19%, transparent)
-            calc($border-trail-length * 1.04),
-          transparent calc($border-trail-length * 1.2),
-          transparent 100%
-        );
-
-      /* masque pour ne garder que la bande intérieure (padding) et masquer le centre */
-      -webkit-mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-      mask-composite: exclude;
-
-      transform-origin: 50% 50%;
-      animation: borderSpin $border-animation-duration linear infinite;
-    }
+    /* Bordure animée « comète » — voir utils/_animations.scss */
+    @include animated-border();
   }
 
   &__header {
@@ -488,23 +408,6 @@
   }
   75% {
     transform: translateX(10px);
-  }
-}
-
-/* Déclaration de la propriété animable pour l'angle du gradient */
-@property --a {
-  syntax: "<angle>";
-  initial-value: 0deg;
-  inherits: false;
-}
-
-/* Animation qui change la variable --a pour faire tourner le gradient autour */
-@keyframes borderSpin {
-  from {
-    --a: 0deg;
-  }
-  to {
-    --a: 1turn;
   }
 }
 

@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import ConfirmationModal from "../../../../components/ConfirmationModal";
 import TrashCard from "../../components/TrashCard";
 import TrashService from "../../../../services/trashService";
-import { useOdysseeColor } from "../../contexts/OdysseeColorContext.jsx";
+import { useOdysseeColor } from "../../contexts/useOdysseeColor";
 
 const Settings = () => {
   const { colors } = useOdysseeColor();

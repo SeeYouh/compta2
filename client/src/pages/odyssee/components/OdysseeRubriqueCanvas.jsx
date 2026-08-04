@@ -11,7 +11,14 @@ const DRAFT_TTL = 10 * 60 * 1000;
 function saveDraft(data) {
   try {
     localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...data, savedAt: Date.now() }));
-  } catch {}
+  } catch (error) {
+    // On n'interrompt pas l'édition — mais l'échec doit être visible.
+    // Causes usuelles : quota localStorage dépassé, navigation privée.
+    console.warn(
+      "[OdysseeRubriqueCanvas] Échec de sauvegarde du brouillon — l'édition continue, mais aucune restauration ne sera possible :",
+      error,
+    );
+  }
 }
 
 function loadDraft() {
@@ -24,7 +31,14 @@ function loadDraft() {
       return null;
     }
     return data;
-  } catch {
+  } catch (error) {
+    // Brouillon illisible (JSON corrompu, format obsolète). On le purge pour ne
+    // pas rejouer l'échec à chaque montage, et on trace la cause.
+    console.warn(
+      "[OdysseeRubriqueCanvas] Brouillon illisible, purgé :",
+      error,
+    );
+    localStorage.removeItem(DRAFT_KEY);
     return null;
   }
 }
@@ -122,6 +136,9 @@ const OdysseeRubriqueCanvas = forwardRef(({ onSaved, initialBlock }, ref) => {
     if (draft.rows) setRows(draft.rows);
     if (draft.sourceType) setSourceType(draft.sourceType);
     if (draft.fieldPlacements?.length) setFieldPlacements(draft.fieldPlacements);
+  // Restauration du brouillon au montage uniquement — le garde `initialBlock`
+  // en début d'effet suffit à couvrir le mode édition.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Auto-save to localStorage — désactivé en mode édition
@@ -132,7 +149,7 @@ const OdysseeRubriqueCanvas = forwardRef(({ onSaved, initialBlock }, ref) => {
       saveDraft({ name, columns, rows, fieldPlacements, sourceType });
     }, 500);
     return () => clearTimeout(timer);
-  }, [name, columns, rows, fieldPlacements, sourceType]);
+  }, [initialBlock, name, columns, rows, fieldPlacements, sourceType]);
 
   // ─── Resize listeners (active only while resizing) ────────────────────────
   useEffect(() => {

@@ -1,0 +1,120 @@
+// ============================================
+// ANIMATIONS RÉUTILISABLES
+// ============================================
+
+@use "sass:string";
+@use "./variable" as *;
+
+// ─── Bordure animée « comète » ────────────────────────────────────────────────
+//
+// Deux comètes opposées (180° de décalage) parcourent le pourtour de l'élément.
+// Technique : un ::after rempli de deux conic-gradient, masqué pour ne laisser
+// visible que sa bande de padding — ce qui simule une bordure.
+//
+// Usage SCSS :
+//   .mon-element { @include animated-border(); }
+//   .mon-element { @include animated-border($width: 3px, $duration: 15s); }
+//
+// Usage direct en JSX :
+//   <div className="animated-border">…</div>
+//
+// Notes :
+//  - Le mixin pose `position: relative` sur l'hôte. Si l'élément doit être
+//    positionné autrement, déclarer sa propre `position` APRÈS le @include.
+//  - Le `border-radius` de la bordure est hérité de l'hôte : aucun réglage à
+//    dupliquer, y compris dans les media queries.
+
+/* Angle animable — une instance indépendante par élément (inherits: false) */
+@property --border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes borderSpin {
+  from {
+    --border-angle: 0deg;
+  }
+  to {
+    --border-angle: 1turn;
+  }
+}
+
+/// Construit une des deux comètes coniques.
+/// @param {Angle}  $offset      - Décalage angulaire de la comète (0deg ou 180deg)
+/// @param {Number} $trail       - Longueur de la traînée, en % du tour complet
+/// @param {Angle}  $start-angle - Angle de départ, pour calibrer la position initiale
+/// @param {Color}  $peak        - Couleur du cœur de la comète
+/// @param {Color}  $soft        - Couleur des extrémités de la traînée
+@function comet-gradient($offset, $trail, $start-angle, $peak, $soft) {
+  @return string.unquote(
+    "conic-gradient(" +
+      "from calc(#{$start-angle} + var(--border-angle, 0deg) + #{$offset}), " +
+      "transparent 0deg, " +
+      "transparent #{$trail * 0.2}, " +
+      "color-mix(in srgb, #{$soft} 19%, transparent) #{$trail * 0.4}, " +
+      "color-mix(in srgb, #{$soft} 32%, transparent) #{$trail * 0.48}, " +
+      "color-mix(in srgb, #{$peak} 48%, transparent) #{$trail * 0.56}, " +
+      "color-mix(in srgb, #{$peak} 64%, transparent) #{$trail * 0.64}, " +
+      "#{$peak} #{$trail * 0.72}, " +
+      "color-mix(in srgb, #{$peak} 64%, transparent) #{$trail * 0.8}, " +
+      "color-mix(in srgb, #{$peak} 48%, transparent) #{$trail * 0.88}, " +
+      "color-mix(in srgb, #{$soft} 32%, transparent) #{$trail * 0.96}, " +
+      "color-mix(in srgb, #{$soft} 19%, transparent) #{$trail * 1.04}, " +
+      "transparent #{$trail * 1.2}, " +
+      "transparent 100%" + ")"
+  );
+}
+
+/// Bordure animée « comète ».
+/// @param {Length} $width       - Épaisseur de la bordure
+/// @param {Time}   $duration    - Durée d'un tour complet
+/// @param {Number} $trail       - Longueur de la traînée, en % du tour complet
+/// @param {Angle}  $start-angle - Angle de départ
+/// @param {Color}  $peak        - Couleur du cœur — contrastée dans les 2 thèmes
+/// @param {Color}  $soft        - Couleur des extrémités — contrastée dans les 2 thèmes
+/// @param {Number} $z-index     - Empilement du ::after
+@mixin animated-border(
+  $width: $border-animation-width,
+  $duration: $border-animation-duration,
+  $trail: $border-trail-length,
+  $start-angle: $border-start-angle,
+  $peak: var(--color-darkest),
+  $soft: var(--color-darker),
+  $z-index: 3
+) {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: $width;
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: $z-index;
+
+    background:
+      comet-gradient(180deg, $trail, $start-angle, $peak, $soft),
+      comet-gradient(0deg, $trail, $start-angle, $peak, $soft);
+
+    /* Ne conserve que la bande de padding : le centre est découpé */
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+
+    transform-origin: 50% 50%;
+    animation: borderSpin $duration linear infinite;
+  }
+}
+
+/* Classe utilitaire — applicable directement via className */
+.animated-border {
+  @include animated-border();
+}

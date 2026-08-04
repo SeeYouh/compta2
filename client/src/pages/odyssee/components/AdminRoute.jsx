@@ -18,6 +18,7 @@ const AdminRoute = ({ children }) => {
           setIsAdmin(false);
         }
       } catch (error) {
+        console.error("AdminRoute — échec de la vérification des droits :", error);
         setIsAdmin(false);
       } finally {
         setIsLoading(false);

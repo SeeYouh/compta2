@@ -18,7 +18,8 @@ const countryPreferencesService = {
       if (!res.ok) throw new Error(data.error || "Erreur serveur");
       return { success: true, countries: data.countries };
     } catch (error) {
-      return { success: false, countries: [] };
+      console.error("countryPreferencesService.getFrequent :", error);
+      return { success: false, error: error.message, countries: [] };
     }
   },
 
@@ -33,7 +34,8 @@ const countryPreferencesService = {
       if (!res.ok) throw new Error(data.error || "Erreur serveur");
       return { success: true, countries: data.countries };
     } catch (error) {
-      return { success: false };
+      console.error("countryPreferencesService.addFrequent :", error);
+      return { success: false, error: error.message };
     }
   },
 
@@ -47,7 +49,8 @@ const countryPreferencesService = {
       if (!res.ok) throw new Error(data.error || "Erreur serveur");
       return { success: true, countries: data.countries };
     } catch (error) {
-      return { success: false };
+      console.error("countryPreferencesService.removeFrequent :", error);
+      return { success: false, error: error.message };
     }
   },
 };

@@ -9,7 +9,7 @@ import {
 } from '../config/documentGrid';
 import { computeColorPalette, DEFAULT_COLOR } from '../../../utils/colorPalette';
 import { useColorPreferences } from '../../../components/hooks/useColorPreferences';
-import { useOdysseeColor } from '../contexts/OdysseeColorContext';
+import { useOdysseeColor } from '../contexts/useOdysseeColor';
 import OdysseeCanvas from './OdysseeCanvas';
 import OdysseeRubriqueCanvas from './OdysseeRubriqueCanvas';
 import SaveStatus from './SaveStatus';
@@ -388,6 +388,8 @@ const OdysseeItem = ({
       });
       setBindings(enriched);
     });
+  // Chargement au montage uniquement.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -420,6 +422,8 @@ const OdysseeItem = ({
         })),
       );
     });
+  // Chargement au montage uniquement.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleModeChange = (newMode) => {

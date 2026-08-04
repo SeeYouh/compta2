@@ -13,7 +13,7 @@ import ProductService from "../services/productService";
 import Range14 from "./Range14";
 import RangeDays from "./RangeDays";
 import { useColorPreferences } from "../../../components/hooks/useColorPreferences";
-import { useOdysseeColor } from "../contexts/OdysseeColorContext.jsx";
+import { useOdysseeColor } from "../contexts/useOdysseeColor";
 
 function buildProductStyles(c, id) {
   return `

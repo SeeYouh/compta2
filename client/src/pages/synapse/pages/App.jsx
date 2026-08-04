@@ -7,7 +7,8 @@ import { APP_LABELS, TABLE_HEADERS } from "../utils";
 import AppShell from "../components/AppShell";
 import BalanceCalculator from "../components/BalanceCalculator";
 import ChartsDashboard from "../components/ChartsDashboard";
-import ColorPickerButton from "../components/ColorPickerButton";
+import AppColorPickerButton from "../../../components/AppColorPickerButton";
+import { useSynapseColorContext } from "../contexts/useSynapseColorContext";
 import ConfirmationModal from "../../../components/ConfirmationModal";
 import DrawerThemeManager from "../components/DrawerThemeManager";
 import { enrichTransactions } from "../utils/themeResolver";
@@ -41,6 +42,7 @@ import YearTabs from "../components/filters/YearTabs";
 
 const App = () => {
   const navigate = useNavigate();
+  const { color: appColor, updateColor } = useSynapseColorContext();
   const {
     transactions: rawTransactions,
     add,
@@ -253,15 +255,15 @@ const App = () => {
   return (
     <AppShell
       headerRight={
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <ColorPickerButton />
-          <UserMenu
-            menuItems={[
-              { label: "Paramètres", onClick: () => navigate("/synapse/settings") },
-              { label: "Import CSV", onClick: () => navigate("/synapse/import") },
-            ]}
-          />
-        </div>
+        <UserMenu
+          colorPickerButton={
+            <AppColorPickerButton color={appColor} onChange={updateColor} />
+          }
+          menuItems={[
+            { label: "Paramètres", onClick: () => navigate("/synapse/settings") },
+            { label: "Import CSV", onClick: () => navigate("/synapse/import") },
+          ]}
+        />
       }
       accountTabs={<AccountTabs />}
       lastUpdateText={lastUpdateText}

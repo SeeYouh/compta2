@@ -13,13 +13,11 @@ import PendingInvitations from "./pages/PendingInvitations";
 import ProjectionsSettings from "./pages/ProjectionsSettings";
 import SettingsPage from "./pages/SettingsPage";
 import { SynapseColorProvider } from "./contexts/SynapseColorContext";
-import ThemeInjector from "./components/ThemeInjector";
 import { ThemesProvider } from "./contexts/ThemesContext";
 
 export default function SynapseDashboard() {
   return (
     <SynapseColorProvider>
-      <ThemeInjector />
       <LabelsProvider>
         <AccountsProvider>
           <ThemesProvider>

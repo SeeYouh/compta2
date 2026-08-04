@@ -57,6 +57,9 @@ export function useAuth() {
     return () => {
       cancelled = true;
     };
+  // Effet de montage : vérifie l'authentification une seule fois. `logout` est
+  // recréé à chaque rendu — l'ajouter relancerait l'appel API en boucle.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const logout = () => {

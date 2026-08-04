@@ -1,45 +1,13 @@
 import { useRef, useState } from "react";
 
 import { FONT_DEFINITIONS } from "../config/fontDefinitions";
+import { cssFromFormat, DEFAULT_FIELD_FORMAT } from "../utils/fieldFormat";
 
-// Formatage par champ de Rubrique (MODE_TEMPLATE).
-// La source de vérité est un objet plat fieldFormat — pas de rich text, pas de
-// sélection, pas de curseur. La toolbar agit sur la totalité du champ.
-// cssFromFormat()      → styles CSS inline (rendu browser)
-// fieldFormatToHtml()  → HTML sémantique déterministe (rendu PDF)
+// Toolbar de formatage d'un champ de Rubrique (MODE_TEMPLATE).
+// Les helpers de format (DEFAULT_FIELD_FORMAT, cssFromFormat, fieldFormatToHtml)
+// vivent dans ../utils/fieldFormat.js.
 
 const FONT_SIZES = ["8px", "10px", "12px", "14px", "16px", "18px", "24px"];
-
-export const DEFAULT_FIELD_FORMAT = {
-  bold: false,
-  italic: false,
-  underline: false,
-  align: "left",
-  fontFamily: "Inter",
-  fontSize: "12px",
-};
-
-export function cssFromFormat(format) {
-  const f = { ...DEFAULT_FIELD_FORMAT, ...format };
-  return {
-    fontWeight: f.bold ? "bold" : "normal",
-    fontStyle: f.italic ? "italic" : "normal",
-    textDecoration: f.underline ? "underline" : "none",
-    textAlign: f.align,
-    fontFamily: f.fontFamily,
-    fontSize: f.fontSize,
-  };
-}
-
-export function fieldFormatToHtml(value, format) {
-  const f = { ...DEFAULT_FIELD_FORMAT, ...format };
-  let inner = value;
-  if (f.underline) inner = `<u>${inner}</u>`;
-  if (f.italic) inner = `<em>${inner}</em>`;
-  if (f.bold) inner = `<strong>${inner}</strong>`;
-  const style = `text-align:${f.align};font-family:${f.fontFamily};font-size:${f.fontSize}`;
-  return `<p style="${style}">${inner}</p>`;
-}
 
 // ─── OdysseeFieldEditor ───────────────────────────────────────────────────────
 

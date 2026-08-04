@@ -2,8 +2,11 @@ import './Dashboard.scss';
 
 import { useNavigate } from 'react-router-dom';
 
-import AnimatedBackground from '../components/AnimatedBackground';
+import AppColorPickerButton from '../components/AppColorPickerButton';
+import { useAppColor } from '../components/hooks/useAppColor';
+import { useAppTheme } from '../components/hooks/useAppTheme';
 import { useDocumentTitle } from '../components/hooks/useDocumentTitle';
+import { DEFAULT_COLOR } from '../utils/colorPalette';
 import UserMenu from '../components/UserMenu';
 
 const apps = [
@@ -78,18 +81,27 @@ const apps = [
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  useDocumentTitle("Accueil");
+  useDocumentTitle("Accueil", "JSi");
+
+  const { color, updateColor } = useAppColor({
+    contextKey: 'portal-primary',
+    storageKey: 'portalColor',
+    defaultColor: DEFAULT_COLOR,
+  });
+  useAppTheme({ styleId: 'portal-theme', color });
 
   return (
     <div className="dashboard-page">
-      <AnimatedBackground />
-
       <header className="dashboard-header">
         <div className="dashboard-header__brand">
-          <span className="dashboard-header__logo">S</span>
-          <span className="dashboard-header__name">Synapse</span>
+          <span className="dashboard-header__logo">J</span>
+          <span className="dashboard-header__name">JSi</span>
         </div>
-        <UserMenu />
+        <UserMenu
+          colorPickerButton={
+            <AppColorPickerButton color={color} onChange={updateColor} />
+          }
+        />
       </header>
 
       <main className="dashboard-main">

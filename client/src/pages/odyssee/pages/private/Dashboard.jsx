@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 
 import { Link, useNavigate } from "react-router-dom";
 
-import { applyThemeColors } from "../../config/themeColors";
+import AppColorPickerButton from "../../../../components/AppColorPickerButton";
+import { useAppColor } from "../../../../components/hooks/useAppColor";
+import { useAppTheme } from "../../../../components/hooks/useAppTheme";
+import { DEFAULT_COLOR } from "../../../../utils/colorPalette";
 import CatalogContent from "../../components/CatalogContent";
 import CategoryForm from "../../components/CategoryForm";
 import { categoryLibrary } from "../../utils/variable";
@@ -201,9 +204,12 @@ const Dashboard = () => {
   );
   const currentEngine = engines[selectedCategoryLibrary];
 
-  useEffect(() => {
-    applyThemeColors();
-  }, []);
+  const { color: appColor, updateColor } = useAppColor({
+    contextKey: 'odyssee-primary',
+    storageKey: 'odysseeColor',
+    defaultColor: DEFAULT_COLOR,
+  });
+  useAppTheme({ styleId: 'odyssee-theme', color: appColor, scope: '.odyssee-root' });
 
   useEffect(() => {
     passengersEngine.setSelectedFileData(null);
@@ -235,6 +241,9 @@ const Dashboard = () => {
           </Link>
           <UserMenu
             align="right"
+            colorPickerButton={
+              <AppColorPickerButton color={appColor} onChange={updateColor} />
+            }
             menuItems={[
               {
                 label: "⚙️ Paramètres",

@@ -57,6 +57,9 @@ const Gear = ({ dataTimeRotateGear, setDataTimeRotateGear }) => {
       setDataTimeRotateGear(dataTimeRotateAllGear);
     };
     calcTimeRotateGear();
+  // Calcul unique au montage. L'effet écrit `dataTimeRotateGear` via son setter :
+  // ajouter ces dépendances créerait une boucle de rendu infinie.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const timeRotateGreatGear = dataTimeRotateGear.timeRotateGear + "s";

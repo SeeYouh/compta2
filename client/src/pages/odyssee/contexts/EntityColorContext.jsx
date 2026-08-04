@@ -1,17 +1,16 @@
-import {
-  createContext,
-  useContext,
-  useMemo,
-} from 'react';
+import { useMemo } from 'react';
 
 import { computeColorPalette } from '../../../utils/colorPalette.js';
-import { useOdysseeColor } from './OdysseeColorContext.jsx';
-
-const EntityColorContext = createContext(null);
+import { EntityColorContext } from './createEntityColorContext';
+import { useOdysseeColor } from './useOdysseeColor';
 
 /**
  * Fournit une palette de couleurs spécifique à une entité (produit, passager, etc.).
  * Si l'entité n'a pas de couleur propre, utilise la palette globale de l'Odyssée.
+ *
+ * ⚠️ Ce provider n'est branché nulle part. L'expression qu'il factorise est écrite
+ * à l'identique dans OdysseeItem, PaperProduct et PassagerItem. Sort en attente
+ * d'arbitrage — voir DUP-03 dans AUDIT_2.md.
  */
 export function EntityColorProvider({ color, children }) {
   const { colors: themeColors } = useOdysseeColor();
@@ -25,8 +24,4 @@ export function EntityColorProvider({ color, children }) {
       {children}
     </EntityColorContext.Provider>
   );
-}
-
-export function useEntityColor() {
-  return useContext(EntityColorContext);
 }

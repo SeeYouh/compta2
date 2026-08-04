@@ -1,18 +1,19 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { computeColorPalette, DEFAULT_COLOR } from '../../../utils/colorPalette.js';
 import { useColorPreferences } from "../../../components/hooks/useColorPreferences.js";
+import { OdysseeColorContext } from "./createOdysseeColorContext";
 
 export const ODYSSEE_THEME_KEY = "odyssee-theme";
 
-const OdysseeColorContext = createContext(null);
+
 
 /**
  * Génère le CSS global pour tous les éléments d'interface de l'Odyssée.
  * Injecte les variables CSS scoped à .odyssee-root (pas de pollution de :root)
  * ET les règles concrètes pour les composants de layout.
  */
-export function buildOdysseeGlobalStyles(c) {
+function buildOdysseeGlobalStyles(c) {
   return `
     /* ─── Variables CSS scoped à .odyssee-root ─── */
     .odyssee-root {
@@ -107,6 +108,3 @@ export function OdysseeColorProvider({
   );
 }
 
-export function useOdysseeColor() {
-  return useContext(OdysseeColorContext);
-}

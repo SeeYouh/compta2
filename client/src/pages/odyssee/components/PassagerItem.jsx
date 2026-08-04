@@ -20,7 +20,7 @@ import { passengersItemService } from "../services/passengersServices";
 import SidebarCategoryItem from "./SidebarCategoryItem";
 import SidebarFolderItem from "./SidebarFolderItem";
 import { useColorPreferences } from "../../../components/hooks/useColorPreferences";
-import { useOdysseeColor } from "../contexts/OdysseeColorContext.jsx";
+import { useOdysseeColor } from "../contexts/useOdysseeColor";
 import { useSidebarDnd } from "../hooks/useSidebarDnd";
 import { useSidebarIndicator } from "../hooks/useSidebarIndicator";
 
@@ -564,6 +564,10 @@ const PassagerItem = ({
         return passengersItemService.updateInfoSuppLayout(productId, items);
       },
     }),
+    // `getDefault` provient du composant parent et n'est pas mémoïsé : l'ajouter
+  // recréerait ce useMemo à chaque rendu, annulant son intérêt. À revoir si le
+  // parent stabilise sa référence.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [productId],
   );
 

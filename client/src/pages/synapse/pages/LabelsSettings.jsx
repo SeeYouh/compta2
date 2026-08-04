@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import AppShell from "../components/AppShell";
+import ConfirmationModal from "../../../components/ConfirmationModal";
 import Loader from "../../../components/Loader";
 import { useLabels } from "../hooks/useLabels";
 
@@ -16,6 +17,7 @@ export default function LabelsSettings() {
   const [resetting, setResetting] = useState(false);
   const [message, setMessage] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isResetModalOpen, setIsResetModalOpen] = useState(false);
 
   useEffect(() => {
     if (rawLabels) {
@@ -39,6 +41,7 @@ export default function LabelsSettings() {
       await saveLabels(formData);
       setMessage({ type: "success", text: "Labels sauvegardés avec succès" });
     } catch (err) {
+      console.error("LabelsSettings — échec de la sauvegarde :", err);
       setMessage({ type: "error", text: "Erreur lors de la sauvegarde" });
     } finally {
       setSaving(false);
@@ -46,14 +49,7 @@ export default function LabelsSettings() {
   };
 
   const handleReset = async () => {
-    if (
-      !window.confirm(
-        "Êtes-vous sûr de vouloir réinitialiser tous les labels aux valeurs par défaut ?",
-      )
-    ) {
-      return;
-    }
-
+    setIsResetModalOpen(false);
     setResetting(true);
     setMessage(null);
 
@@ -64,6 +60,7 @@ export default function LabelsSettings() {
         text: "Labels réinitialisés avec succès",
       });
     } catch (err) {
+      console.error("LabelsSettings — échec de la réinitialisation :", err);
       setMessage({ type: "error", text: "Erreur lors de la réinitialisation" });
     } finally {
       setResetting(false);
@@ -234,7 +231,7 @@ export default function LabelsSettings() {
           <button
             type="button"
             className="labels-settings__reset-btn"
-            onClick={handleReset}
+            onClick={() => setIsResetModalOpen(true)}
             disabled={resetting || saving}
           >
             {resetting ? "Réinitialisation..." : "Réinitialiser tout"}
@@ -285,6 +282,15 @@ export default function LabelsSettings() {
           </div>
         </form>
       </div>
+
+      <ConfirmationModal
+        isOpen={isResetModalOpen}
+        onConfirm={handleReset}
+        onCancel={() => setIsResetModalOpen(false)}
+        title="Réinitialiser les labels"
+        message="Tous les labels seront remis à leurs valeurs par défaut. Cette action est irréversible."
+        confirmText="Réinitialiser"
+      />
     </AppShell>
   );
 }

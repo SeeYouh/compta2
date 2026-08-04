@@ -1,5 +1,4 @@
 // src/components/AppShell.jsx
-import React from "react";
 
 import { motion } from "framer-motion";
 

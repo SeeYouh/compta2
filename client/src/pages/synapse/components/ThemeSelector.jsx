@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import styles from "../sass/components/ThemeSelector.module.scss";
 import { useThemes } from "../contexts/useThemes";
@@ -6,7 +6,6 @@ import { useThemes } from "../contexts/useThemes";
 const ThemeSelector = ({ value, onChange }) => {
   // value attendu : { theme: themeId, subTheme: subThemeId }
   const {
-    themes,
     getThemeName,
     getSubThemeName,
     getThemesArray,

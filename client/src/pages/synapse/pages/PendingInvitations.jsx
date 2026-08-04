@@ -49,6 +49,8 @@ export default function PendingInvitations() {
 
   useEffect(() => {
     loadInvitations();
+  // Chargement au montage uniquement.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleAccept = async (token) => {

@@ -66,7 +66,7 @@ export const useSettings = () => {
         console.error(API_ERRORS.updatePeriodFilter, error);
       }
     },
-    [settings],
+    [],
   );
 
   return {

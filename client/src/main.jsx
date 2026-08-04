@@ -1,27 +1,24 @@
 import "./sass/index.scss";
 
-import { lazy, StrictMode, Suspense } from "react";
+import { StrictMode } from "react";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 
 import AcceptInvitation from "./pages/auth/AcceptInvitation";
-import Dashboard from "./pages/Dashboard";
+import { ErrorBoundary, NotFound, RouteError } from "./components/ErrorScreen";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import Login from "./pages/auth/Login";
 import { odysseeDashboardLoader } from "./pages/odyssee/loaders/odysseeDashboardLoader";
-import ProtectedRoute from "./components/ProtectedRoute";
+import {
+  ProtectedDashboard,
+  ProtectedOdyssee,
+  ProtectedSynapse,
+  ProtectedTrame,
+} from "./components/ProtectedPages";
 import Register from "./pages/auth/Register";
 import ResetPassword from "./pages/auth/ResetPassword";
 import VerifyEmail from "./pages/auth/VerifyEmail";
-
-const TramePage = lazy(() => import("./pages/trame/TramePage.jsx"));
-const OdysseeDashboard = lazy(
-  () => import("./pages/odyssee/OdysseeDashboard.jsx"),
-);
-const SynapseDashboard = lazy(
-  () => import("./pages/synapse/SynapseDashboard.jsx"),
-);
 
 function initTheme() {
   const stored = localStorage.getItem("theme");
@@ -38,63 +35,41 @@ function initTheme() {
 initTheme();
 
 const container = document.getElementById("root");
+
+// `window.__reactRoot` : garde-fou de rechargement à chaud. En développement, Vite
+// peut ré-exécuter ce module ; sans ce cache, `createRoot` serait appelé une seconde
+// fois sur le même conteneur, ce que React refuse. À supprimer si le rechargement à
+// chaud cesse de ré-exécuter le point d'entrée.
 const root = window.__reactRoot ?? (window.__reactRoot = createRoot(container));
 
 const router = createBrowserRouter([
-  { path: "/login", element: <Login /> },
-  { path: "/register", element: <Register /> },
-  { path: "/verify-email", element: <VerifyEmail /> },
-  { path: "/forgot-password", element: <ForgotPassword /> },
-  { path: "/reset-password", element: <ResetPassword /> },
-  { path: "/accept-invitation", element: <AcceptInvitation /> },
-  {
-    path: "/",
-    element: (
-      <ProtectedRoute>
-        <Dashboard />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/synapse/*",
-    element: (
-      <ProtectedRoute>
-        <Suspense fallback={null}>
-          <SynapseDashboard />
-        </Suspense>
-      </ProtectedRoute>
-    ),
-  },
+  { path: "/login", Component: Login, errorElement: <RouteError /> },
+  { path: "/register", Component: Register, errorElement: <RouteError /> },
+  { path: "/verify-email", Component: VerifyEmail, errorElement: <RouteError /> },
+  { path: "/forgot-password", Component: ForgotPassword, errorElement: <RouteError /> },
+  { path: "/reset-password", Component: ResetPassword, errorElement: <RouteError /> },
+  { path: "/accept-invitation", Component: AcceptInvitation, errorElement: <RouteError /> },
+  { path: "/", Component: ProtectedDashboard, errorElement: <RouteError /> },
+  { path: "/synapse/*", Component: ProtectedSynapse, errorElement: <RouteError /> },
   {
     path: "/odyssee/*",
     loader: odysseeDashboardLoader,
     hydrateFallbackElement: (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--color-bg, #f5f5f5)' }}>
-        <p style={{ color: 'var(--color-text, #333)' }}>Chargement...</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--color-lightness, #f5f5f5)' }}>
+        <p style={{ color: 'var(--color-darkest, #333)' }}>Chargement...</p>
       </div>
     ),
-    element: (
-      <ProtectedRoute>
-        <Suspense fallback={null}>
-          <OdysseeDashboard />
-        </Suspense>
-      </ProtectedRoute>
-    ),
+    Component: ProtectedOdyssee,
+    errorElement: <RouteError />,
   },
-  {
-    path: "/trame",
-    element: (
-      <ProtectedRoute>
-        <Suspense fallback={null}>
-          <TramePage />
-        </Suspense>
-      </ProtectedRoute>
-    ),
-  },
+  { path: "/trame", Component: ProtectedTrame, errorElement: <RouteError /> },
+  { path: "*", Component: NotFound },
 ]);
 
 root.render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <ErrorBoundary>
+      <RouterProvider router={router} />
+    </ErrorBoundary>
   </StrictMode>,
 );

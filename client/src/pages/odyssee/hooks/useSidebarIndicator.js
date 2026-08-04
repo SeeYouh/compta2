@@ -31,7 +31,6 @@ export const useSidebarIndicator = ({
 
   const findFolderByFolderId = useCallback(
     (id) => folders.find((f) => folderId(f) === id),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [folders],
   );
 
@@ -106,6 +105,9 @@ export const useSidebarIndicator = ({
       }
       setIndicatorY(snapY);
     },
+    // `getItemColor` est optionnel et fourni par l'appelant sans mémoïsation :
+  // l'ajouter recréerait ce callback à chaque rendu du parent.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [sidebarRef, findFolderByCatId, findFolderByFolderId],
   );
 

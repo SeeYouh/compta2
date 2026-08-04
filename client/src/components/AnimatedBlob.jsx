@@ -11,7 +11,7 @@ const DEFAULT_BLUR = 50;
 /** Opacité du blob (0–1) */
 const DEFAULT_OPACITY = 0.5;
 /** Couleur CSS du blob */
-const DEFAULT_COLOR = "var(--color-neutral-200)";
+const DEFAULT_COLOR = "var(--color-dark)";
 /** Durée minimale d'une transition de morphing en secondes */
 const MORPH_DURATION_MIN = 2;
 /** Durée maximale d'une transition de morphing en secondes */

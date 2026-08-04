@@ -1,5 +1,6 @@
 import { CATALOGUE_FIELDS, PASSENGER_FIELDS } from '../config/fieldDefinitions';
-import OdysseeFieldEditor, { cssFromFormat } from './OdysseeFieldEditor';
+import { cssFromFormat } from '../utils/fieldFormat';
+import OdysseeFieldEditor from './OdysseeFieldEditor';
 
 function resolvePath(obj, path) {
   const normalized = path.startsWith('contentFilesData.')

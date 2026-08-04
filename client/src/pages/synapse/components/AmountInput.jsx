@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import styles from "../sass/components/AmountInput.module.scss";
 
@@ -13,7 +13,6 @@ const AmountInput = ({ value, defaultValue = "", onChange, ...rest }) => {
       const v = value === null || value === undefined ? "" : String(value);
       setLocal(v);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, isControlled]);
 
   const normalize = (v) => (v ?? "").replace(",", ".");

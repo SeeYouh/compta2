@@ -8,7 +8,7 @@ import FolderContextMenu from "./FolderContextMenu";
 import FolderSettingsModal from "./FolderSettingsModal";
 import IconLibrary from "../assets/IconLibrary";
 import SidebarTooltip from "./SidebarTooltip";
-import { useOdysseeColor } from "../contexts/OdysseeColorContext.jsx";
+import { useOdysseeColor } from "../contexts/useOdysseeColor";
 
 const CatalogContent = ({ engine, labels, isCompact }) => {
   const {

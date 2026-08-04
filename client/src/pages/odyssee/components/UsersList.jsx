@@ -29,6 +29,7 @@ const UsersList = () => {
         setUsers([]);
       }
     } catch (err) {
+      console.error("UsersList — échec du chargement des utilisateurs :", err);
       setError("Erreur lors du chargement des utilisateurs");
       setUsers([]);
     } finally {
@@ -38,6 +39,10 @@ const UsersList = () => {
 
   useEffect(() => {
     fetchUsers(currentPage, searchTerm);
+  // Volontaire : on ne recharge que sur changement de page. `searchTerm` est
+  // soumis explicitement via handleSearch — l'ajouter déclencherait une requête
+  // à chaque frappe.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
 
   const handleSearch = (e) => {
